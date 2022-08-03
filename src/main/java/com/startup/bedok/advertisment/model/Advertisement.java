@@ -1,17 +1,13 @@
 package com.startup.bedok.advertisment.model;
 
-import com.startup.bedok.helper.model.*;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Getter
-@Setter
-@RequiredArgsConstructor
+@NoArgsConstructor
+@Data
 public class Advertisement {
 
     @Id
@@ -20,7 +16,6 @@ public class Advertisement {
     private Long hostId;
     private String postCode;
     private String hostStreet;
-    private int roomId;
     @OneToMany
     private List<RoomPhoto> roomPhotosUrl;
     private String roomDescription;
@@ -30,20 +25,43 @@ public class Advertisement {
     private List<Price> priceList;
     private boolean sharedBeds;
     private String language;
-    @OneToMany
-    private List<RoomEquipment> roomEquipment;
-    @OneToMany
+    @ElementCollection(targetClass = RoomEquipment.class)
+    @JoinTable(name = "advertisement", joinColumns = @JoinColumn(name = "id"))
+    @Column(name = "room", nullable = false)
+    @Enumerated(EnumType.STRING)    private List<RoomEquipment> roomEquipment;
+    @ElementCollection(targetClass = SharedEquipment.class)
+    @JoinTable(name = "advertisement", joinColumns = @JoinColumn(name = "id"))
+    @Column(name = "shared", nullable = false)
+    @Enumerated(EnumType.STRING)
     private List<SharedEquipment> sharedEquipment;
-    @ManyToMany
+    @ElementCollection(targetClass = PaymentType.class)
+    @JoinTable(name = "advertisement", joinColumns = @JoinColumn(name = "id"))
+    @Column(name = "paymentType", nullable = false)
+    @Enumerated(EnumType.STRING)
     private List<PaymentType> paymentType;
-    @OneToMany
-    private List<RentalRules> RentalRulesObject;
+    @ElementCollection(targetClass = RentalRules.class)
+    @JoinTable(name = "advertisement", joinColumns = @JoinColumn(name = "id"))
+    @Column(name = "rules", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private List<RentalRules> rentalRulesObject;
 
-    public Advertisement(Long hostId, String postCode, String hostStreet, int roomId, List<RoomPhoto> roomPhotos, String roomDescription, String roomArea, String numBeds, List<Price> priceList, boolean sharedBeds, String language, List<RoomEquipment> roomEquipment, List<SharedEquipment> sharedEquipment, List<PaymentType> paymentType, List<RentalRules> rentalRulesObject) {
+    public Advertisement(Long hostId,
+                         String postCode,
+                         String hostStreet,
+                         List<String> roomPhotos,
+                         String roomDescription,
+                         String roomArea,
+                         String numBeds,
+                         List<Price> priceList,
+                         boolean sharedBeds,
+                         String language,
+                         List<RoomEquipment> roomEquipment,
+                         List<SharedEquipment> sharedEquipment,
+                         List<PaymentType> paymentType,
+                         List<RentalRules> rentalRulesObject) {
         this.hostId = hostId;
         this.postCode = postCode;
         this.hostStreet = hostStreet;
-        this.roomId = roomId;
         this.roomPhotosUrl = roomPhotosUrl;
         this.roomDescription = roomDescription;
         this.roomArea = roomArea;
@@ -54,6 +72,6 @@ public class Advertisement {
         this.roomEquipment = roomEquipment;
         this.sharedEquipment = sharedEquipment;
         this.paymentType = paymentType;
-        RentalRulesObject = rentalRulesObject;
+        this.rentalRulesObject = rentalRulesObject;
     }
 }

@@ -22,21 +22,17 @@ public class HostPhotoService {
         this.hostPhotoRepository = hostPhotoRepository;
     }
 
-    public String savePhoto(MultipartFile file, String hostName)  {
+    public String savePhoto(byte[] file, String hostName)  {
         HostPhoto photo = new HostPhoto(hostName);
-        try {
-            photo.setImage(
-                    new Binary(BsonBinarySubType.BINARY, file.getBytes()));
-        } catch (IOException e) {
-
-        }
+        photo.setImage(
+                new Binary(BsonBinarySubType.BINARY, file));
         photo = hostPhotoRepository.insert(photo);
         return photo.getId();
     }
 
-    public MultipartFile getHostPhoto(String id) {
+    public Binary getHostPhoto(String id) {
        if (hostPhotoRepository.findById(id).isPresent()) {
-          return (MultipartFile) hostPhotoRepository.findById(id).get().getImage();
+          return hostPhotoRepository.findById(id).get().getImage();
         }
        else
            return null;

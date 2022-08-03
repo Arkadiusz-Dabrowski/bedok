@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.GeneratedValue;
 
-@Document(collection = "hostPhoto")
+@Document(collection = "advertisementPhoto")
 @Setter
 @Getter
 @NoArgsConstructor

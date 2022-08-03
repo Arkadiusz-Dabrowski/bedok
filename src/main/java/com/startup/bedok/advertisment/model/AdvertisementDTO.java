@@ -1,6 +1,6 @@
 package com.startup.bedok.advertisment.model;
 
-import com.startup.bedok.helper.model.*;
+import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,21 +13,29 @@ import java.util.List;
 @Getter
 public class AdvertisementDTO {
 
+    @NotNull
     private Long hostId;
+    @NotNull
     private String postCode;
+    @NotNull
     private String hostStreet;
-    private int roomId;
+    @NotNull
     private List<MultipartFile> roomPhotos;
+
     private String roomDescription;
+    @NotNull
     private String roomArea;
+    @NotNull
     private String numBeds;
-    private List<Price> priceList;
+    @NotNull
+    private List<PriceDTO> priceList;
+    @NotNull
     private boolean sharedBeds;
+    @NotNull
     private String language;
     private List<RoomEquipment> roomEquipment;
     private List<SharedEquipment> sharedEquipment;
+    @NotNull
     private List<PaymentType> paymentType;
-    private List<RentalRules> RentalRulesObject;
-
-
+    private List<RentalRules> RentalRules;
 }

@@ -1,41 +1,34 @@
 package com.startup.bedok.host.controller;
 
-import com.startup.bedok.host.model.Host;
 import com.startup.bedok.host.model.HostDTO;
+import com.startup.bedok.host.model.HostResponse;
 import com.startup.bedok.host.service.HostPhotoService;
 import com.startup.bedok.host.service.HostService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.http.HttpResponse;
 
 @RestController
 @RequestMapping("host")
 @RequiredArgsConstructor
 public class HostController {
 
-    private HostService hostService;
-    private HostPhotoService hostPhotoService;
-
-    @Autowired
-    public HostController(HostService hostService, HostPhotoService hostPhotoService) {
-        this.hostService = hostService;
-        this.hostPhotoService = hostPhotoService;
-    }
+    private final HostService hostService;
+    private final HostPhotoService hostPhotoService;
 
     @PostMapping
-    private Long createHost(HostDTO hostDTO) {
-        Long id = hostService.createHost(hostDTO);
-        return id;
+    private ResponseEntity<Long> createHost(@Validated HostDTO hostDTO) throws IOException {
+        return ResponseEntity.ok(hostService.createHost(hostDTO));
     }
 
     @GetMapping
-    private HostDTO getHost(Long id) {
+    private HostResponse getHost(Long id) {
         return hostService.getHostByID(id);
     }
 

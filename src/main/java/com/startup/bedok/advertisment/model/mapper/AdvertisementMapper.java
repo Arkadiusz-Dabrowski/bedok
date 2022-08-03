@@ -2,30 +2,31 @@ package com.startup.bedok.advertisment.model.mapper;
 
 import com.startup.bedok.advertisment.model.Advertisement;
 import com.startup.bedok.advertisment.model.AdvertisementDTO;
-import com.startup.bedok.helper.model.RoomPhoto;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class AdvertisementMapper {
 
     public static AdvertisementDTO mapAdvertisementToAdvertisementDTO(Advertisement advertisement, List<MultipartFile> photos) {
         return new AdvertisementDTO(advertisement.getHostId(),
-                        advertisement.getPostCode(),
-                        advertisement.getHostStreet(),
-                advertisement.getRoomId(),
+                advertisement.getPostCode(),
+                advertisement.getHostStreet(),
                 photos,
                 advertisement.getRoomDescription(),
                 advertisement.getRoomArea(),
                 advertisement.getNumBeds(),
-                advertisement.getPriceList(),
+                advertisement.getPriceList().stream()
+                        .map(PriceMapper::mapPricetoPriceDTO)
+                        .collect(Collectors.toList()),
                 advertisement.isSharedBeds(),
                 advertisement.getLanguage(),
                 advertisement.getRoomEquipment(),
                 advertisement.getSharedEquipment(),
                 advertisement.getPaymentType(),
                 advertisement.getRentalRulesObject()
-                );
+        );
     }
 
 
@@ -34,18 +35,19 @@ public class AdvertisementMapper {
                 advertisementDTO.getHostId(),
                 advertisementDTO.getPostCode(),
                 advertisementDTO.getHostStreet(),
-                advertisementDTO.getRoomId(),
-                ,
+                photosId,
                 advertisementDTO.getRoomDescription(),
                 advertisementDTO.getRoomArea(),
                 advertisementDTO.getNumBeds(),
-                advertisementDTO.getPriceList(),
+                advertisementDTO.getPriceList().stream()
+                        .map(PriceMapper::mapPriceDTOtoPrice)
+                        .collect(Collectors.toList()),
                 advertisementDTO.isSharedBeds(),
                 advertisementDTO.getLanguage(),
                 advertisementDTO.getRoomEquipment(),
                 advertisementDTO.getSharedEquipment(),
                 advertisementDTO.getPaymentType(),
-                advertisementDTO.getRentalRulesObject()
+                advertisementDTO.getRentalRules()
         );
     }
 }

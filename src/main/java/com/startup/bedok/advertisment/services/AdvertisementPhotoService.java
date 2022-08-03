@@ -8,8 +8,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class AdvertisementPhotoService {
@@ -29,5 +30,11 @@ public class AdvertisementPhotoService {
             }
         });
         return photosID;
+    }
+
+    public List<AdvertisementPhoto> getPhotosByIds(List<String> ids){
+        List<AdvertisementPhoto> photos = new ArrayList<>();
+        ids.forEach(id -> photos.add(advertisementPhotoRepository.findById(id).get()));
+        return photos;
     }
 }

@@ -1,6 +1,7 @@
-package com.startup.bedok.helper.model;
+package com.startup.bedok.advertisment.model;
 
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import javax.persistence.Entity;
@@ -9,6 +10,7 @@ import javax.persistence.Id;
 
 @Entity
 @RequiredArgsConstructor
+@Getter
 public class RoomPhoto {
 
     @Id
