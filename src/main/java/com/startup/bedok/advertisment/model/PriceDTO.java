@@ -10,9 +10,9 @@ import lombok.Setter;
 @Setter
 public class PriceDTO {
     @NotNull
-    int rangeFrom;
+    Integer rangeFrom;
     @NotNull
-    int rangeTo;
+    Integer rangeTo;
     @NotNull
     double value;
 }

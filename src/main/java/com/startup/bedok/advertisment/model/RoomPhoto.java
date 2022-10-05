@@ -1,21 +1,25 @@
 package com.startup.bedok.advertisment.model;
 
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.util.UUID;
 
 @Entity
-@RequiredArgsConstructor
-@Getter
+@Data
+@NoArgsConstructor
 public class RoomPhoto {
 
     @Id
     @GeneratedValue
-    private Long id;
+    private UUID id;
     private String photoId;
 
+    public RoomPhoto(String photoId) {
+        this.photoId = photoId;
+    }
 }

@@ -6,17 +6,16 @@ import com.startup.bedok.host.model.Host;
 import com.startup.bedok.host.model.HostDTO;
 import com.startup.bedok.host.model.HostResponse;
 import com.startup.bedok.host.repository.HostRepository;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.Binary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.UUID;
 
 
 @Service
-@Getter
 @RequiredArgsConstructor
 public class HostService {
 
@@ -24,7 +23,7 @@ public class HostService {
     private final HostPhotoService hostPhotoService;
 
     @Transactional
-    public Long createHost(HostDTO hostDTO) throws IOException {
+    public UUID createHost(HostDTO hostDTO) throws IOException {
         try {
             String photoId = hostPhotoService.savePhoto(hostDTO.getHostPhoto().getBytes(),
                     hostDTO.getHostName());
@@ -36,9 +35,15 @@ public class HostService {
     }
 
 
-    public HostResponse getHostByID(Long id) {
-        Host host = hostRepository.getById(id);
+    public HostResponse getHostByID(UUID id) {
+        Host host = hostRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException(String.format("there is no host with uuid: '%s'", id)));
         Binary hostPhoto = hostPhotoService.getHostPhoto(host.getHostPhotoId());
-        return hostToHostResponse(host, hostPhoto.getData());
+        return hostToHostResponse(host, hostPhoto);
+    }
+
+    public void checkIfHostExists(UUID id) {
+        if(!hostRepository.existsById(id));
+        throw new RuntimeException(String.format("there is no host with uuid: '%s'", id));
     }
 }

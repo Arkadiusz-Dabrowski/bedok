@@ -1,21 +1,21 @@
 package com.startup.bedok.host.model;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.util.UUID;
 
 @Entity
-@Getter
 @NoArgsConstructor
+@Data
 public class Host {
 
     @Id
     @GeneratedValue
-    private Long id;
+    private UUID id;
 
     private String hostName;
     private String hostPassword;

@@ -1,35 +1,36 @@
 package com.startup.bedok.advertisment.model;
 
-import com.startup.bedok.host.model.HostResponse;
 import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.bson.types.Binary;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.UUID;
 
 @AllArgsConstructor
 @Setter
 @Getter
-public class AdvertisementDTO {
+public class AdvertisementRequest {
 
     @NotNull
-    private HostResponse host;
+    private UUID hostId;
     @NotNull
     private String postCode;
     @NotNull
     private String hostStreet;
     @NotNull
-    private List<Binary> roomPhotos;
+    private List<MultipartFile> roomPhotos;
 
     private String roomDescription;
-    @NotNull
+
     private Double roomArea;
     @NotNull
     private Integer numBeds;
     @NotNull
     private Integer usedBeds;
+    @NotNull
     private List<PriceDTO> priceList;
     @NotNull
     private Boolean sharedBeds;

@@ -5,7 +5,7 @@ import com.startup.bedok.advertisment.model.PriceDTO;
 
 public class PriceMapper {
 
-    public static Price mapPriceDTOtoPrice(PriceDTO priceDTO){
+    public static Price mapPriceDTOtoPrice(PriceDTO priceDTO) {
         return new Price(priceDTO.getRangeFrom(),
                 priceDTO.getRangeTo(),
                 priceDTO.getValue());

@@ -3,6 +3,7 @@ package com.startup.bedok.host.mapper;
 import com.startup.bedok.host.model.Host;
 import com.startup.bedok.host.model.HostDTO;
 import com.startup.bedok.host.model.HostResponse;
+import org.bson.types.Binary;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.security.SecureRandom;
@@ -19,7 +20,7 @@ public class HostMapperImpl {
         );
     }
 
-    static public HostResponse hostToHostResponse(Host host, byte[] hostPhoto) {
+    static public HostResponse hostToHostResponse(Host host, Binary hostPhoto) {
         return new HostResponse(
                 host.getHostName(),
                 host.getHostEmail(),

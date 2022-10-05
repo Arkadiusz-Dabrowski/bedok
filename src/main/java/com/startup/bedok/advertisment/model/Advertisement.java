@@ -1,9 +1,12 @@
 package com.startup.bedok.advertisment.model;
 
-import lombok.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @NoArgsConstructor
@@ -12,60 +15,68 @@ public class Advertisement {
 
     @Id
     @GeneratedValue
-    private Long id;
-    private Long hostId;
+    private UUID id;
+    private UUID hostId;
     private String postCode;
     private String hostStreet;
-    @OneToMany
-    private List<RoomPhoto> roomPhotosUrl;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "room_photo_id")
+    private List<RoomPhoto> roomPhotos;
     private String roomDescription;
-    private String roomArea;
-    private String numBeds;
-    @OneToMany
-    private List<Price> priceList;
-    private boolean sharedBeds;
-    private String language;
-    @ElementCollection(targetClass = RoomEquipment.class)
-    @JoinTable(name = "advertisement", joinColumns = @JoinColumn(name = "id"))
-    @Column(name = "room", nullable = false)
-    @Enumerated(EnumType.STRING)    private List<RoomEquipment> roomEquipment;
-    @ElementCollection(targetClass = SharedEquipment.class)
-    @JoinTable(name = "advertisement", joinColumns = @JoinColumn(name = "id"))
-    @Column(name = "shared", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private List<SharedEquipment> sharedEquipment;
-    @ElementCollection(targetClass = PaymentType.class)
-    @JoinTable(name = "advertisement", joinColumns = @JoinColumn(name = "id"))
-    @Column(name = "paymentType", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private List<PaymentType> paymentType;
-    @ElementCollection(targetClass = RentalRules.class)
-    @JoinTable(name = "advertisement", joinColumns = @JoinColumn(name = "id"))
-    @Column(name = "rules", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private List<RentalRules> rentalRulesObject;
+    private Double roomArea;
+    private int numBeds;
 
-    public Advertisement(Long hostId,
+    private int usedBeds;
+    @OneToMany
+    @JoinColumn(name = "price_id")
+    @Size(min = 1, max = 5)
+    private List<Price> priceList;
+    private Boolean sharedBeds;
+    private String language;
+
+    @ManyToMany
+    @JoinTable(name = "advertisement_room_equipment",
+            joinColumns = @JoinColumn(name = "advertisement_id"),
+            inverseJoinColumns = @JoinColumn(name = "environment_id"))
+    private List<Equipment> roomEquipment;
+
+    @ManyToMany
+    @JoinTable(name = "advertisement_shared_equipment",
+            joinColumns = @JoinColumn(name = "advertisement_id"),
+            inverseJoinColumns = @JoinColumn(name = "environment_id"))
+    private List<Equipment> sharedEquipment;
+
+    @ManyToMany
+    @JoinTable(name = "advertisement_payment_type",
+            joinColumns = @JoinColumn(name = "advertisement_id"),
+            inverseJoinColumns = @JoinColumn(name = "payment_type_id"))
+    private List<PaymentType> paymentType;
+
+    private String rentalRulesObject;
+
+    public Advertisement(UUID hostId,
                          String postCode,
                          String hostStreet,
-                         List<String> roomPhotos,
+                         List<RoomPhoto> roomPhotos,
                          String roomDescription,
-                         String roomArea,
-                         String numBeds,
+                         Double roomArea,
+                         Integer numBeds,
+                         Integer usedBeds,
                          List<Price> priceList,
-                         boolean sharedBeds,
+                         Boolean sharedBeds,
                          String language,
-                         List<RoomEquipment> roomEquipment,
-                         List<SharedEquipment> sharedEquipment,
+                         List<Equipment> roomEquipment,
+                         List<Equipment> sharedEquipment,
                          List<PaymentType> paymentType,
-                         List<RentalRules> rentalRulesObject) {
+                         String rentalRulesObject) {
         this.hostId = hostId;
         this.postCode = postCode;
         this.hostStreet = hostStreet;
-        this.roomPhotosUrl = roomPhotosUrl;
+        this.roomPhotos = roomPhotos;
         this.roomDescription = roomDescription;
         this.roomArea = roomArea;
         this.numBeds = numBeds;
+        this.usedBeds = usedBeds;
         this.priceList = priceList;
         this.sharedBeds = sharedBeds;
         this.language = language;

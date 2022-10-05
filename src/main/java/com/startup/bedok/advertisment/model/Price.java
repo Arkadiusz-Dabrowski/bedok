@@ -1,19 +1,19 @@
 package com.startup.bedok.advertisment.model;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.Data;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.util.UUID;
+
 @Entity
-@NoArgsConstructor
-@Getter
+@Data
 public class Price {
 
     @Id
     @GeneratedValue
-    private Long id;
+    private UUID id;
     private int rangeFrom;
     private int rangeTo;
     private double value;

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("host")
@@ -23,12 +24,12 @@ public class HostController {
     private final HostPhotoService hostPhotoService;
 
     @PostMapping
-    private ResponseEntity<Long> createHost(@Validated HostDTO hostDTO) throws IOException {
+    private ResponseEntity<UUID> createHost(@Validated HostDTO hostDTO) throws IOException {
         return ResponseEntity.ok(hostService.createHost(hostDTO));
     }
 
     @GetMapping
-    private HostResponse getHost(Long id) {
+    private HostResponse getHost(UUID id) {
         return hostService.getHostByID(id);
     }
 
