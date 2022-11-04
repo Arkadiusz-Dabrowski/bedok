@@ -43,7 +43,7 @@ public class HostService {
     }
 
     public void checkIfHostExists(UUID id) {
-        if(!hostRepository.existsById(id));
+        if(!hostRepository.existsById(id))
         throw new RuntimeException(String.format("there is no host with uuid: '%s'", id));
     }
 }

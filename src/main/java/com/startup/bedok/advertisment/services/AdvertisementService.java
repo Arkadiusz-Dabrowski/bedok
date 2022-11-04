@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.bson.types.Binary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,11 +30,10 @@ public class AdvertisementService {
     @Transactional
     public UUID createAdvertisement(AdvertisementRequest advertisementRequest) {
         hostService.checkIfHostExists(advertisementRequest.getHostId());
-        List<RoomPhoto> photosID = advertisementPhotoService.
-                saveAdvertisementPhotos(advertisementRequest.getRoomPhotos());
+
         List<Price> priceList = priceService.addPriceList(advertisementRequest.getPriceList());
         return advertisementRepository
-                .save(advertisementMapper.mapAdvertisementDTOToAdvertisement(advertisementRequest, photosID, priceList))
+                .save(advertisementMapper.mapAdvertisementDTOToAdvertisement(advertisementRequest, priceList))
                 .getId();
 
     }
@@ -70,5 +70,20 @@ public class AdvertisementService {
                                    advertisementPhoto.getImage(),
                                    hostResponse);})
                 .collect(Collectors.toList());
+    }
+
+    public String saveRoomPhotos(List<MultipartFile> photos, UUID advertisementId) {
+        List<RoomPhoto> roomPhotos = advertisementPhotoService.saveAdvertisementPhotos(photos);
+        return addPhotosToAdvertisement(roomPhotos, advertisementId);
+    }
+
+    @Transactional
+    private String addPhotosToAdvertisement(List<RoomPhoto> roomPhotos, UUID advertisementId){
+        advertisementRepository.findById(advertisementId)
+                .orElseThrow(() -> new RuntimeException(String.format("there is no Advertisement with uuid %s", advertisementId)))
+                .setRoomPhotos(roomPhotos);
+        if(advertisementRepository.getById(advertisementId).getRoomPhotos().size() > 0)
+            return " added";
+        return "fail";
     }
 }

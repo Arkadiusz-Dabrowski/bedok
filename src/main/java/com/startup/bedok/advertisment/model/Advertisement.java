@@ -20,15 +20,13 @@ public class Advertisement {
     private String postCode;
     private String hostStreet;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "room_photo_id")
     private List<RoomPhoto> roomPhotos;
     private String roomDescription;
     private Double roomArea;
     private int numBeds;
 
     private int usedBeds;
-    @OneToMany
-    @JoinColumn(name = "price_id")
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @Size(min = 1, max = 5)
     private List<Price> priceList;
     private Boolean sharedBeds;

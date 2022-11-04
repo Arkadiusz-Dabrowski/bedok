@@ -3,6 +3,7 @@ package com.startup.bedok.advertisment.model;
 import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,6 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Setter
 @Getter
+@NoArgsConstructor
 public class AdvertisementRequest {
 
     @NotNull
@@ -20,8 +22,6 @@ public class AdvertisementRequest {
     private String postCode;
     @NotNull
     private String hostStreet;
-    @NotNull
-    private List<MultipartFile> roomPhotos;
 
     private String roomDescription;
 
@@ -40,5 +40,5 @@ public class AdvertisementRequest {
     private List<String> roomEquipment;
     private List<String> sharedEquipment;
     private List<String> paymentType;
-    private List<String> RentalRules;
+    private List<String> rentalRules;
 }

@@ -11,7 +11,6 @@ import javax.persistence.ManyToMany;
 import java.util.List;
 
 @Entity
-@RequiredArgsConstructor
 @Getter
 @NoArgsConstructor
 public class PaymentType {
@@ -24,23 +23,8 @@ public class PaymentType {
     @ManyToMany(mappedBy = "paymentType")
     private List<Advertisement> advertisement;
 
-    public enum PaymentTypeEnum {
-        CACHE,
-        CARD,
-        BLIK;
-
-        public static String getPaymentTypeEnum(PaymentTypeEnum paymentTypeEnum) {
-            String value = "";
-            switch (paymentTypeEnum) {
-                case CACHE:
-                    value = "gotwka";
-                case BLIK:
-                    value = "blik";
-                case CARD:
-                    value = "karta";
-            }
-            return value;
-        }
-
+    public PaymentType(String code, String name) {
+        this.code = code;
+        this.name = name;
     }
 }

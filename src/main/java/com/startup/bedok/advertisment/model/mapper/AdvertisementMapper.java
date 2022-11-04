@@ -58,13 +58,12 @@ public class AdvertisementMapper {
 
 
     public Advertisement mapAdvertisementDTOToAdvertisement(AdvertisementRequest advertisementRequest,
-                                                            List<RoomPhoto> photos,
                                                             List<Price> priceList) {
         return new Advertisement(
                 advertisementRequest.getHostId(),
                 advertisementRequest.getPostCode(),
                 advertisementRequest.getHostStreet(),
-                photos,
+                null,
                 advertisementRequest.getRoomDescription(),
                 advertisementRequest.getRoomArea(),
                 advertisementRequest.getNumBeds(),
@@ -75,7 +74,14 @@ public class AdvertisementMapper {
                 equipmentService.getEquipmentsById(advertisementRequest.getRoomEquipment()),
                 equipmentService.getEquipmentsById(advertisementRequest.getSharedEquipment()),
                 paymentTypeService.getAllPaymentTypeById(advertisementRequest.getPaymentType()),
-                advertisementRequest.getRentalRules().toString()
+                addRentalRules(advertisementRequest.getRentalRules())
         );
+    }
+
+    private static String addRentalRules(List<String> rentalRules){
+        if(!rentalRules.isEmpty())
+        return String.join(",", rentalRules);
+
+        return "";
     }
 }
