@@ -3,6 +3,7 @@ package com.startup.bedok.advertisment.services;
 import com.startup.bedok.advertisment.model.*;
 import com.startup.bedok.advertisment.model.mapper.AdvertisementMapper;
 import com.startup.bedok.advertisment.repository.AdvertisementRepository;
+import com.startup.bedok.advertisment.repository.RoomPhotosRepository;
 import com.startup.bedok.host.model.HostResponse;
 import com.startup.bedok.host.service.HostService;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -26,6 +26,8 @@ public class AdvertisementService {
     private final AdvertisementMapper advertisementMapper;
     private final PriceService priceService;
     private final HostService hostService;
+
+    private final RoomPhotosRepository roomPhotosRepository;
 
     @Transactional
     public UUID createAdvertisement(AdvertisementRequest advertisementRequest) {
@@ -58,17 +60,17 @@ public class AdvertisementService {
     public List<AdvertisementShort> getAdvertisementsList() {
         return advertisementRepository.findAll().stream()
                 .map(advertisement -> {
-                    AdvertisementPhoto advertisementPhoto = advertisementPhotoService
-                            .getPhotoById(advertisement
-                                    .getRoomPhotos()
-                                    .get(0)
-                                    .getPhotoId());
                     HostResponse hostResponse = hostService
                             .getHostByID(advertisement.getHostId());
-                   return advertisementMapper
-                           .mapAdvertisementToAdvertisementShort(advertisement,
-                                   advertisementPhoto.getImage(),
-                                   hostResponse);})
+                    RoomPhoto mainPhoto = null;
+                    if (!advertisement.getRoomPhotos().isEmpty())
+                        mainPhoto = advertisement.getRoomPhotos().get(0);
+
+                    AdvertisementPhoto advertisementPhoto = advertisementPhotoService
+                            .getPhotoById(mainPhoto.getPhotoId());
+
+                    return advertisementMapper.mapAdvertisementToAdvertisementShort(advertisement, advertisementPhoto.getImage(), hostResponse);
+                })
                 .collect(Collectors.toList());
     }
 
@@ -77,11 +79,12 @@ public class AdvertisementService {
         return addPhotosToAdvertisement(roomPhotos, advertisementId);
     }
 
-    @Transactional
     private String addPhotosToAdvertisement(List<RoomPhoto> roomPhotos, UUID advertisementId){
-        advertisementRepository.findById(advertisementId)
-                .orElseThrow(() -> new RuntimeException(String.format("there is no Advertisement with uuid %s", advertisementId)))
-                .setRoomPhotos(roomPhotos);
+        roomPhotosRepository.saveAll(roomPhotos);
+        Advertisement advertisement = advertisementRepository.findById(advertisementId)
+                .orElseThrow(() -> new RuntimeException(String.format("there is no Advertisement with uuid %s", advertisementId)));
+        advertisement.getRoomPhotos().addAll(roomPhotos);
+        advertisementRepository.save(advertisement);
         if(advertisementRepository.getById(advertisementId).getRoomPhotos().size() > 0)
             return " added";
         return "fail";

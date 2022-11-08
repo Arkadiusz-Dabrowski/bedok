@@ -4,7 +4,9 @@ import com.startup.bedok.host.model.Host;
 import com.startup.bedok.host.model.HostDTO;
 import com.startup.bedok.host.model.HostResponse;
 import org.bson.types.Binary;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.security.SecureRandom;
 

@@ -33,9 +33,14 @@ public class AdvertisementPhotoService {
             }
 
         }).collect(Collectors.toList());
-             List<String> photosID = advertisementPhotoRepository.saveAll(advertisementPhotos).stream().map(photo -> photo.getId()).collect(Collectors.toList());
+             List<String> photosID = advertisementPhotoRepository.saveAll(advertisementPhotos)
+                     .stream()
+                     .map(AdvertisementPhoto::getId)
+                     .toList();
 
-        return photosID.stream().map(RoomPhoto::new).collect(Collectors.toList());
+        return photosID.stream()
+                .map(RoomPhoto::new)
+                .toList();
     }
 
     public List<AdvertisementPhoto> getPhotosByIds(List<String> ids) {

@@ -8,6 +8,7 @@ import com.startup.bedok.host.model.HostResponse;
 import com.startup.bedok.host.repository.HostRepository;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.Binary;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,12 +26,15 @@ public class HostService {
     @Transactional
     public UUID createHost(HostDTO hostDTO) throws IOException {
         try {
-            String photoId = hostPhotoService.savePhoto(hostDTO.getHostPhoto().getBytes(),
-                    hostDTO.getHostName());
+            String photoId = null;
+            if(hostDTO.getHostPhoto() != null) {
+                photoId = hostPhotoService.savePhoto(hostDTO.getHostPhoto().getBytes(),
+                        hostDTO.getHostName());
+            }
             Host host = hostDTOtoHost(hostDTO, photoId);
             return hostRepository.save(host).getId();
         } catch (IOException ioException) {
-            throw new IOException("fail");
+            throw new IOException("Error during host creation", ioException.getCause());
         }
     }
 

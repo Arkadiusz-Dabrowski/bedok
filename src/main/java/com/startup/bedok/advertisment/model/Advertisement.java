@@ -19,14 +19,14 @@ public class Advertisement {
     private UUID hostId;
     private String postCode;
     private String hostStreet;
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(orphanRemoval = true)
     private List<RoomPhoto> roomPhotos;
     private String roomDescription;
     private Double roomArea;
     private int numBeds;
 
     private int usedBeds;
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(orphanRemoval = true)
     @Size(min = 1, max = 5)
     private List<Price> priceList;
     private Boolean sharedBeds;
