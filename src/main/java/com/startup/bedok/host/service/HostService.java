@@ -1,19 +1,20 @@
 package com.startup.bedok.host.service;
 
-import static com.startup.bedok.host.mapper.HostMapperImpl.hostDTOtoHost;
-import static com.startup.bedok.host.mapper.HostMapperImpl.hostToHostResponse;
 import com.startup.bedok.host.model.Host;
 import com.startup.bedok.host.model.HostDTO;
 import com.startup.bedok.host.model.HostResponse;
 import com.startup.bedok.host.repository.HostRepository;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.Binary;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.UUID;
+
+import static com.startup.bedok.host.mapper.HostMapperImpl.hostDTOtoHost;
+import static com.startup.bedok.host.mapper.HostMapperImpl.hostToHostResponse;
 
 
 @Service
@@ -22,6 +23,7 @@ public class HostService {
 
     private final HostRepository hostRepository;
     private final HostPhotoService hostPhotoService;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public UUID createHost(HostDTO hostDTO) throws IOException {
@@ -31,7 +33,7 @@ public class HostService {
                 photoId = hostPhotoService.savePhoto(hostDTO.getHostPhoto().getBytes(),
                         hostDTO.getHostName());
             }
-            Host host = hostDTOtoHost(hostDTO, photoId);
+            Host host = hostDTOtoHost(hostDTO, photoId,passwordEncoder);
             return hostRepository.save(host).getId();
         } catch (IOException ioException) {
             throw new IOException("Error during host creation", ioException.getCause());
@@ -42,7 +44,11 @@ public class HostService {
     public HostResponse getHostByID(UUID id) {
         Host host = hostRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException(String.format("there is no host with uuid: '%s'", id)));
-        Binary hostPhoto = hostPhotoService.getHostPhoto(host.getHostPhotoId());
+        Binary hostPhoto = null;
+        String hostPhotoId = host.getHostPhotoId();
+        if(hostPhotoId !=null)
+        hostPhoto = hostPhotoService.getHostPhoto(hostPhotoId);
+
         return hostToHostResponse(host, hostPhoto);
     }
 
