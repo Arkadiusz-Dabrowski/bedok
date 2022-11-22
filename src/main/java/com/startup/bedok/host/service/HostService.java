@@ -23,7 +23,6 @@ public class HostService {
 
     private final HostRepository hostRepository;
     private final HostPhotoService hostPhotoService;
-    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public UUID createHost(HostDTO hostDTO) throws IOException {
@@ -33,7 +32,7 @@ public class HostService {
                 photoId = hostPhotoService.savePhoto(hostDTO.getHostPhoto().getBytes(),
                         hostDTO.getHostName());
             }
-            Host host = hostDTOtoHost(hostDTO, photoId,passwordEncoder);
+            Host host = hostDTOtoHost(hostDTO, photoId);
             return hostRepository.save(host).getId();
         } catch (IOException ioException) {
             throw new IOException("Error during host creation", ioException.getCause());
