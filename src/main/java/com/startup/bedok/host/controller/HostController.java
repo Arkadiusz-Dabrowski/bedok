@@ -33,4 +33,10 @@ public class HostController {
         return hostService.getHostByID(id);
     }
 
+    @PostMapping("random")
+    private ResponseEntity<String> createSomeRandomHost(){
+        hostService.createSomeRandomHosts();
+        return ResponseEntity.ok("ok");
+    }
+
 }

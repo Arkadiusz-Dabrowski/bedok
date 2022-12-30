@@ -1,5 +1,6 @@
 package com.startup.bedok.host.service;
 
+import com.startup.bedok.datahelper.DataGenerator;
 import com.startup.bedok.host.model.Host;
 import com.startup.bedok.host.model.HostDTO;
 import com.startup.bedok.host.model.HostResponse;
@@ -10,8 +11,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.startup.bedok.host.mapper.HostMapperImpl.hostDTOtoHost;
 import static com.startup.bedok.host.mapper.HostMapperImpl.hostToHostResponse;
@@ -23,6 +30,7 @@ public class HostService {
 
     private final HostRepository hostRepository;
     private final HostPhotoService hostPhotoService;
+    private final DataGenerator dataGenerator;
 
     @Transactional
     public UUID createHost(HostDTO hostDTO) throws IOException {
@@ -55,4 +63,14 @@ public class HostService {
         if(!hostRepository.existsById(id))
         throw new RuntimeException(String.format("there is no host with uuid: '%s'", id));
     }
+
+    public void createSomeRandomHosts() {
+        dataGenerator.createSomeHostData();
+    }
+
+    public void createSomeHostPhotos() throws IOException {
+        dataGenerator.createSomeHostPhotos();
+    }
+
+
 }

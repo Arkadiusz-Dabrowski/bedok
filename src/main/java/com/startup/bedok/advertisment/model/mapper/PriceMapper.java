@@ -1,7 +1,7 @@
 package com.startup.bedok.advertisment.model.mapper;
 
-import com.startup.bedok.advertisment.model.Price;
-import com.startup.bedok.advertisment.model.PriceDTO;
+import com.startup.bedok.advertisment.model.entity.Price;
+import com.startup.bedok.advertisment.model.response.PriceDTO;
 
 public class PriceMapper {
 

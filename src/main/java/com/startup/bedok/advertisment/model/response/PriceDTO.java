@@ -1,4 +1,4 @@
-package com.startup.bedok.advertisment.model;
+package com.startup.bedok.advertisment.model.response;
 
 import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;

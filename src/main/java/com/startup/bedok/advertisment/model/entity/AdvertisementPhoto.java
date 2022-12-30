@@ -1,4 +1,4 @@
-package com.startup.bedok.advertisment.model;
+package com.startup.bedok.advertisment.model.entity;
 
 import lombok.Data;
 import org.bson.types.Binary;

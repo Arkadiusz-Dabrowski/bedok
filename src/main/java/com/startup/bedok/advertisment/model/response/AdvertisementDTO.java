@@ -1,4 +1,4 @@
-package com.startup.bedok.advertisment.model;
+package com.startup.bedok.advertisment.model.response;
 
 import com.startup.bedok.host.model.HostResponse;
 import com.sun.istack.NotNull;
@@ -35,9 +35,17 @@ public class AdvertisementDTO {
     private Boolean sharedBeds;
     @NotNull
     private String language;
-
-    private List<String> roomEquipment;
-    private List<String> sharedEquipment;
-    private List<String> paymentType;
+    private boolean ironRoom;
+    private boolean hooverRoom;
+    private boolean televisionRoom;
+    private boolean radioRoom;
+    private boolean balconyRoom;
+    private boolean ironShared;
+    private boolean hooverShared;
+    private boolean televisionShared;
+    private boolean radioShared;
+    private boolean balconyShared;
+    private boolean cache;
+    private boolean transfer;
     private List<String> RentalRules;
 }

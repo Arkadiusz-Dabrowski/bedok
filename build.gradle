@@ -26,6 +26,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.session:spring-session-core'
     implementation 'io.springfox:springfox-boot-starter:3.0.0'
+    implementation group: 'com.github.javafaker', name: 'javafaker', version: '1.0.2'
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.7.0'
     implementation 'org.springdoc:springdoc-openapi-ui:1.6.4'

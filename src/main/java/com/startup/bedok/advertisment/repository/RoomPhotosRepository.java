@@ -1,7 +1,6 @@
 package com.startup.bedok.advertisment.repository;
 
-import com.startup.bedok.advertisment.model.Advertisement;
-import com.startup.bedok.advertisment.model.RoomPhoto;
+import com.startup.bedok.advertisment.model.entity.RoomPhoto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,8 +1,10 @@
 package com.startup.bedok.advertisment.model.mapper;
 
-import com.startup.bedok.advertisment.model.*;
-import com.startup.bedok.advertisment.services.EquipmentService;
-import com.startup.bedok.advertisment.services.PaymentTypeService;
+import com.startup.bedok.advertisment.model.entity.Advertisement;
+import com.startup.bedok.advertisment.model.entity.Price;
+import com.startup.bedok.advertisment.model.request.AdvertisementRequest;
+import com.startup.bedok.advertisment.model.request.AdvertisementShort;
+import com.startup.bedok.advertisment.model.response.AdvertisementDTO;
 import com.startup.bedok.host.model.HostResponse;
 import com.startup.bedok.host.service.HostService;
 import lombok.RequiredArgsConstructor;
@@ -17,15 +19,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AdvertisementMapper {
 
-    private final EquipmentService equipmentService;
-    private final PaymentTypeService paymentTypeService;
     private final HostService hostService;
 
     public AdvertisementDTO mapAdvertisementToAdvertisementDTO(Advertisement advertisement, List<Binary> photos) {
         return new AdvertisementDTO(
                 hostService.getHostByID(advertisement.getHostId()),
                 advertisement.getPostCode(),
-                advertisement.getHostStreet(),
+                advertisement.getStreetName(),
                 photos,
                 advertisement.getRoomDescription(),
                 advertisement.getRoomArea(),
@@ -36,23 +36,47 @@ public class AdvertisementMapper {
                         .collect(Collectors.toList()),
                 advertisement.getSharedBeds(),
                 advertisement.getLanguage(),
-                advertisement.getRoomEquipment().stream().map(Equipment::getCode).collect(Collectors.toList()),
-                advertisement.getSharedEquipment().stream().map(Equipment::getCode).collect(Collectors.toList()),
-                advertisement.getPaymentType().stream().map(PaymentType::getCode)
-                        .collect(Collectors.toList()),
+                advertisement.isIronRoom(),
+                advertisement.isHooverRoom(),
+                advertisement.isTelevisionRoom(),
+                advertisement.isRadioRoom(),
+                advertisement.isBalconyRoom(),
+                advertisement.isIronShared(),
+                advertisement.isHooverShared(),
+                advertisement.isTelevisionShared(),
+                advertisement.isRadioShared(),
+                advertisement.isBalconyShared(),
+                advertisement.isCache(),
+                advertisement.isTransfer(),
                 Arrays.asList(advertisement.getRentalRulesObject().split(","))
         );
     }
 
     public AdvertisementShort mapAdvertisementToAdvertisementShort(Advertisement advertisement, Binary photo, HostResponse hostResponse) {
         return new AdvertisementShort(
-                hostResponse,
-                advertisement.getHostStreet(),
-                photo,
-                advertisement.getRoomArea(),
+                advertisement.getTitle(),
+                advertisement.getDistrict(),
                 advertisement.getNumBeds(),
+                advertisement.getRoomDescription(),
+                advertisement.getGenderRoomEnum(),
+                Arrays.stream(advertisement.getGuests().split(",")).toList(),
+                advertisement.getPriceList().stream()
+                        .map(PriceMapper::mapPricetoPriceDTO)
+                        .collect(Collectors.toList()),
+                advertisement.getRoomArea(),
+                hostResponse,
+                photo,
                 advertisement.getUsedBeds(),
-                advertisement.getLanguage()
+                advertisement.isIronRoom(),
+                advertisement.isHooverRoom(),
+                advertisement.isTelevisionRoom(),
+                advertisement.isRadioRoom(),
+                advertisement.isBalconyRoom(),
+                advertisement.isIronShared(),
+                advertisement.isHooverShared(),
+                advertisement.isTelevisionShared(),
+                advertisement.isRadioShared(),
+                advertisement.isBalconyShared()
         );
     }
 
@@ -61,6 +85,10 @@ public class AdvertisementMapper {
                                                             List<Price> priceList) {
         return new Advertisement(
                 advertisementRequest.getHostId(),
+                advertisementRequest.getTitle(),
+                advertisementRequest.getDistrict(),
+                advertisementRequest.getGennderRoom(),
+                advertisementRequest.getGuests(),
                 advertisementRequest.getPostCode(),
                 advertisementRequest.getHostStreet(),
                 null,
@@ -71,9 +99,18 @@ public class AdvertisementMapper {
                 priceList,
                 advertisementRequest.getSharedBeds(),
                 advertisementRequest.getLanguage(),
-                equipmentService.getEquipmentsById(advertisementRequest.getRoomEquipment()),
-                equipmentService.getEquipmentsById(advertisementRequest.getSharedEquipment()),
-                paymentTypeService.getAllPaymentTypeById(advertisementRequest.getPaymentType()),
+                advertisementRequest.isIronRoom(),
+                advertisementRequest.isHooverRoom(),
+                advertisementRequest.isTelevisionRoom(),
+                advertisementRequest.isRadioRoom(),
+                advertisementRequest.isBalconyRoom(),
+                advertisementRequest.isIronShared(),
+                advertisementRequest.isHooverShared(),
+                advertisementRequest.isTelevisionShared(),
+                advertisementRequest.isRadioShared(),
+                advertisementRequest.isBalconyShared(),
+                advertisementRequest.isCache(),
+                advertisementRequest.isTransfer(),
                 addRentalRules(advertisementRequest.getRentalRules())
         );
     }

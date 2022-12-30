@@ -1,7 +1,7 @@
 package com.startup.bedok.advertisment.services;
 
-import com.startup.bedok.advertisment.model.Price;
-import com.startup.bedok.advertisment.model.PriceDTO;
+import com.startup.bedok.advertisment.model.entity.Price;
+import com.startup.bedok.advertisment.model.response.PriceDTO;
 import com.startup.bedok.advertisment.repository.PriceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

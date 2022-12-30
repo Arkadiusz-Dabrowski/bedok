@@ -1,8 +1,8 @@
 //package com.startup.bedok.advertisement.controller;
 //
 //import com.startup.bedok.advertisment.controller.AdvertisementController;
-//import com.startup.bedok.advertisment.model.AdvertisementRequest;
-//import com.startup.bedok.advertisment.model.PriceDTO;
+//import com.startup.bedok.advertisment.model.request.AdvertisementRequest;
+//import com.startup.bedok.advertisment.model.response.PriceDTO;
 //import com.startup.bedok.advertisment.model.PriceListDTO;
 //import com.startup.bedok.advertisment.services.AdvertisementService;
 //import org.junit.jupiter.api.Test;

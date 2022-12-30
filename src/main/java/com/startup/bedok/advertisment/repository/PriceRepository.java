@@ -1,6 +1,6 @@
 package com.startup.bedok.advertisment.repository;
 
-import com.startup.bedok.advertisment.model.Price;
+import com.startup.bedok.advertisment.model.entity.Price;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;
