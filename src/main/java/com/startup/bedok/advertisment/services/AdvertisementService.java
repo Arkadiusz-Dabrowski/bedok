@@ -1,7 +1,7 @@
 package com.startup.bedok.advertisment.services;
 
+import com.startup.bedok.advertisment.exception.AdvertisementNotExistsException;
 import com.startup.bedok.datahelper.DataGenerator;
-import com.startup.bedok.advertisment.model.AdvertisementPage;
 import com.startup.bedok.advertisment.model.entity.Advertisement;
 import com.startup.bedok.advertisment.model.entity.AdvertisementPhoto;
 import com.startup.bedok.advertisment.model.entity.Price;
@@ -52,14 +52,20 @@ public class AdvertisementService {
         return advertisementRepository
                 .save(advertisementMapper.mapAdvertisementDTOToAdvertisement(advertisementRequest, priceList))
                 .getId();
+    }
 
+    @Transactional
+    public Advertisement updateAdvertisement(AdvertisementRequest advertisementRequest, UUID advertisementId) {
+        Advertisement advertisement = advertisementRepository.findById(advertisementId)
+                .orElseThrow(() -> new AdvertisementNotExistsException(advertisementId.toString()));
+        return advertisementMapper.updateAdvertisementFromRequest(advertisement, advertisementRequest);
     }
 
     @Transactional
     public AdvertisementDTO getAdvertisementById(UUID advertisementId) {
         Advertisement advertisement = advertisementRepository
                 .findById(advertisementId)
-                .orElseThrow(() -> new RuntimeException(String.format("there is no Advertisement with uuid %s", advertisementId)));
+                .orElseThrow(() -> new AdvertisementNotExistsException(advertisementId.toString()));
         List<Binary> photos = advertisementPhotoService
                 .getPhotosByIds(advertisement.getRoomPhotos()
                         .stream()
@@ -97,7 +103,7 @@ public class AdvertisementService {
     private String addPhotosToAdvertisement(List<RoomPhoto> roomPhotos, UUID advertisementId) {
         roomPhotosRepository.saveAll(roomPhotos);
         Advertisement advertisement = advertisementRepository.findById(advertisementId)
-                .orElseThrow(() -> new RuntimeException(String.format("there is no Advertisement with uuid %s", advertisementId)));
+                .orElseThrow(() -> new AdvertisementNotExistsException(advertisementId.toString()));
         advertisement.getRoomPhotos().addAll(roomPhotos);
         advertisementRepository.save(advertisement);
         if (advertisementRepository.getById(advertisementId).getRoomPhotos().size() > 0)
@@ -123,7 +129,8 @@ public class AdvertisementService {
     }
 
     public Page<AdvertisementShort> findAllWithFilters(AdvertisementMultisearch advertisementMultisearch) {
-        Page<Advertisement> pageOfAdvertisements = advertisementCriteriaRepository.findAllWithFilters(new AdvertisementPage(), advertisementMultisearch);
+        Page<Advertisement> pageOfAdvertisements = advertisementCriteriaRepository
+                .findAllWithFilters(advertisementMultisearch);
         List<AdvertisementShort> listOfAdvertisements = pageOfAdvertisements.stream()
                 .map(advertisement -> {
                     HostResponse hostResponse = hostService
@@ -139,7 +146,8 @@ public class AdvertisementService {
                                     advertisementPhoto.getImage(),
                                     hostResponse);
                 }).toList();
-        return new PageImpl<>(listOfAdvertisements, pageOfAdvertisements.getPageable(), pageOfAdvertisements.getTotalElements());
+        return new PageImpl<>(listOfAdvertisements, pageOfAdvertisements.getPageable(),
+                pageOfAdvertisements.getTotalElements());
     }
 
     public void createSomeRandomAdvertisements() {

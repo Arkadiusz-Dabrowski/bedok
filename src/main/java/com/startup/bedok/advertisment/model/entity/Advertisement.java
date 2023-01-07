@@ -2,12 +2,14 @@ package com.startup.bedok.advertisment.model.entity;
 
 import com.startup.bedok.advertisment.model.enumerated.DistrictEnum;
 import com.startup.bedok.advertisment.model.enumerated.GenderRoomEnum;
-import lombok.*;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
-import javax.validation.constraints.Max;
 import javax.validation.constraints.Size;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -55,6 +57,9 @@ public class Advertisement {
     private boolean cache;
     private boolean transfer;
     private String rentalRulesObject;
+    private Long uploadDate;
+    private Long updateDate;
+
 
     public Advertisement(UUID hostId,
                          String title,
@@ -112,5 +117,7 @@ public class Advertisement {
         this.cache = cache;
         this.transfer = transfer;
         this.rentalRulesObject = rentalRulesObject;
+        this.uploadDate = Instant.now().toEpochMilli();
+        this.updateDate = Instant.now().toEpochMilli();
     }
 }

@@ -2,6 +2,7 @@ package com.startup.bedok.advertisment.model.request;
 
 import com.sun.istack.NotNull;
 import lombok.Data;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -17,4 +18,8 @@ public class AdvertisementMultisearch {
     private List<String> sharedEquipment;
     private List<String> paymentType;
     private List<String> rentalRules;
+    private int pageNumber = 0;
+    private int pageSize = 10;
+    private Sort.Direction direction = Sort.DEFAULT_DIRECTION;
+    private String sortBy = "uploadDate";
 }

@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.bson.types.Binary;
 import org.springframework.stereotype.Component;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -63,6 +65,7 @@ public class AdvertisementMapper {
                 advertisement.getPriceList().stream()
                         .map(PriceMapper::mapPricetoPriceDTO)
                         .collect(Collectors.toList()),
+                advertisement.getStreetName(),
                 advertisement.getRoomArea(),
                 hostResponse,
                 photo,
@@ -87,10 +90,10 @@ public class AdvertisementMapper {
                 advertisementRequest.getHostId(),
                 advertisementRequest.getTitle(),
                 advertisementRequest.getDistrict(),
-                advertisementRequest.getGennderRoom(),
+                advertisementRequest.getGenderRoom(),
                 advertisementRequest.getGuests(),
                 advertisementRequest.getPostCode(),
-                advertisementRequest.getHostStreet(),
+                advertisementRequest.getStreetName(),
                 null,
                 advertisementRequest.getRoomDescription(),
                 advertisementRequest.getRoomArea(),
@@ -113,6 +116,37 @@ public class AdvertisementMapper {
                 advertisementRequest.isTransfer(),
                 addRentalRules(advertisementRequest.getRentalRules())
         );
+    }
+
+    public Advertisement updateAdvertisementFromRequest(Advertisement advertisement,
+                                                        AdvertisementRequest request) {
+        advertisement.setTitle(request.getTitle());
+        advertisement.setDistrict(request.getDistrict());
+        advertisement.setGenderRoomEnum(request.getGenderRoom());
+        advertisement.setGuests(String.join(",", request.getGuests()));
+        advertisement.setPostCode(request.getPostCode());
+        advertisement.setStreetName(request.getStreetName());
+        advertisement.setRoomDescription(request.getRoomDescription());
+        advertisement.setRoomArea(request.getRoomArea());
+        advertisement.setNumBeds(request.getNumBeds());
+        advertisement.setUsedBeds(request.getUsedBeds());
+        advertisement.setSharedBeds(request.getSharedBeds());
+        advertisement.setLanguage(request.getLanguage());
+        advertisement.setIronRoom(request.isIronRoom());
+        advertisement.setHooverRoom(request.isHooverRoom());
+        advertisement.setTelevisionRoom(request.isTelevisionRoom());
+        advertisement.setRadioRoom(request.isRadioRoom());
+        advertisement.setBalconyRoom(request.isBalconyRoom());
+        advertisement.setIronShared(request.isIronShared());
+        advertisement.setHooverShared(request.isHooverShared());
+        advertisement.setTelevisionShared(request.isTelevisionShared());
+        advertisement.setRadioShared(request.isRadioShared());
+        advertisement.setBalconyShared(request.isBalconyShared());
+        advertisement.setCache(request.isCache());
+        advertisement.setTransfer(request.isTransfer());
+        advertisement.setRentalRulesObject(addRentalRules(request.getRentalRules()));
+        advertisement.setUpdateDate(Instant.now().getEpochSecond());
+        return advertisement;
     }
 
     private static String addRentalRules(List<String> rentalRules){

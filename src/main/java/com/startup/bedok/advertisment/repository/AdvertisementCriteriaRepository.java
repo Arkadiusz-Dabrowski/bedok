@@ -1,6 +1,5 @@
 package com.startup.bedok.advertisment.repository;
 
-import com.startup.bedok.advertisment.model.AdvertisementPage;
 import com.startup.bedok.advertisment.model.entity.Advertisement;
 import com.startup.bedok.advertisment.model.request.AdvertisementMultisearch;
 import lombok.RequiredArgsConstructor;
@@ -26,21 +25,19 @@ public class AdvertisementCriteriaRepository {
 
     private CriteriaBuilder criteriaBuilder;
 
-    public Page<Advertisement> findAllWithFilters(AdvertisementPage advertisementPage,
-                                                  AdvertisementMultisearch advertisementMultisearch){
+    public Page<Advertisement> findAllWithFilters(AdvertisementMultisearch advertisementMultisearch){
         criteriaBuilder = session.getCriteriaBuilder();
-        CriteriaQuery<Advertisement> cq = criteriaBuilder.createQuery(Advertisement.class);
         CriteriaQuery<Advertisement> criteriaQuery = criteriaBuilder.createQuery(Advertisement.class);
         Root<Advertisement> advertisementRoot = criteriaQuery.from(Advertisement.class);
         Predicate predicate = getPredicate(advertisementMultisearch, advertisementRoot);
         criteriaQuery.where(predicate);
-        setOrder(advertisementPage, criteriaQuery, advertisementRoot);
+        setOrder(advertisementMultisearch, criteriaQuery, advertisementRoot);
 
         TypedQuery<Advertisement> typedQuery = entityManager.createQuery(criteriaQuery);
-        typedQuery.setFirstResult(advertisementPage.getPageNumber() * advertisementPage.getPageSize());
-        typedQuery.setMaxResults(advertisementPage.getPageSize());
+        typedQuery.setFirstResult(advertisementMultisearch.getPageNumber() * advertisementMultisearch.getPageSize());
+        typedQuery.setMaxResults(advertisementMultisearch.getPageSize());
 
-        Pageable pageable = getPageable(advertisementPage);
+        Pageable pageable = getPageable(advertisementMultisearch);
         long advertisementCount = getAdvertisementCount(predicate);
         return new PageImpl<>(typedQuery.getResultList(), pageable, advertisementCount);
     }
@@ -49,40 +46,40 @@ public class AdvertisementCriteriaRepository {
                                    Root<Advertisement> advertisementRoot) {
         List<Predicate> predicateList = new ArrayList<>();
         if(advertisementMultisearch.getStreet() != null){
-            criteriaBuilder.equal(advertisementRoot.get("streetName"), advertisementMultisearch.getStreet());
+            predicateList.add(criteriaBuilder.equal(advertisementRoot.get("streetName"), advertisementMultisearch.getStreet()));
         }
         if(advertisementMultisearch.getLanguage()!= null){
-            criteriaBuilder.isMember(advertisementMultisearch.getLanguage(), advertisementRoot.get("language"));
+            predicateList.add(criteriaBuilder.isMember(advertisementMultisearch.getLanguage(), advertisementRoot.get("language")));
         }
         if(advertisementMultisearch.getRoomAreaFrom() != null){
-            criteriaBuilder.greaterThanOrEqualTo(advertisementRoot.get("roomArea"), advertisementMultisearch.getRoomAreaFrom());
+            predicateList.add(criteriaBuilder.greaterThanOrEqualTo(advertisementRoot.get("roomArea"), advertisementMultisearch.getRoomAreaFrom()));
         }
-        if(advertisementMultisearch.getRoomAreaFrom() != null){
-            criteriaBuilder.lessThanOrEqualTo(advertisementRoot.get("roomArea"), advertisementMultisearch.getRoomAreaTo());
+        if(advertisementMultisearch.getRoomAreaTo() != null){
+            predicateList.add(criteriaBuilder.lessThanOrEqualTo(advertisementRoot.get("roomArea"), advertisementMultisearch.getRoomAreaTo()));
         }
         if(advertisementMultisearch.getRoomEquipment() != null){
-            criteriaBuilder.equal(advertisementRoot.get("roomEquipment"), advertisementMultisearch.getRoomEquipment());
+            predicateList.add(criteriaBuilder.equal(advertisementRoot.get("roomEquipment"), advertisementMultisearch.getRoomEquipment()));
         }
         if(advertisementMultisearch.getSharedEquipment() != null){
-            criteriaBuilder.equal(advertisementRoot.get("sharedEquipment"), advertisementMultisearch.getSharedEquipment());
+            predicateList.add(criteriaBuilder.equal(advertisementRoot.get("sharedEquipment"), advertisementMultisearch.getSharedEquipment()));
         }
         return criteriaBuilder.and(predicateList.toArray(new Predicate[0]));
     }
 
 
-    private void setOrder(AdvertisementPage advertisementPage,
+    private void setOrder(AdvertisementMultisearch advertisementMultisearch,
                           CriteriaQuery<Advertisement> criteriaQuery,
                           Root<Advertisement> advertisementRoot) {
-        if(advertisementPage.getDirection().equals(Sort.Direction.ASC)){
-            criteriaQuery.orderBy(criteriaBuilder.asc(advertisementRoot.get(advertisementPage.getSortBy())));
+        if(advertisementMultisearch.getDirection().equals(Sort.Direction.ASC)){
+            criteriaQuery.orderBy(criteriaBuilder.asc(advertisementRoot.get(advertisementMultisearch.getSortBy())));
         } else {
-            criteriaQuery.orderBy(criteriaBuilder.desc(advertisementRoot.get(advertisementPage.getSortBy())));
+            criteriaQuery.orderBy(criteriaBuilder.desc(advertisementRoot.get(advertisementMultisearch.getSortBy())));
         }
     }
 
-    private Pageable getPageable(AdvertisementPage advertisementPage) {
-        Sort sort = Sort.by(advertisementPage.getDirection(), advertisementPage.getSortBy());
-        return PageRequest.of(advertisementPage.getPageNumber(), advertisementPage.getPageSize(), sort);
+    private Pageable getPageable(AdvertisementMultisearch advertisementMultisearch) {
+        Sort sort = Sort.by(advertisementMultisearch.getDirection(), advertisementMultisearch.getSortBy());
+        return PageRequest.of(advertisementMultisearch.getPageNumber(), advertisementMultisearch.getPageSize(), sort);
     }
 
     private long getAdvertisementCount(Predicate predicate) {
