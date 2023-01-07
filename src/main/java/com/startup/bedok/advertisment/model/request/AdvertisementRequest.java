@@ -9,8 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,14 +22,14 @@ public class AdvertisementRequest {
     @NotNull
     private DistrictEnum district;
     @NotNull
-    private GenderRoomEnum gennderRoom;
+    private GenderRoomEnum genderRoom;
     private List<String> guests;
     @NotNull
     private UUID hostId;
     @NotNull
     private String postCode;
     @NotNull
-    private String hostStreet;
+    private String streetName;
     private String roomShortDescription;
     private String roomDescription;
     @NotNull

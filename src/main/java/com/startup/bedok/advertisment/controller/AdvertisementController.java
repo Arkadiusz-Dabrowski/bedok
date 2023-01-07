@@ -1,5 +1,6 @@
 package com.startup.bedok.advertisment.controller;
 
+import com.startup.bedok.advertisment.model.entity.Advertisement;
 import com.startup.bedok.advertisment.model.request.AdvertisementMultisearch;
 import com.startup.bedok.advertisment.model.request.AdvertisementRequest;
 import com.startup.bedok.advertisment.model.request.AdvertisementShort;
@@ -30,6 +31,11 @@ public class AdvertisementController {
         return ResponseEntity.ok(advertisementService.createAdvertisement(advertisementRequest));
     }
 
+    @PutMapping
+    private ResponseEntity<Advertisement> updateAdvertisement(@RequestBody AdvertisementRequest advertisementRequest, @RequestParam UUID advertisementId) {
+        return ResponseEntity.ok(advertisementService.updateAdvertisement(advertisementRequest, advertisementId));
+    }
+
     @GetMapping
     private ResponseEntity<AdvertisementDTO> getAdvertisementById(@RequestParam UUID advertisementId) {
         return ResponseEntity.ok(advertisementService.getAdvertisementById(advertisementId));
@@ -41,7 +47,8 @@ public class AdvertisementController {
     }
 
     @GetMapping("criteria")
-    private ResponseEntity<Page<AdvertisementShort>> getAdvertisementListByMultiSearch(@RequestBody AdvertisementMultisearch advertisementMultisearch) {
+    private ResponseEntity<Page<AdvertisementShort>> getAdvertisementListByMultiSearch(
+            @RequestBody AdvertisementMultisearch advertisementMultisearch) {
         return ResponseEntity.ok(advertisementService.findAllWithFilters(advertisementMultisearch));
     }
 

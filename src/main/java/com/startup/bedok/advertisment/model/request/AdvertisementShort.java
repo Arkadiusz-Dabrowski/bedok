@@ -23,6 +23,7 @@ public class AdvertisementShort {
     private final GenderRoomEnum gennderRoom;
     private final List<String> guests;
     private final List<PriceDTO> priceDTO;
+    private final String street;
     @NotNull
     private final Double roomArea;
     @NotNull
