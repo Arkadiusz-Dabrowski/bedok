@@ -1,0 +1,52 @@
+version: "3"
+services:
+  postgres:
+    image: 7c80beb133ed
+    network_mode: bridge
+    container_name: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    expose:
+      - 5432
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=bedok
+  mongo:
+    image: d73a69c03151
+    network_mode: bridge
+    hostname: mongo
+    container_name: mongo
+    expose:
+      - 27017
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_data_container:/data/db
+  # APP*****************************************
+  springbootapp:
+    image: 0979efc22a6e
+    network_mode: bridge
+    container_name: springbootapp
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=admin
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/test
+      - SPRING_DATA_MONGODB_DATABASE=test
+    expose:
+      - 8080
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres
+      - mongo
+    links:
+      - postgres
+      - mongo
+volumes:
+  postgres-data:
+  mongodb_data_container:

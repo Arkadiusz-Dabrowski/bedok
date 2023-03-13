@@ -2,8 +2,7 @@ package com.startup.bedok.advertisment.model.request;
 
 import com.startup.bedok.advertisment.model.enumerated.DistrictEnum;
 import com.startup.bedok.advertisment.model.enumerated.GenderRoomEnum;
-import com.startup.bedok.advertisment.model.response.PriceDTO;
-import com.startup.bedok.host.model.HostResponse;
+import com.startup.bedok.user.model.UserResponse;
 import com.sun.istack.NotNull;
 import lombok.Data;
 import org.bson.types.Binary;
@@ -16,20 +15,22 @@ public class AdvertisementShort {
     @NotNull
     private final String title;
     @NotNull
+    private final String city;
+    @NotNull
     private final DistrictEnum district;
     @NotNull
     private final Integer numBeds;
-    private final String descryption;
+    private final String description;
     private final GenderRoomEnum gennderRoom;
     private final List<String> guests;
-    private final List<PriceDTO> priceDTO;
+    private final Double price;
     private final String street;
     @NotNull
     private final Double roomArea;
     @NotNull
-    private final HostResponse hostResponse;
+    private final UserResponse userResponse;
     @NotNull
-    private final Binary mainPhoto;
+    private final List<Binary> mainPhoto;
     @NotNull
     private final Integer usedBeds;
     private final boolean ironRoom;
@@ -42,4 +43,5 @@ public class AdvertisementShort {
     private final boolean televisionShared;
     private final boolean radioShared;
     private final boolean balconyShared;
+    private final boolean active;
 }

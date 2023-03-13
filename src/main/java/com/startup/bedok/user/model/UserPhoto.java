@@ -1,4 +1,4 @@
-package com.startup.bedok.host.model;
+package com.startup.bedok.user.model;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -11,13 +11,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Setter
 @Getter
 @RequiredArgsConstructor
-public class HostPhoto {
+public class UserPhoto {
     @Id
     private String id;
     private String title;
     private Binary image;
 
-    public HostPhoto(String title) {
+    public UserPhoto(String title) {
         this.title = title;
     }
 }

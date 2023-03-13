@@ -1,9 +1,9 @@
-package com.startup.bedok.host.controller;
+package com.startup.bedok.user.controller;
 
-import com.startup.bedok.host.model.HostDTO;
-import com.startup.bedok.host.model.HostResponse;
-import com.startup.bedok.host.service.HostPhotoService;
-import com.startup.bedok.host.service.HostService;
+import com.startup.bedok.user.model.UserDTO;
+import com.startup.bedok.user.model.UserResponse;
+import com.startup.bedok.user.service.UserPhotoService;
+import com.startup.bedok.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -18,24 +18,24 @@ import java.util.UUID;
 @RestController
 @RequestMapping("host")
 @RequiredArgsConstructor
-public class HostController {
+public class UserController {
 
-    private final HostService hostService;
-    private final HostPhotoService hostPhotoService;
+    private final UserService userService;
+    private final UserPhotoService userPhotoService;
 
     @PostMapping
-    private ResponseEntity<UUID> createHost(@Validated HostDTO hostDTO) throws IOException {
-        return ResponseEntity.ok(hostService.createHost(hostDTO));
+    private ResponseEntity<UUID> registerUser(@Validated UserDTO userDTO) throws IOException {
+        return ResponseEntity.ok(userService.registerUser(userDTO));
     }
 
     @GetMapping
-    private HostResponse getHost(UUID id) {
-        return hostService.getHostByID(id);
+    private UserResponse getUser(UUID id) {
+        return userService.getUserByID(id);
     }
 
     @PostMapping("random")
     private ResponseEntity<String> createSomeRandomHost(){
-        hostService.createSomeRandomHosts();
+        userService.createSomeRandomUsers();
         return ResponseEntity.ok("ok");
     }
 

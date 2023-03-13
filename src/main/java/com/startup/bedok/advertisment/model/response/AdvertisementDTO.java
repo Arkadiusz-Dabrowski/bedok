@@ -1,6 +1,6 @@
 package com.startup.bedok.advertisment.model.response;
 
-import com.startup.bedok.host.model.HostResponse;
+import com.startup.bedok.user.model.UserResponse;
 import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,7 +15,11 @@ import java.util.List;
 public class AdvertisementDTO {
 
     @NotNull
-    private HostResponse host;
+    private UserResponse host;
+    @NotNull
+    private String title;
+    @NotNull
+    private String city;
     @NotNull
     private String postCode;
     @NotNull
@@ -30,7 +34,7 @@ public class AdvertisementDTO {
     private Integer numBeds;
     @NotNull
     private Integer usedBeds;
-    private List<PriceDTO> priceList;
+    private Double price;
     @NotNull
     private Boolean sharedBeds;
     @NotNull
@@ -48,4 +52,5 @@ public class AdvertisementDTO {
     private boolean cache;
     private boolean transfer;
     private List<String> RentalRules;
+    private boolean active;
 }

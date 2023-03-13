@@ -2,7 +2,6 @@ package com.startup.bedok.advertisment.model.request;
 
 import com.startup.bedok.advertisment.model.enumerated.DistrictEnum;
 import com.startup.bedok.advertisment.model.enumerated.GenderRoomEnum;
-import com.startup.bedok.advertisment.model.response.PriceDTO;
 import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,6 +21,8 @@ public class AdvertisementRequest {
     @NotNull
     private DistrictEnum district;
     @NotNull
+    private String city;
+    @NotNull
     private GenderRoomEnum genderRoom;
     private List<String> guests;
     @NotNull
@@ -39,7 +40,17 @@ public class AdvertisementRequest {
     @NotNull
     private Integer usedBeds;
     @NotNull
-    private List<PriceDTO> priceList;
+    private Integer price;
+    @NotNull
+    private Double firstStageDiscount;
+    @NotNull
+    private Double secondStageDiscount;
+    @NotNull
+    private Double thirdStageDiscount;
+    @NotNull
+    private Double fourthStageDiscount;
+    @NotNull
+    private Integer discountMonth;
     @NotNull
     private Boolean sharedBeds;
     @NotNull

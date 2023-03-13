@@ -24,24 +24,25 @@ public class Advertisement {
     @GeneratedValue
     private UUID id;
     private UUID hostId;
+    private String city;
     private String title;
     @Enumerated
     private DistrictEnum district;
     @Enumerated
-    private GenderRoomEnum genderRoomEnum;
+    private GenderRoomEnum roomGender;
     private String guests;
     private String postCode;
     private String streetName;
-    @OneToMany(orphanRemoval = true)
-    private List<RoomPhoto> roomPhotos;
     private String roomDescription;
-    private Double roomArea;
+    private double roomArea;
     private int numBeds;
 
     private int usedBeds;
-    @OneToMany(orphanRemoval = true)
-    @Size(min = 1, max = 5)
-    private List<Price> priceList;
+    private double price;
+    private double firstStageDiscount;
+    private double secondStageDiscount;
+    private double thirdStageDiscount;
+    private double fourthStageDiscount;
     private Boolean sharedBeds;
     private String language;
     private boolean ironRoom;
@@ -60,21 +61,26 @@ public class Advertisement {
 
     private Long uploadDate;
     private Long updateDate;
+    private boolean active;
 
 
     public Advertisement(UUID hostId,
                          String title,
+                         String city,
                          DistrictEnum district,
-                         GenderRoomEnum genderRoomEnum,
+                         GenderRoomEnum roomGender,
                          List<String> guests,
                          String postCode,
                          String streetName,
-                         List<RoomPhoto> roomPhotos,
                          String roomDescription,
-                         Double roomArea,
+                         double roomArea,
                          int numBeds,
                          int usedBeds,
-                         List<Price> priceList,
+                         double price,
+                         double firstStageDiscount,
+                         double secondStageDiscount,
+                         double thirdStageDiscount,
+                         double fourthStageDiscount,
                          Boolean sharedBeds,
                          String language,
                          boolean ironRoom,
@@ -92,17 +98,21 @@ public class Advertisement {
                          String rentalRulesObject) {
         this.hostId = hostId;
         this.title = title;
+        this.city = city;
         this.district = district;
-        this.genderRoomEnum = genderRoomEnum;
+        this.roomGender = roomGender;
         this.guests = String.join(",", guests);
         this.postCode = postCode;
         this.streetName = streetName;
-        this.roomPhotos = roomPhotos;
         this.roomDescription = roomDescription;
         this.roomArea = roomArea;
         this.numBeds = numBeds;
         this.usedBeds = usedBeds;
-        this.priceList = priceList;
+        this.price = price;
+        this.firstStageDiscount = firstStageDiscount;
+        this.secondStageDiscount = secondStageDiscount;
+        this.thirdStageDiscount = thirdStageDiscount;
+        this.fourthStageDiscount = fourthStageDiscount;
         this.sharedBeds = sharedBeds;
         this.language = language;
         this.ironRoom = ironRoom;
@@ -120,65 +130,6 @@ public class Advertisement {
         this.rentalRulesObject = rentalRulesObject;
         this.uploadDate = Instant.now().toEpochMilli();
         this.updateDate = Instant.now().toEpochMilli();
-    }
-
-    public Advertisement(UUID hostId,
-                         String title,
-                         DistrictEnum district,
-                         GenderRoomEnum genderRoomEnum,
-                         List<String> guests,
-                         String postCode,
-                         String streetName,
-                         List<RoomPhoto> roomPhotos,
-                         String roomDescription,
-                         Double roomArea,
-                         int numBeds,
-                         int usedBeds,
-                         List<Price> priceList,
-                         Boolean sharedBeds,
-                         String language,
-                         boolean ironRoom,
-                         boolean hooverRoom,
-                         boolean televisionRoom,
-                         boolean radioRoom,
-                         boolean balconyRoom,
-                         boolean ironShared,
-                         boolean hooverShared,
-                         boolean televisionShared,
-                         boolean radioShared,
-                         boolean balconyShared,
-                         boolean cache,
-                         boolean transfer,
-                         String rentalRulesObject,
-                         Long updateDate) {
-        this.hostId = hostId;
-        this.title = title;
-        this.district = district;
-        this.genderRoomEnum = genderRoomEnum;
-        this.guests = String.join(",", guests);
-        this.postCode = postCode;
-        this.streetName = streetName;
-        this.roomPhotos = roomPhotos;
-        this.roomDescription = roomDescription;
-        this.roomArea = roomArea;
-        this.numBeds = numBeds;
-        this.usedBeds = usedBeds;
-        this.priceList = priceList;
-        this.sharedBeds = sharedBeds;
-        this.language = language;
-        this.ironRoom = ironRoom;
-        this.hooverRoom = hooverRoom;
-        this.televisionRoom = televisionRoom;
-        this.radioRoom = radioRoom;
-        this.balconyRoom = balconyRoom;
-        this.ironShared = ironShared;
-        this.hooverShared = hooverShared;
-        this.televisionShared = televisionShared;
-        this.radioShared = radioShared;
-        this.balconyShared = balconyShared;
-        this.cache = cache;
-        this.transfer = transfer;
-        this.rentalRulesObject = rentalRulesObject;
-        this.updateDate = updateDate;
+        this.active = true;
     }
 }

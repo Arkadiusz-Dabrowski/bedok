@@ -67,11 +67,6 @@ public class AdvertisementController {
         return ResponseEntity.ok(advertisementService.saveRoomPhotos(photos, advertisementId));
     }
 
-    @PutMapping("all/photos")
-    private ResponseEntity<String> addPhotosToAllAdvertisement(List<MultipartFile> photos) {
-        return ResponseEntity.ok(advertisementService.saveRoomPhotostoAll(photos));
-    }
-
     @PostMapping("random")
     private ResponseEntity<String> createSomeRandomAdvertisements(){
         advertisementService.createSomeRandomAdvertisements();
@@ -80,7 +75,16 @@ public class AdvertisementController {
 
     @PostMapping("randomPhotos")
     private ResponseEntity<String> createSomePhotosForRandomAdvertisements() throws IOException {
+        return ResponseEntity.ok(advertisementService.createSomePhotosForRandomAdvertisements());
+    }
 
-        return ResponseEntity.ok( advertisementService.createSomePhotosForRandomAdvertisements());
+    @DeleteMapping("delete")
+    private ResponseEntity<String> deleteAdvertisementById(UUID id) {
+       return ResponseEntity.ok(advertisementService.deleteAdvertisementById(id).toString());
+    }
+
+    @DeleteMapping("deactivate")
+    private ResponseEntity<String> deactivateAdvertisementById(UUID id) {
+        return ResponseEntity.ok(advertisementService.deactivateAdvertisementById(id).toString());
     }
 }
