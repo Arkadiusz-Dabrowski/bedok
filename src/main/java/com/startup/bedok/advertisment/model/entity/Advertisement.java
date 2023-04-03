@@ -1,6 +1,5 @@
 package com.startup.bedok.advertisment.model.entity;
 
-import com.startup.bedok.advertisment.model.enumerated.DistrictEnum;
 import com.startup.bedok.advertisment.model.enumerated.RoomGender;
 import com.startup.bedok.guest.model.entity.Guest;
 import lombok.AllArgsConstructor;
