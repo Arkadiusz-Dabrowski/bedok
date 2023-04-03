@@ -1,7 +1,7 @@
 package com.startup.bedok.advertisment.model.request;
 
 import com.startup.bedok.advertisment.model.enumerated.DistrictEnum;
-import com.startup.bedok.advertisment.model.enumerated.GenderRoomEnum;
+import com.startup.bedok.advertisment.model.enumerated.RoomGender;
 import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,11 +19,11 @@ public class AdvertisementRequest {
     @NotNull
     private String title;
     @NotNull
-    private DistrictEnum district;
+    private String district;
     @NotNull
     private String city;
     @NotNull
-    private GenderRoomEnum genderRoom;
+    private RoomGender genderRoom;
     private List<String> guests;
     @NotNull
     private UUID hostId;

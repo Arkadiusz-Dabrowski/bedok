@@ -1,9 +1,11 @@
 package com.startup.bedok.advertisment.model.mapper;
 
 import com.startup.bedok.advertisment.model.entity.Advertisement;
+import com.startup.bedok.advertisment.model.entity.District;
 import com.startup.bedok.advertisment.model.request.AdvertisementRequest;
-import com.startup.bedok.advertisment.model.request.AdvertisementShort;
-import com.startup.bedok.advertisment.model.response.AdvertisementDTO;
+import com.startup.bedok.advertisment.model.response.AdvertisementResponse;
+import com.startup.bedok.advertisment.model.response.AdvertisementShort;
+import com.startup.bedok.guest.model.GuestMapper;
 import com.startup.bedok.user.model.UserResponse;
 import com.startup.bedok.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -13,16 +15,16 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 public class AdvertisementMapper {
 
     private final UserService userService;
+    private final GuestMapper guestMapper;
 
-    public AdvertisementDTO mapAdvertisementToAdvertisementDTO(Advertisement advertisement, List<Binary> photos) {
-        return new AdvertisementDTO(
+    public AdvertisementResponse mapAdvertisementToAdvertisementDTO(Advertisement advertisement, List<Binary> photos) {
+        return new AdvertisementResponse(
                 userService.getUserByID(advertisement.getHostId()),
                 advertisement.getTitle(),
                 advertisement.getCity(),
@@ -57,11 +59,12 @@ public class AdvertisementMapper {
         return new AdvertisementShort(
                 advertisement.getTitle(),
                 advertisement.getCity(),
-                advertisement.getDistrict(),
+                advertisement.getDistrict().getName(),
                 advertisement.getNumBeds(),
                 advertisement.getRoomDescription(),
                 advertisement.getRoomGender(),
-                Arrays.stream(advertisement.getGuests().split(","))
+                advertisement.getGuests().stream()
+                        .map(guestMapper::mapGuestToGuestResponse)
                         .toList(),
                 advertisement.getPrice(),
                 advertisement.getStreetName(),
@@ -84,14 +87,14 @@ public class AdvertisementMapper {
     }
 
 
-    public Advertisement mapAdvertisementRequestToAdvertisement(AdvertisementRequest advertisementRequest) {
+    public Advertisement mapAdvertisementRequestToAdvertisement(AdvertisementRequest advertisementRequest, District district) {
         return new Advertisement(
                 advertisementRequest.getHostId(),
                 advertisementRequest.getTitle(),
                 advertisementRequest.getCity(),
-                advertisementRequest.getDistrict(),
+                district,
                 advertisementRequest.getGenderRoom(),
-                advertisementRequest.getGuests(),
+                null,
                 advertisementRequest.getPostCode(),
                 advertisementRequest.getStreetName(),
                 advertisementRequest.getRoomDescription(),
@@ -122,11 +125,10 @@ public class AdvertisementMapper {
     }
 
     public Advertisement updateAdvertisementFromRequest(Advertisement advertisement,
-                                                        AdvertisementRequest request) {
+                                                        AdvertisementRequest request, District district) {
         advertisement.setTitle(request.getTitle());
-        advertisement.setDistrict(request.getDistrict());
+        advertisement.setDistrict(district);
         advertisement.setRoomGender(request.getGenderRoom());
-        advertisement.setGuests(String.join(",", request.getGuests()));
         advertisement.setPostCode(request.getPostCode());
         advertisement.setStreetName(request.getStreetName());
         advertisement.setRoomDescription(request.getRoomDescription());

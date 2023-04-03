@@ -45,9 +45,15 @@ public class AdvertisementCriteriaRepository {
     private Predicate getPredicate(AdvertisementMultisearch advertisementMultisearch,
                                    Root<Advertisement> advertisementRoot) {
         List<Predicate> predicateList = new ArrayList<>();
-        if(advertisementMultisearch.getStreet() != null){
-            predicateList.add(criteriaBuilder.equal(advertisementRoot.get("streetName"), advertisementMultisearch.getStreet()));
+
+        if(advertisementMultisearch.getLocation() != null){
+            predicateList.add(criteriaBuilder.or(
+                criteriaBuilder.like(advertisementRoot.get("streetName"), "%" + advertisementMultisearch.getLocation() + "%"),
+                criteriaBuilder.like(advertisementRoot.get("city"), "%" + advertisementMultisearch.getLocation() + "%"),
+                criteriaBuilder.like(advertisementRoot.get("postCode"), "%" + advertisementMultisearch.getLocation() + "%")
+        ));
         }
+
         if(advertisementMultisearch.getLanguage()!= null){
             predicateList.add(criteriaBuilder.isMember(advertisementMultisearch.getLanguage(), advertisementRoot.get("language")));
         }

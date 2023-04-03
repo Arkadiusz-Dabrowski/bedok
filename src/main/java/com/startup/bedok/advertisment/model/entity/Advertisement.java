@@ -1,16 +1,16 @@
 package com.startup.bedok.advertisment.model.entity;
 
 import com.startup.bedok.advertisment.model.enumerated.DistrictEnum;
-import com.startup.bedok.advertisment.model.enumerated.GenderRoomEnum;
+import com.startup.bedok.advertisment.model.enumerated.RoomGender;
+import com.startup.bedok.guest.model.entity.Guest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.time.Instant;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -26,17 +26,17 @@ public class Advertisement {
     private UUID hostId;
     private String city;
     private String title;
+    @OneToOne
+    private District district;
     @Enumerated
-    private DistrictEnum district;
-    @Enumerated
-    private GenderRoomEnum roomGender;
-    private String guests;
+    private RoomGender roomGender;
+    @ManyToMany
+    private Set<Guest> guests;
     private String postCode;
     private String streetName;
     private String roomDescription;
     private double roomArea;
     private int numBeds;
-
     private int usedBeds;
     private double price;
     private double firstStageDiscount;
@@ -67,9 +67,9 @@ public class Advertisement {
     public Advertisement(UUID hostId,
                          String title,
                          String city,
-                         DistrictEnum district,
-                         GenderRoomEnum roomGender,
-                         List<String> guests,
+                         District district,
+                         RoomGender roomGender,
+                         Set<String> guests,
                          String postCode,
                          String streetName,
                          String roomDescription,
@@ -101,7 +101,6 @@ public class Advertisement {
         this.city = city;
         this.district = district;
         this.roomGender = roomGender;
-        this.guests = String.join(",", guests);
         this.postCode = postCode;
         this.streetName = streetName;
         this.roomDescription = roomDescription;

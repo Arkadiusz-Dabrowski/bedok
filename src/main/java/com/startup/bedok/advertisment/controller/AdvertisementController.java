@@ -3,8 +3,8 @@ package com.startup.bedok.advertisment.controller;
 import com.startup.bedok.advertisment.model.entity.Advertisement;
 import com.startup.bedok.advertisment.model.request.AdvertisementMultisearch;
 import com.startup.bedok.advertisment.model.request.AdvertisementRequest;
-import com.startup.bedok.advertisment.model.request.AdvertisementShort;
-import com.startup.bedok.advertisment.model.response.AdvertisementDTO;
+import com.startup.bedok.advertisment.model.response.AdvertisementShort;
+import com.startup.bedok.advertisment.model.response.AdvertisementResponse;
 import com.startup.bedok.advertisment.services.AdvertisementService;
 import com.startup.bedok.config.SpringFoxConfig;
 import io.swagger.annotations.Api;
@@ -37,8 +37,8 @@ public class AdvertisementController {
     }
 
     @GetMapping
-    private ResponseEntity<AdvertisementDTO> getAdvertisementById(@RequestParam UUID advertisementId) {
-        return ResponseEntity.ok(advertisementService.getAdvertisementById(advertisementId));
+    private ResponseEntity<AdvertisementResponse> getAdvertisementById(@RequestParam UUID advertisementId) {
+        return ResponseEntity.ok(advertisementService.getAdvertisementDTOById(advertisementId));
     }
 
     @GetMapping("host")
@@ -53,8 +53,8 @@ public class AdvertisementController {
     }
 
     @GetMapping("details")
-    private ResponseEntity<AdvertisementDTO> getAdvertisementByDetails(@RequestParam UUID advertisementId) {
-        return ResponseEntity.ok(advertisementService.getAdvertisementById(advertisementId));
+    private ResponseEntity<AdvertisementResponse> getAdvertisementByDetails(@RequestParam UUID advertisementId) {
+        return ResponseEntity.ok(advertisementService.getAdvertisementDTOById(advertisementId));
     }
 
     @GetMapping("list")
@@ -83,7 +83,7 @@ public class AdvertisementController {
        return ResponseEntity.ok(advertisementService.deleteAdvertisementById(id).toString());
     }
 
-    @DeleteMapping("deactivate")
+    @PutMapping("deactivate")
     private ResponseEntity<String> deactivateAdvertisementById(UUID id) {
         return ResponseEntity.ok(advertisementService.deactivateAdvertisementById(id).toString());
     }

@@ -1,7 +1,8 @@
-package com.startup.bedok.advertisment.model.request;
+package com.startup.bedok.advertisment.model.response;
 
 import com.startup.bedok.advertisment.model.enumerated.DistrictEnum;
-import com.startup.bedok.advertisment.model.enumerated.GenderRoomEnum;
+import com.startup.bedok.advertisment.model.enumerated.RoomGender;
+import com.startup.bedok.guest.model.response.GuestResponse;
 import com.startup.bedok.user.model.UserResponse;
 import com.sun.istack.NotNull;
 import lombok.Data;
@@ -17,12 +18,12 @@ public class AdvertisementShort {
     @NotNull
     private final String city;
     @NotNull
-    private final DistrictEnum district;
+    private final String district;
     @NotNull
     private final Integer numBeds;
     private final String description;
-    private final GenderRoomEnum gennderRoom;
-    private final List<String> guests;
+    private final RoomGender roomGender;
+    private final List<GuestResponse> guests;
     private final Double price;
     private final String street;
     @NotNull

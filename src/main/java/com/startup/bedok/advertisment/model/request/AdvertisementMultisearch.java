@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 public class AdvertisementMultisearch {
 
-    private String street;
+    private String location;
     private Double roomAreaFrom;
     private Double roomAreaTo;
     private List<String> language;

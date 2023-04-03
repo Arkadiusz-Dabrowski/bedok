@@ -3,10 +3,11 @@ package com.startup.bedok.datahelper;
 import com.github.javafaker.Faker;
 import com.startup.bedok.advertisment.model.entity.Advertisement;
 import com.startup.bedok.advertisment.model.entity.AdvertisementPhoto;
+import com.startup.bedok.advertisment.model.entity.District;
 import com.startup.bedok.advertisment.model.entity.RoomPhoto;
-import com.startup.bedok.advertisment.model.enumerated.DistrictEnum;
-import com.startup.bedok.advertisment.model.enumerated.GenderRoomEnum;
+import com.startup.bedok.advertisment.model.enumerated.RoomGender;
 import com.startup.bedok.advertisment.repository.AdvertisementRepository;
+import com.startup.bedok.advertisment.repository.DistrictRepository;
 import com.startup.bedok.advertisment.repository.RoomPhotosRepository;
 import com.startup.bedok.advertisment.services.AdvertisementPhotoService;
 import com.startup.bedok.user.entity.TypeOfUser;
@@ -41,7 +42,7 @@ public class DataGenerator {
     private final UserPhotoRepository userPhotoRepository;
     private final RoomPhotosRepository roomPhotosRepository;
     private final UserPhotoService userPhotoService;
-
+    private final DistrictRepository districtRepository;
     private final AdvertisementPhotoService advertisementPhotoService;
     private Faker faker = new Faker();
 
@@ -116,14 +117,15 @@ public class DataGenerator {
 
     @Transactional
     public void createSomeAdvertisementData(){
+        District district = districtRepository.findAll().stream().findAny().get();
         List<Advertisement> advertisements = IntStream.rangeClosed(1, 3)
                 .mapToObj(i -> new Advertisement(
                         getHostUUID(),
                         faker.ancient().hero(),
                         faker.address().city(),
-                        faker.options().option(DistrictEnum.class),
-                        faker.options().option(GenderRoomEnum.class),
-                        Collections.nCopies(2, faker.rickAndMorty().character()),
+                        district,
+                        faker.options().option(RoomGender.class),
+                        null,
                         faker.address().zipCode(),
                         faker.address().streetName(),
                         faker.rickAndMorty().quote(),

@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @Setter
 @Getter
-public class AdvertisementDTO {
+public class AdvertisementResponse {
 
     @NotNull
     private UserResponse host;

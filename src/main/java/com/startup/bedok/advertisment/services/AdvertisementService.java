@@ -3,14 +3,16 @@ package com.startup.bedok.advertisment.services;
 import com.startup.bedok.advertisment.exception.AdvertisementNoExistsException;
 import com.startup.bedok.advertisment.model.entity.Advertisement;
 import com.startup.bedok.advertisment.model.entity.AdvertisementPhoto;
+import com.startup.bedok.advertisment.model.entity.District;
 import com.startup.bedok.advertisment.model.entity.RoomPhoto;
 import com.startup.bedok.advertisment.model.mapper.AdvertisementMapper;
 import com.startup.bedok.advertisment.model.request.AdvertisementMultisearch;
 import com.startup.bedok.advertisment.model.request.AdvertisementRequest;
-import com.startup.bedok.advertisment.model.request.AdvertisementShort;
-import com.startup.bedok.advertisment.model.response.AdvertisementDTO;
+import com.startup.bedok.advertisment.model.response.AdvertisementShort;
+import com.startup.bedok.advertisment.model.response.AdvertisementResponse;
 import com.startup.bedok.advertisment.repository.AdvertisementCriteriaRepository;
 import com.startup.bedok.advertisment.repository.AdvertisementRepository;
+import com.startup.bedok.advertisment.repository.DistrictRepository;
 import com.startup.bedok.advertisment.repository.RoomPhotosRepository;
 import com.startup.bedok.datahelper.DataGenerator;
 import com.startup.bedok.user.model.UserResponse;
@@ -41,13 +43,15 @@ public class AdvertisementService {
 
     private final RoomPhotosRepository roomPhotosRepository;
     private final DataGenerator dataGenerator;
+    private final DistrictRepository districtRepository;
 
     @Transactional
     public UUID createAdvertisement(AdvertisementRequest advertisementRequest) {
         userService.checkIfHostExists(advertisementRequest.getHostId());
-
+        District district = districtRepository.findByName(advertisementRequest.getDistrict())
+                .orElseThrow(() -> new RuntimeException(String.format("District with name %s not exists", advertisementRequest.getDistrict())));
         return advertisementRepository
-                .save(advertisementMapper.mapAdvertisementRequestToAdvertisement(advertisementRequest))
+                .save(advertisementMapper.mapAdvertisementRequestToAdvertisement(advertisementRequest, district))
                 .getId();
     }
 
@@ -55,11 +59,13 @@ public class AdvertisementService {
     public Advertisement updateAdvertisement(AdvertisementRequest advertisementRequest, UUID advertisementId) {
         Advertisement advertisement = advertisementRepository.findById(advertisementId)
                 .orElseThrow(() -> new AdvertisementNoExistsException(advertisementId.toString()));
-        return advertisementMapper.updateAdvertisementFromRequest(advertisement, advertisementRequest);
+        District district = districtRepository.findByName(advertisementRequest.getDistrict())
+                .orElseThrow(() -> new RuntimeException(String.format("District with name %s not exists", advertisementRequest.getDistrict())));
+        return advertisementMapper.updateAdvertisementFromRequest(advertisement, advertisementRequest, district);
     }
 
     @Transactional
-    public AdvertisementDTO getAdvertisementById(UUID advertisementId) {
+    public AdvertisementResponse getAdvertisementDTOById(UUID advertisementId) {
         Advertisement advertisement = advertisementRepository
                 .findById(advertisementId)
                 .orElseThrow(() -> new AdvertisementNoExistsException(advertisementId.toString()));
@@ -73,6 +79,13 @@ public class AdvertisementService {
                 .map(AdvertisementPhoto::getImage)
                 .collect(Collectors.toList());
         return advertisementMapper.mapAdvertisementToAdvertisementDTO(advertisement, photos);
+    }
+
+    @Transactional
+    public Advertisement getAdvertisementById(UUID advertisementId) {
+        return advertisementRepository
+                .findById(advertisementId)
+                .orElseThrow(() -> new AdvertisementNoExistsException(advertisementId.toString()));
     }
 
     @Transactional

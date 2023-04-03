@@ -1,5 +1,5 @@
 package com.startup.bedok.advertisment.model.enumerated;
 
-public enum GenderRoomEnum {
+public enum RoomGender {
     MALE, FEMALE, OTHER
 }

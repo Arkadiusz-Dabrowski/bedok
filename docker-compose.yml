@@ -1,7 +1,7 @@
 version: "3"
 services:
   postgres:
-    image: 7c80beb133ed
+    image: d1881fab44dd
     network_mode: bridge
     container_name: postgres
     volumes:
@@ -24,10 +24,12 @@ services:
     ports:
       - 27017:27017
     volumes:
-      - mongodb_data_container:/data/db
+      - type: bind
+        source: ./mongodb_data
+        target: /data/db
   # APP*****************************************
   springbootapp:
-    image: 0979efc22a6e
+    image: 1c50e6e20ab6
     network_mode: bridge
     container_name: springbootapp
     environment:
@@ -35,8 +37,8 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=admin
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-      - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/test
-      - SPRING_DATA_MONGODB_DATABASE=test
+      - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/bedok
+      - SPRING_DATA_MONGODB_DATABASE=bedok
     expose:
       - 8080
     ports:
