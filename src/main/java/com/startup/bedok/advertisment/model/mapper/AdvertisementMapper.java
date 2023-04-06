@@ -1,31 +1,33 @@
 package com.startup.bedok.advertisment.model.mapper;
 
 import com.startup.bedok.advertisment.model.entity.Advertisement;
-import com.startup.bedok.advertisment.model.entity.Price;
+import com.startup.bedok.advertisment.model.entity.District;
 import com.startup.bedok.advertisment.model.request.AdvertisementRequest;
-import com.startup.bedok.advertisment.model.request.AdvertisementShort;
-import com.startup.bedok.advertisment.model.response.AdvertisementDTO;
-import com.startup.bedok.host.model.HostResponse;
-import com.startup.bedok.host.service.HostService;
+import com.startup.bedok.advertisment.model.response.AdvertisementResponse;
+import com.startup.bedok.advertisment.model.response.AdvertisementShort;
+import com.startup.bedok.guest.model.GuestMapper;
+import com.startup.bedok.user.model.UserResponse;
+import com.startup.bedok.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.Binary;
 import org.springframework.stereotype.Component;
 
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 public class AdvertisementMapper {
 
-    private final HostService hostService;
+    private final UserService userService;
+    private final GuestMapper guestMapper;
 
-    public AdvertisementDTO mapAdvertisementToAdvertisementDTO(Advertisement advertisement, List<Binary> photos) {
-        return new AdvertisementDTO(
-                hostService.getHostByID(advertisement.getHostId()),
+    public AdvertisementResponse mapAdvertisementToAdvertisementDTO(Advertisement advertisement, List<Binary> photos) {
+        return new AdvertisementResponse(
+                userService.getUserByID(advertisement.getHostId()),
+                advertisement.getTitle(),
+                advertisement.getCity(),
                 advertisement.getPostCode(),
                 advertisement.getStreetName(),
                 photos,
@@ -33,9 +35,7 @@ public class AdvertisementMapper {
                 advertisement.getRoomArea(),
                 advertisement.getNumBeds(),
                 advertisement.getUsedBeds(),
-                advertisement.getPriceList().stream()
-                        .map(PriceMapper::mapPricetoPriceDTO)
-                        .collect(Collectors.toList()),
+                advertisement.getPrice(),
                 advertisement.getSharedBeds(),
                 advertisement.getLanguage(),
                 advertisement.isIronRoom(),
@@ -50,24 +50,26 @@ public class AdvertisementMapper {
                 advertisement.isBalconyShared(),
                 advertisement.isCache(),
                 advertisement.isTransfer(),
-                Arrays.asList(advertisement.getRentalRulesObject().split(","))
+                Arrays.asList(advertisement.getRentalRulesObject().split(",")),
+                advertisement.isActive()
         );
     }
 
-    public AdvertisementShort mapAdvertisementToAdvertisementShort(Advertisement advertisement, Binary photo, HostResponse hostResponse) {
+    public AdvertisementShort mapAdvertisementToAdvertisementShort(Advertisement advertisement, List<Binary> photo, UserResponse userResponse) {
         return new AdvertisementShort(
                 advertisement.getTitle(),
-                advertisement.getDistrict(),
+                advertisement.getCity(),
+                advertisement.getDistrict().getName(),
                 advertisement.getNumBeds(),
                 advertisement.getRoomDescription(),
-                advertisement.getGenderRoomEnum(),
-                Arrays.stream(advertisement.getGuests().split(",")).toList(),
-                advertisement.getPriceList().stream()
-                        .map(PriceMapper::mapPricetoPriceDTO)
-                        .collect(Collectors.toList()),
+                advertisement.getRoomGender(),
+                advertisement.getGuests().stream()
+                        .map(guestMapper::mapGuestToGuestResponse)
+                        .toList(),
+                advertisement.getPrice(),
                 advertisement.getStreetName(),
                 advertisement.getRoomArea(),
-                hostResponse,
+                userResponse,
                 photo,
                 advertisement.getUsedBeds(),
                 advertisement.isIronRoom(),
@@ -79,27 +81,31 @@ public class AdvertisementMapper {
                 advertisement.isHooverShared(),
                 advertisement.isTelevisionShared(),
                 advertisement.isRadioShared(),
-                advertisement.isBalconyShared()
+                advertisement.isBalconyShared(),
+                advertisement.isActive()
         );
     }
 
 
-    public Advertisement mapAdvertisementDTOToAdvertisement(AdvertisementRequest advertisementRequest,
-                                                            List<Price> priceList) {
+    public Advertisement mapAdvertisementRequestToAdvertisement(AdvertisementRequest advertisementRequest, District district) {
         return new Advertisement(
                 advertisementRequest.getHostId(),
                 advertisementRequest.getTitle(),
-                advertisementRequest.getDistrict(),
+                advertisementRequest.getCity(),
+                district,
                 advertisementRequest.getGenderRoom(),
-                advertisementRequest.getGuests(),
+                null,
                 advertisementRequest.getPostCode(),
                 advertisementRequest.getStreetName(),
-                null,
                 advertisementRequest.getRoomDescription(),
                 advertisementRequest.getRoomArea(),
                 advertisementRequest.getNumBeds(),
                 advertisementRequest.getUsedBeds(),
-                priceList,
+                advertisementRequest.getPrice(),
+                advertisementRequest.getFirstStageDiscount(),
+                advertisementRequest.getSecondStageDiscount(),
+                advertisementRequest.getThirdStageDiscount(),
+                advertisementRequest.getFourthStageDiscount(),
                 advertisementRequest.getSharedBeds(),
                 advertisementRequest.getLanguage(),
                 advertisementRequest.isIronRoom(),
@@ -119,17 +125,21 @@ public class AdvertisementMapper {
     }
 
     public Advertisement updateAdvertisementFromRequest(Advertisement advertisement,
-                                                        AdvertisementRequest request) {
+                                                        AdvertisementRequest request, District district) {
         advertisement.setTitle(request.getTitle());
-        advertisement.setDistrict(request.getDistrict());
-        advertisement.setGenderRoomEnum(request.getGenderRoom());
-        advertisement.setGuests(String.join(",", request.getGuests()));
+        advertisement.setDistrict(district);
+        advertisement.setRoomGender(request.getGenderRoom());
         advertisement.setPostCode(request.getPostCode());
         advertisement.setStreetName(request.getStreetName());
         advertisement.setRoomDescription(request.getRoomDescription());
         advertisement.setRoomArea(request.getRoomArea());
         advertisement.setNumBeds(request.getNumBeds());
         advertisement.setUsedBeds(request.getUsedBeds());
+        advertisement.setPrice(request.getPrice());
+        advertisement.setFirstStageDiscount(request.getFirstStageDiscount());
+        advertisement.setSecondStageDiscount(request.getSecondStageDiscount());
+        advertisement.setThirdStageDiscount(request.getThirdStageDiscount());
+        advertisement.setFourthStageDiscount(request.getFourthStageDiscount());
         advertisement.setSharedBeds(request.getSharedBeds());
         advertisement.setLanguage(request.getLanguage());
         advertisement.setIronRoom(request.isIronRoom());
@@ -154,5 +164,9 @@ public class AdvertisementMapper {
         return String.join(",", rentalRules);
 
         return "";
+    }
+
+    private Integer calculatePrice(Advertisement advertisement){
+        return null;
     }
 }

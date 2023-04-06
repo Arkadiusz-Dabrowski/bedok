@@ -1,37 +1,32 @@
-package com.startup.bedok.advertisment.model.request;
+package com.startup.bedok.advertisment.model.response;
 
-import com.startup.bedok.advertisment.model.enumerated.DistrictEnum;
-import com.startup.bedok.advertisment.model.enumerated.RoomGender;
+import com.startup.bedok.user.model.UserResponse;
 import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.bson.types.Binary;
 
 import java.util.List;
-import java.util.UUID;
 
 @AllArgsConstructor
 @Setter
 @Getter
-@NoArgsConstructor
-public class AdvertisementRequest {
+public class AdvertisementResponse {
+
+    @NotNull
+    private UserResponse host;
     @NotNull
     private String title;
     @NotNull
-    private String district;
-    @NotNull
     private String city;
-    @NotNull
-    private RoomGender genderRoom;
-    private List<String> guests;
-    @NotNull
-    private UUID hostId;
     @NotNull
     private String postCode;
     @NotNull
-    private String streetName;
-    private String roomShortDescription;
+    private String hostStreet;
+    @NotNull
+    private List<Binary> roomPhotos;
+
     private String roomDescription;
     @NotNull
     private Double roomArea;
@@ -39,18 +34,7 @@ public class AdvertisementRequest {
     private Integer numBeds;
     @NotNull
     private Integer usedBeds;
-    @NotNull
-    private Integer price;
-    @NotNull
-    private Double firstStageDiscount;
-    @NotNull
-    private Double secondStageDiscount;
-    @NotNull
-    private Double thirdStageDiscount;
-    @NotNull
-    private Double fourthStageDiscount;
-    @NotNull
-    private Integer discountMonth;
+    private Double price;
     @NotNull
     private Boolean sharedBeds;
     @NotNull
@@ -67,5 +51,6 @@ public class AdvertisementRequest {
     private boolean balconyShared;
     private boolean cache;
     private boolean transfer;
-    private List<String> rentalRules;
+    private List<String> RentalRules;
+    private boolean active;
 }

@@ -1,0 +1,7 @@
+FROM openjdk:18
+ARG JAR_FILE=build/libs/bedok-0.0.1-SNAPSHOT.jar
+ENV SPRING_DATA_JPA_REPOSITORIES_ENABLED=true
+ENV SPRING_JPA_DATABASE=postgresql
+ENV SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+COPY ${JAR_FILE} bedok.jar
+ENTRYPOINT ["java","-jar", "/bedok.jar"]

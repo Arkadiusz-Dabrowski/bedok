@@ -4,9 +4,7 @@ package com.startup.bedok.advertisment.model.entity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.UUID;
 
 @Entity
@@ -19,7 +17,11 @@ public class RoomPhoto {
     private UUID id;
     private String photoId;
 
-    public RoomPhoto(String photoId) {
+    @ManyToOne
+    private Advertisement advertisement;
+
+    public RoomPhoto(String photoId, Advertisement advertisement) {
         this.photoId = photoId;
+        this.advertisement = advertisement;
     }
 }

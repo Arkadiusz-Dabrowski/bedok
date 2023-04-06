@@ -1,16 +1,15 @@
 package com.startup.bedok.advertisment.model.entity;
 
-import com.startup.bedok.advertisment.model.enumerated.DistrictEnum;
-import com.startup.bedok.advertisment.model.enumerated.GenderRoomEnum;
+import com.startup.bedok.advertisment.model.enumerated.RoomGender;
+import com.startup.bedok.guest.model.entity.Guest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.time.Instant;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -24,24 +23,25 @@ public class Advertisement {
     @GeneratedValue
     private UUID id;
     private UUID hostId;
+    private String city;
     private String title;
+    @OneToOne
+    private District district;
     @Enumerated
-    private DistrictEnum district;
-    @Enumerated
-    private GenderRoomEnum genderRoomEnum;
-    private String guests;
+    private RoomGender roomGender;
+    @ManyToMany
+    private Set<Guest> guests;
     private String postCode;
     private String streetName;
-    @OneToMany(orphanRemoval = true)
-    private List<RoomPhoto> roomPhotos;
     private String roomDescription;
-    private Double roomArea;
+    private double roomArea;
     private int numBeds;
-
     private int usedBeds;
-    @OneToMany(orphanRemoval = true)
-    @Size(min = 1, max = 5)
-    private List<Price> priceList;
+    private double price;
+    private double firstStageDiscount;
+    private double secondStageDiscount;
+    private double thirdStageDiscount;
+    private double fourthStageDiscount;
     private Boolean sharedBeds;
     private String language;
     private boolean ironRoom;
@@ -57,23 +57,29 @@ public class Advertisement {
     private boolean cache;
     private boolean transfer;
     private String rentalRulesObject;
+
     private Long uploadDate;
     private Long updateDate;
+    private boolean active;
 
 
     public Advertisement(UUID hostId,
                          String title,
-                         DistrictEnum district,
-                         GenderRoomEnum genderRoomEnum,
-                         List<String> guests,
+                         String city,
+                         District district,
+                         RoomGender roomGender,
+                         Set<String> guests,
                          String postCode,
                          String streetName,
-                         List<RoomPhoto> roomPhotos,
                          String roomDescription,
-                         Double roomArea,
+                         double roomArea,
                          int numBeds,
                          int usedBeds,
-                         List<Price> priceList,
+                         double price,
+                         double firstStageDiscount,
+                         double secondStageDiscount,
+                         double thirdStageDiscount,
+                         double fourthStageDiscount,
                          Boolean sharedBeds,
                          String language,
                          boolean ironRoom,
@@ -91,17 +97,20 @@ public class Advertisement {
                          String rentalRulesObject) {
         this.hostId = hostId;
         this.title = title;
+        this.city = city;
         this.district = district;
-        this.genderRoomEnum = genderRoomEnum;
-        this.guests = String.join(",", guests);
+        this.roomGender = roomGender;
         this.postCode = postCode;
         this.streetName = streetName;
-        this.roomPhotos = roomPhotos;
         this.roomDescription = roomDescription;
         this.roomArea = roomArea;
         this.numBeds = numBeds;
         this.usedBeds = usedBeds;
-        this.priceList = priceList;
+        this.price = price;
+        this.firstStageDiscount = firstStageDiscount;
+        this.secondStageDiscount = secondStageDiscount;
+        this.thirdStageDiscount = thirdStageDiscount;
+        this.fourthStageDiscount = fourthStageDiscount;
         this.sharedBeds = sharedBeds;
         this.language = language;
         this.ironRoom = ironRoom;
@@ -119,5 +128,6 @@ public class Advertisement {
         this.rentalRulesObject = rentalRulesObject;
         this.uploadDate = Instant.now().toEpochMilli();
         this.updateDate = Instant.now().toEpochMilli();
+        this.active = true;
     }
 }

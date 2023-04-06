@@ -2,23 +2,24 @@ package com.startup.bedok.datahelper;
 
 import com.github.javafaker.Faker;
 import com.startup.bedok.advertisment.model.entity.Advertisement;
-import com.startup.bedok.advertisment.model.entity.Price;
+import com.startup.bedok.advertisment.model.entity.AdvertisementPhoto;
+import com.startup.bedok.advertisment.model.entity.District;
 import com.startup.bedok.advertisment.model.entity.RoomPhoto;
-import com.startup.bedok.advertisment.model.enumerated.DistrictEnum;
-import com.startup.bedok.advertisment.model.enumerated.GenderRoomEnum;
+import com.startup.bedok.advertisment.model.enumerated.RoomGender;
 import com.startup.bedok.advertisment.repository.AdvertisementRepository;
-import com.startup.bedok.advertisment.repository.PriceRepository;
+import com.startup.bedok.advertisment.repository.DistrictRepository;
 import com.startup.bedok.advertisment.repository.RoomPhotosRepository;
 import com.startup.bedok.advertisment.services.AdvertisementPhotoService;
-import com.startup.bedok.host.model.Host;
-import com.startup.bedok.host.repository.HostPhotoRepository;
-import com.startup.bedok.host.repository.HostRepository;
-import com.startup.bedok.host.service.HostPhotoService;
+import com.startup.bedok.user.entity.TypeOfUser;
+import com.startup.bedok.user.model.ApplicationUser;
+import com.startup.bedok.user.repository.UserPhotoRepository;
+import com.startup.bedok.user.repository.UserRepository;
+import com.startup.bedok.user.service.UserPhotoService;
 import lombok.RequiredArgsConstructor;
+import org.bson.BsonBinarySubType;
 import org.bson.types.Binary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,27 +37,27 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class DataGenerator {
 
-    private final HostRepository hostRepository;
+    private final UserRepository userRepository;
     private final AdvertisementRepository advertisementRepository;
-    private final HostPhotoRepository hostPhotoRepository;
+    private final UserPhotoRepository userPhotoRepository;
     private final RoomPhotosRepository roomPhotosRepository;
-    private final PriceRepository priceRepository;
-    private final HostPhotoService hostPhotoService;
-
+    private final UserPhotoService userPhotoService;
+    private final DistrictRepository districtRepository;
     private final AdvertisementPhotoService advertisementPhotoService;
     private Faker faker = new Faker();
 
     @Transactional
     public void createSomeHostData(){
-        List<Host> hosts = IntStream.rangeClosed(1, 20)
-                .mapToObj(i -> new Host(
+        List<ApplicationUser> users = IntStream.rangeClosed(1, 20)
+                .mapToObj(i -> new ApplicationUser(
+                        TypeOfUser.TENANT,
                         faker.name().name(),
                         faker.internet().password(),
                         faker.internet().emailAddress(),
                         faker.phoneNumber().phoneNumber(),
                         null
                 )).toList();
-        hostRepository.saveAll(hosts);
+        userRepository.saveAll(users);
     }
 
     public void createSomeHostPhotos() throws IOException {
@@ -64,7 +65,7 @@ public class DataGenerator {
             File file = new File(x);
             try {
                 FileInputStream in = new FileInputStream(file);
-                hostPhotoService.savePhoto(in.readAllBytes(), faker.rickAndMorty().character());
+                userPhotoService.savePhoto(in.readAllBytes(), faker.rickAndMorty().character());
                 return new Binary(in.readAllBytes());
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
@@ -73,28 +74,35 @@ public class DataGenerator {
             }
         });
     }
-
-    public String createSomeAdvertisementPhotos() throws IOException {
+    @Transactional
+    public List<RoomPhoto> createSomeAdvertisementPhotos() throws IOException {
+        String directory = "./src/main/resources/room/";
+        Set<String>  files = listFilesUsingFilesList(directory);
+        List<Advertisement> advertisementWithPhoto = roomPhotosRepository.findAll().stream().map(RoomPhoto::getAdvertisement).toList();
         List<Advertisement> advertisementsWithoutPhoto =
                 advertisementRepository.findAll().
-                        stream().filter(x -> x.getRoomPhotos().isEmpty()).toList();
-        Set<String>  files = listFilesUsingFilesList(("c:/users/arkad/IdeaProjects/bedok/src/main/resources/room"));
-        return files.stream().map(x -> {
-            File file = new File(x);
-            try {
-                FileInputStream in = new FileInputStream(file);
-                System.out.println(file.getName());
-                List<RoomPhoto> roomPhotos = advertisementPhotoService.saveAdvertisementPhotosFromBinary(Arrays.asList(in.readAllBytes()));
-                advertisementsWithoutPhoto.forEach(y -> {
-                    addPhotosToAdvertisement(roomPhotos ,y.getId());
-                });
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            return null;
-        }).collect(Collectors.toSet()).stream().findFirst().get().toString();
+                        stream().filter(x -> !advertisementWithPhoto.contains(x)).toList();
+        List<AdvertisementPhoto> advertisementPhotos = files.stream().map(x ->  new File(directory + x))
+                .toList()
+                .stream()
+                .map(file -> {
+                    try {
+                        return new FileInputStream(file);
+                    } catch (FileNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).map(in -> {
+                    try {
+                        return new AdvertisementPhoto(new Binary(BsonBinarySubType.BINARY, in.readAllBytes()));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).toList();
+        List<String> advertisementPhotosId = advertisementPhotos.stream().map(advertisementPhotoService::saveAdvertisementPhoto).toList();
+        advertisementsWithoutPhoto.forEach(advertisement -> {
+              advertisementPhotosId.forEach(id -> roomPhotosRepository.save(new RoomPhoto(id, advertisement)));
+        });
+        return roomPhotosRepository.findAll();
     }
 
     public Set<String> listFilesUsingFilesList(String dir) throws IOException {
@@ -109,21 +117,26 @@ public class DataGenerator {
 
     @Transactional
     public void createSomeAdvertisementData(){
+        District district = districtRepository.findAll().stream().findAny().get();
         List<Advertisement> advertisements = IntStream.rangeClosed(1, 3)
                 .mapToObj(i -> new Advertisement(
                         getHostUUID(),
                         faker.ancient().hero(),
-                        faker.options().option(DistrictEnum.class),
-                        faker.options().option(GenderRoomEnum.class),
-                        Collections.nCopies(2, faker.rickAndMorty().character()),
+                        faker.address().city(),
+                        district,
+                        faker.options().option(RoomGender.class),
+                        null,
                         faker.address().zipCode(),
                         faker.address().streetName(),
-                        null,
                         faker.rickAndMorty().quote(),
                         faker.number().randomDouble(2,20,40),
-                        faker.number().numberBetween(1,5),
-                        faker.number().numberBetween(0,1),
-                        createSomePrice(),
+                        faker.number().randomDigit(),
+                        faker.number().randomDigit(),
+                        faker.number().randomDouble(2,50,80),
+                        faker.number().randomDouble(2,0,5),
+                        faker.number().randomDouble(2, 5, 8),
+                        faker.number().numberBetween(8,10),
+                        faker.number().numberBetween(10,15),
                         faker.bool().bool(),
                         faker.programmingLanguage().name(),
                         faker.bool().bool(),
@@ -144,34 +157,13 @@ public class DataGenerator {
     }
 
     private UUID getHostUUID(){
-        return hostRepository.findAll().get(faker.number().numberBetween(0,5)).getId();
+        return userRepository.findAll().get(faker.number().numberBetween(0,5)).getId();
     }
 
-    @Transactional
-    public List<Price> createSomePrice(){
-        List<Price> prices = List.of(new Price(
-                        faker.number().numberBetween(0, 5),
-                        faker.number().numberBetween(10, 20),
-                        faker.number().randomDouble(3, 100, 200)
-                ));
-        return priceRepository.saveAll(prices);
-    }
     private String getRandomHostPhoto(){
-        return hostPhotoRepository.findAll().stream().findAny().get().getId();
+        return userPhotoRepository.findAll().stream().findAny().get().getId();
     }
     private List<RoomPhoto> getRoomPhoto(){
         return new ArrayList<>(roomPhotosRepository.findAll()).subList(0, faker.number().numberBetween(1,3));
-    }
-
-
-    private String addPhotosToAdvertisement(List<RoomPhoto> roomPhotos, UUID advertisementId) {
-        roomPhotosRepository.saveAll(roomPhotos);
-        Advertisement advertisement = advertisementRepository.findById(advertisementId)
-                .orElseThrow(() -> new RuntimeException(String.format("there is no Advertisement with uuid %s", advertisementId)));
-        advertisement.getRoomPhotos().addAll(roomPhotos);
-        advertisementRepository.save(advertisement);
-        if (advertisementRepository.getById(advertisementId).getRoomPhotos().size() > 0)
-            return " added";
-        return "fail";
     }
 }
