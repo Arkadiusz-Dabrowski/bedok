@@ -24,13 +24,6 @@ public class Guest {
 
     private UUID userId;
 
-    @ManyToMany
-    @JoinTable(
-            name = "guest_advertisement",
-            joinColumns = @JoinColumn(name = "guest_id"),
-            inverseJoinColumns = @JoinColumn(name = "advertisement_id"))
-    private Set<Advertisement> advertisements;
-
     public Guest(String name, Integer age, String language) {
         this.name = name;
         this.age = age;
