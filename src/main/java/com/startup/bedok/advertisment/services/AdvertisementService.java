@@ -93,7 +93,7 @@ public class AdvertisementService {
         return advertisementRepository.findAll().stream()
                 .map(advertisement -> {
                     UserResponse userResponse = userService
-                            .getUserByID(advertisement.getHostId());
+                            .getUserResponseByID(advertisement.getHostId());
                     List<RoomPhoto> photos = roomPhotosRepository.findAllByAdvertisementId(advertisement.getId());
                     if (!photos.isEmpty())
                         photos = photos.stream().limit(5).collect(Collectors.toList());
@@ -117,7 +117,7 @@ public class AdvertisementService {
         return advertisementRepository.findAllByHostId(hostId).stream()
                 .map(advertisement -> {
                     UserResponse userResponse = userService
-                            .getUserByID(advertisement.getHostId());
+                            .getUserResponseByID(advertisement.getHostId());
                     List<RoomPhoto> photos = roomPhotosRepository.findAllByAdvertisementId(advertisement.getId());
                     if (!photos.isEmpty())
                         photos = photos.stream().limit(5).collect(Collectors.toList());
@@ -135,7 +135,7 @@ public class AdvertisementService {
         List<AdvertisementShort> listOfAdvertisements = pageOfAdvertisements.stream()
                 .map(advertisement -> {
                     UserResponse userResponse = userService
-                            .getUserByID(advertisement.getHostId());
+                            .getUserResponseByID(advertisement.getHostId());
                     List<RoomPhoto> photos = roomPhotosRepository.findAllByAdvertisementId(advertisement.getId());
                     if (!photos.isEmpty())
                         photos = photos.stream().limit(5).collect(Collectors.toList());

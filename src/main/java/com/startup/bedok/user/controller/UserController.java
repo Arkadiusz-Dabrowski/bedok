@@ -30,7 +30,7 @@ public class UserController {
 
     @GetMapping
     private UserResponse getUser(UUID id) {
-        return userService.getUserByID(id);
+        return userService.getUserResponseByID(id);
     }
 
     @PostMapping("random")

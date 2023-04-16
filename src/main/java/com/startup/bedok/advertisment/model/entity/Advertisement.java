@@ -1,7 +1,7 @@
 package com.startup.bedok.advertisment.model.entity;
 
 import com.startup.bedok.advertisment.model.enumerated.RoomGender;
-import com.startup.bedok.guest.model.entity.Guest;
+import com.startup.bedok.reservation.model.entity.Reservation;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -29,15 +30,14 @@ public class Advertisement {
     private District district;
     @Enumerated
     private RoomGender roomGender;
-    @ManyToMany
-    private Set<Guest> guests;
     private String postCode;
     private String streetName;
     private String roomDescription;
     private double roomArea;
     private int numBeds;
-    private int usedBeds;
     private double price;
+    @OneToMany
+    private List<Reservation> reservations;
     private double firstStageDiscount;
     private double secondStageDiscount;
     private double thirdStageDiscount;
@@ -57,7 +57,6 @@ public class Advertisement {
     private boolean cache;
     private boolean transfer;
     private String rentalRulesObject;
-
     private Long uploadDate;
     private Long updateDate;
     private boolean active;
@@ -68,13 +67,11 @@ public class Advertisement {
                          String city,
                          District district,
                          RoomGender roomGender,
-                         Set<String> guests,
                          String postCode,
                          String streetName,
                          String roomDescription,
                          double roomArea,
                          int numBeds,
-                         int usedBeds,
                          double price,
                          double firstStageDiscount,
                          double secondStageDiscount,
@@ -105,7 +102,6 @@ public class Advertisement {
         this.roomDescription = roomDescription;
         this.roomArea = roomArea;
         this.numBeds = numBeds;
-        this.usedBeds = usedBeds;
         this.price = price;
         this.firstStageDiscount = firstStageDiscount;
         this.secondStageDiscount = secondStageDiscount;

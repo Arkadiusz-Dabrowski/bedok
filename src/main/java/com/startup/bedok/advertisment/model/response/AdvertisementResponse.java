@@ -1,5 +1,7 @@
 package com.startup.bedok.advertisment.model.response;
 
+import com.startup.bedok.advertisment.model.enumerated.RoomGender;
+import com.startup.bedok.guest.model.response.GuestResponse;
 import com.startup.bedok.user.model.UserResponse;
 import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
@@ -28,12 +30,13 @@ public class AdvertisementResponse {
     private List<Binary> roomPhotos;
 
     private String roomDescription;
+    private RoomGender roomGender;
+    private List<GuestResponse> guestsList;
     @NotNull
     private Double roomArea;
     @NotNull
     private Integer numBeds;
     @NotNull
-    private Integer usedBeds;
     private Double price;
     @NotNull
     private Boolean sharedBeds;

@@ -14,6 +14,4 @@ public class GuestRequest {
     private final String name;
     private final Integer age;
     private final String language;
-    private final LocalDate dateFrom;
-    private final LocalDate dateTo;
 }
