@@ -17,7 +17,9 @@ public class UserMapperImpl {
                 encryptPassword(userDTO.getPassword()),
                 userDTO.getEmail(),
                 userDTO.getPhone(),
-                photoId
+                photoId,
+                userDTO.getDateOfBirth(),
+                userDTO.getLanguage()
         );
     }
 

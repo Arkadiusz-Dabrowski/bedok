@@ -1,6 +1,7 @@
 package com.startup.bedok.guest.model.entity;
 
 import com.startup.bedok.advertisment.model.entity.Advertisement;
+import com.startup.bedok.user.model.ApplicationUser;
 import lombok.*;
 
 import javax.persistence.*;
@@ -15,14 +16,11 @@ import java.util.UUID;
 public class Guest {
     @Id
     @GeneratedValue
+    @ToString.Exclude
     private UUID id;
     private String name;
     private Integer age;
     private String language;
-    private LocalDate dateFrom;
-    private LocalDate dateTo;
-
-    private UUID userId;
 
     public Guest(String name, Integer age, String language) {
         this.name = name;

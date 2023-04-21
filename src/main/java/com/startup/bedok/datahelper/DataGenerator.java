@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -55,25 +56,14 @@ public class DataGenerator {
                         faker.internet().password(),
                         faker.internet().emailAddress(),
                         faker.phoneNumber().phoneNumber(),
-                        null
+                        null,
+                        LocalDate.now().minusYears(faker.number().numberBetween(20,40))
+                                .minusMonths(faker.number().numberBetween(2,8)),
+                        "polski"
                 )).toList();
         userRepository.saveAll(users);
     }
 
-    public void createSomeHostPhotos() throws IOException {
-        listFilesUsingFilesList("C:\\Users\\arkad\\IdeaProjects\\bedok\\src\\main\\resources\\host").stream().map(x -> {
-            File file = new File(x);
-            try {
-                FileInputStream in = new FileInputStream(file);
-                userPhotoService.savePhoto(in.readAllBytes(), faker.rickAndMorty().character());
-                return new Binary(in.readAllBytes());
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
-    }
     @Transactional
     public List<RoomPhoto> createSomeAdvertisementPhotos() throws IOException {
         String directory = "./src/main/resources/room/";
@@ -125,11 +115,9 @@ public class DataGenerator {
                         faker.address().city(),
                         district,
                         faker.options().option(RoomGender.class),
-                        null,
                         faker.address().zipCode(),
                         faker.address().streetName(),
-                        faker.rickAndMorty().quote(),
-                        faker.number().randomDouble(2,20,40),
+                        faker.superhero().descriptor(),
                         faker.number().randomDigit(),
                         faker.number().randomDigit(),
                         faker.number().randomDouble(2,50,80),
@@ -158,12 +146,5 @@ public class DataGenerator {
 
     private UUID getHostUUID(){
         return userRepository.findAll().get(faker.number().numberBetween(0,5)).getId();
-    }
-
-    private String getRandomHostPhoto(){
-        return userPhotoRepository.findAll().stream().findAny().get().getId();
-    }
-    private List<RoomPhoto> getRoomPhoto(){
-        return new ArrayList<>(roomPhotosRepository.findAll()).subList(0, faker.number().numberBetween(1,3));
     }
 }

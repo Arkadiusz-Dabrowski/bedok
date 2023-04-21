@@ -5,7 +5,7 @@ import com.startup.bedok.advertisment.model.entity.District;
 import com.startup.bedok.advertisment.model.request.AdvertisementRequest;
 import com.startup.bedok.advertisment.model.response.AdvertisementResponse;
 import com.startup.bedok.advertisment.model.response.AdvertisementShort;
-import com.startup.bedok.guest.model.GuestMapper;
+import com.startup.bedok.guest.service.GuestService;
 import com.startup.bedok.user.model.UserResponse;
 import com.startup.bedok.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -16,25 +16,30 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.startup.bedok.guest.model.GuestMapper.mapGuestToGuestResponse;
+
 @Component
 @RequiredArgsConstructor
 public class AdvertisementMapper {
 
     private final UserService userService;
-    private final GuestMapper guestMapper;
 
     public AdvertisementResponse mapAdvertisementToAdvertisementDTO(Advertisement advertisement, List<Binary> photos) {
         return new AdvertisementResponse(
-                userService.getUserByID(advertisement.getHostId()),
+                userService.getUserResponseByID(advertisement.getHostId()),
                 advertisement.getTitle(),
                 advertisement.getCity(),
                 advertisement.getPostCode(),
                 advertisement.getStreetName(),
                 photos,
                 advertisement.getRoomDescription(),
+                advertisement.getRoomGender(),
+                advertisement.getReservations()
+                        .stream()
+                        .map(reservation -> mapGuestToGuestResponse(reservation.getGuest()))
+                        .toList(),
                 advertisement.getRoomArea(),
                 advertisement.getNumBeds(),
-                advertisement.getUsedBeds(),
                 advertisement.getPrice(),
                 advertisement.getSharedBeds(),
                 advertisement.getLanguage(),
@@ -63,15 +68,15 @@ public class AdvertisementMapper {
                 advertisement.getNumBeds(),
                 advertisement.getRoomDescription(),
                 advertisement.getRoomGender(),
-                advertisement.getGuests().stream()
-                        .map(guestMapper::mapGuestToGuestResponse)
+                advertisement.getReservations()
+                        .stream()
+                        .map(reservation -> mapGuestToGuestResponse(reservation.getGuest()))
                         .toList(),
                 advertisement.getPrice(),
                 advertisement.getStreetName(),
                 advertisement.getRoomArea(),
                 userResponse,
                 photo,
-                advertisement.getUsedBeds(),
                 advertisement.isIronRoom(),
                 advertisement.isHooverRoom(),
                 advertisement.isTelevisionRoom(),
@@ -94,13 +99,11 @@ public class AdvertisementMapper {
                 advertisementRequest.getCity(),
                 district,
                 advertisementRequest.getGenderRoom(),
-                null,
                 advertisementRequest.getPostCode(),
                 advertisementRequest.getStreetName(),
                 advertisementRequest.getRoomDescription(),
                 advertisementRequest.getRoomArea(),
                 advertisementRequest.getNumBeds(),
-                advertisementRequest.getUsedBeds(),
                 advertisementRequest.getPrice(),
                 advertisementRequest.getFirstStageDiscount(),
                 advertisementRequest.getSecondStageDiscount(),
@@ -134,7 +137,6 @@ public class AdvertisementMapper {
         advertisement.setRoomDescription(request.getRoomDescription());
         advertisement.setRoomArea(request.getRoomArea());
         advertisement.setNumBeds(request.getNumBeds());
-        advertisement.setUsedBeds(request.getUsedBeds());
         advertisement.setPrice(request.getPrice());
         advertisement.setFirstStageDiscount(request.getFirstStageDiscount());
         advertisement.setSecondStageDiscount(request.getSecondStageDiscount());

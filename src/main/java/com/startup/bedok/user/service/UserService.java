@@ -1,5 +1,6 @@
 package com.startup.bedok.user.service;
 
+import com.github.javafaker.App;
 import com.startup.bedok.datahelper.DataGenerator;
 import com.startup.bedok.user.entity.TypeOfUser;
 import com.startup.bedok.user.exception.HostNoExistsException;
@@ -40,7 +41,7 @@ public class UserService {
         }
     }
 
-    public UserResponse getUserByID(UUID id) {
+    public UserResponse getUserResponseByID(UUID id) {
         ApplicationUser user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException(String.format("there is no user with uuid: '%s'", id)));
         Binary userPhoto = null;
@@ -49,6 +50,11 @@ public class UserService {
         userPhoto = userPhotoService.getPhoto(photoId);
 
         return UserMapperImpl.userToUserResponse(user, userPhoto);
+    }
+
+    public ApplicationUser getUserByID(UUID id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException(String.format("there is no user with uuid: '%s'", id)));
     }
 
     public void checkIfHostExists(UUID id) {
