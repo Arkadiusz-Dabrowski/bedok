@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -46,7 +47,7 @@ public class AdvertisementController {
         return ResponseEntity.ok(advertisementService.getAdvertisementListByHostId(hostId));
     }
 
-    @GetMapping("criteria")
+    @PostMapping("criteria")
     private ResponseEntity<Page<AdvertisementShort>> getAdvertisementListByMultiSearch(
             @RequestBody AdvertisementMultisearch advertisementMultisearch) {
         return ResponseEntity.ok(advertisementService.findAllWithFilters(advertisementMultisearch));
@@ -86,5 +87,10 @@ public class AdvertisementController {
     @PutMapping("deactivate")
     private ResponseEntity<String> deactivateAdvertisementById(UUID id) {
         return ResponseEntity.ok(advertisementService.deactivateAdvertisementById(id).toString());
+    }
+
+    @GetMapping("district")
+    private ResponseEntity<Map<String, List<String>>> getDistrictsCollection(){
+        return ResponseEntity.ok(advertisementService.getDistrictsCollection());
     }
 }

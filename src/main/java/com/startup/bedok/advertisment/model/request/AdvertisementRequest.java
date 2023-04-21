@@ -1,6 +1,5 @@
 package com.startup.bedok.advertisment.model.request;
 
-import com.startup.bedok.advertisment.model.enumerated.DistrictEnum;
 import com.startup.bedok.advertisment.model.enumerated.RoomGender;
 import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
@@ -49,8 +48,6 @@ public class AdvertisementRequest {
     private Double thirdStageDiscount;
     @NotNull
     private Double fourthStageDiscount;
-    @NotNull
-    private Integer discountMonth;
     @NotNull
     private Boolean sharedBeds;
     @NotNull

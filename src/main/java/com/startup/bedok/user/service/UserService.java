@@ -1,8 +1,6 @@
 package com.startup.bedok.user.service;
 
-import com.github.javafaker.App;
 import com.startup.bedok.datahelper.DataGenerator;
-import com.startup.bedok.user.entity.TypeOfUser;
 import com.startup.bedok.user.exception.HostNoExistsException;
 import com.startup.bedok.user.mapper.UserMapperImpl;
 import com.startup.bedok.user.model.ApplicationUser;
@@ -14,7 +12,7 @@ import org.bson.types.Binary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.*;
+import java.io.IOException;
 import java.util.UUID;
 
 
@@ -58,7 +56,7 @@ public class UserService {
     }
 
     public void checkIfHostExists(UUID id) {
-        if(!userRepository.existsByIdAndTypeOfUser(id, TypeOfUser.HOST))
+        if(!userRepository.existsById(id))
         throw new HostNoExistsException(id.toString());
     }
 

@@ -1,6 +1,5 @@
 package com.startup.bedok.user.model;
 
-import com.startup.bedok.user.entity.TypeOfUser;
 import com.sun.istack.NotNull;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,8 +13,6 @@ import java.time.LocalDate;
 public class UserDTO {
 
     @NotNull
-    TypeOfUser typeOfUser;
-    @NotNull
     private String name;
     private String email;
     @NotNull
@@ -26,14 +23,13 @@ public class UserDTO {
     private MultipartFile hostPhoto;
 
 
-    public UserDTO(TypeOfUser typeOfUser,
+    public UserDTO(
                    String hostName,
                    String hostEmail,
                    String hostPhone,
                    LocalDate dateOfBirth,
                    String language,
                    MultipartFile hostPhoto) {
-        this.typeOfUser = typeOfUser;
         this.name = hostName;
         this.email = hostEmail;
         this.phone = hostPhone;

@@ -5,7 +5,6 @@ import com.startup.bedok.advertisment.model.entity.District;
 import com.startup.bedok.advertisment.model.request.AdvertisementRequest;
 import com.startup.bedok.advertisment.model.response.AdvertisementResponse;
 import com.startup.bedok.advertisment.model.response.AdvertisementShort;
-import com.startup.bedok.guest.service.GuestService;
 import com.startup.bedok.user.model.UserResponse;
 import com.startup.bedok.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -62,6 +61,7 @@ public class AdvertisementMapper {
 
     public AdvertisementShort mapAdvertisementToAdvertisementShort(Advertisement advertisement, List<Binary> photo, UserResponse userResponse) {
         return new AdvertisementShort(
+                advertisement.getId(),
                 advertisement.getTitle(),
                 advertisement.getCity(),
                 advertisement.getDistrict().getName(),

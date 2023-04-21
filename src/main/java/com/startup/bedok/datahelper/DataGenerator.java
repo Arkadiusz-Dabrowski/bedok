@@ -10,7 +10,6 @@ import com.startup.bedok.advertisment.repository.AdvertisementRepository;
 import com.startup.bedok.advertisment.repository.DistrictRepository;
 import com.startup.bedok.advertisment.repository.RoomPhotosRepository;
 import com.startup.bedok.advertisment.services.AdvertisementPhotoService;
-import com.startup.bedok.user.entity.TypeOfUser;
 import com.startup.bedok.user.model.ApplicationUser;
 import com.startup.bedok.user.repository.UserPhotoRepository;
 import com.startup.bedok.user.repository.UserRepository;
@@ -51,7 +50,6 @@ public class DataGenerator {
     public void createSomeHostData(){
         List<ApplicationUser> users = IntStream.rangeClosed(1, 20)
                 .mapToObj(i -> new ApplicationUser(
-                        TypeOfUser.TENANT,
                         faker.name().name(),
                         faker.internet().password(),
                         faker.internet().emailAddress(),

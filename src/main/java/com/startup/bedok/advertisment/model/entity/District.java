@@ -2,8 +2,8 @@ package com.startup.bedok.advertisment.model.entity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.UniqueElements;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -17,7 +17,8 @@ public class District {
     @Id
     @GeneratedValue
     private UUID id;
-    @UniqueElements
+    @Column(unique = true, nullable = false)
     private String name;
+    @Column(nullable = false)
     private String cityName;
 }

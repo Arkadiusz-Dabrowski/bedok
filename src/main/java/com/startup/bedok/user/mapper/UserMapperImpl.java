@@ -12,7 +12,6 @@ public class UserMapperImpl {
 
     static public ApplicationUser hostDTOtoHost(UserDTO userDTO, String photoId) {
         return new ApplicationUser(
-                userDTO.getTypeOfUser(),
                 userDTO.getName(),
                 encryptPassword(userDTO.getPassword()),
                 userDTO.getEmail(),
