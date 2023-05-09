@@ -26,10 +26,14 @@ public class Reservation {
     private LocalDate dateTo;
     @ManyToOne
     private ApplicationUser user;
+    @ManyToOne
+    @JoinColumn(name = "advertisement_fk")
+    Advertisement advertisement;
 
-    public Reservation(Guest guest, LocalDate dateFrom, LocalDate dateTo) {
+    public Reservation(Guest guest, LocalDate dateFrom, LocalDate dateTo, Advertisement advertisement) {
         this.guest = guest;
         this.dateFrom = dateFrom;
         this.dateTo = dateTo;
+        this.advertisement = advertisement;
     }
 }

@@ -2,6 +2,7 @@ package com.startup.bedok.advertisment.repository;
 
 import com.startup.bedok.advertisment.model.entity.Advertisement;
 import com.startup.bedok.advertisment.model.request.AdvertisementMultisearch;
+import com.startup.bedok.reservation.model.entity.Reservation;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
 import org.springframework.data.domain.*;
@@ -9,10 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,14 +20,13 @@ public class AdvertisementCriteriaRepository {
 
     private final EntityManager entityManager;
     private final Session session;
-
     private CriteriaBuilder criteriaBuilder;
 
     public Page<Advertisement> findAllWithFilters(AdvertisementMultisearch advertisementMultisearch){
         criteriaBuilder = session.getCriteriaBuilder();
         CriteriaQuery<Advertisement> criteriaQuery = criteriaBuilder.createQuery(Advertisement.class);
         Root<Advertisement> advertisementRoot = criteriaQuery.from(Advertisement.class);
-        Predicate predicate = getPredicate(advertisementMultisearch, advertisementRoot);
+        Predicate predicate = getPredicate(advertisementMultisearch, advertisementRoot, criteriaQuery);
         criteriaQuery.where(predicate);
         setOrder(advertisementMultisearch, criteriaQuery, advertisementRoot);
 
@@ -43,7 +40,7 @@ public class AdvertisementCriteriaRepository {
     }
 
     private Predicate getPredicate(AdvertisementMultisearch advertisementMultisearch,
-                                   Root<Advertisement> advertisementRoot) {
+                                   Root<Advertisement> advertisementRoot, CriteriaQuery query) {
         List<Predicate> predicateList = new ArrayList<>();
 
         if(advertisementMultisearch.getLocation() != null){
@@ -69,8 +66,23 @@ public class AdvertisementCriteriaRepository {
         if(advertisementMultisearch.getSharedEquipment() != null){
             predicateList.add(criteriaBuilder.equal(advertisementRoot.get("sharedEquipment"), advertisementMultisearch.getSharedEquipment()));
         }
+        if (advertisementMultisearch.getDateFrom() != null && advertisementMultisearch.getDateTo() != null) {
+            Subquery<Long> subquery = query.subquery(Long.class);
+            Root<Reservation> reservationRoot = subquery.from(Reservation.class);
+            subquery.select(criteriaBuilder.count(reservationRoot.get("id")))
+                    .where(criteriaBuilder.and(
+                            criteriaBuilder.equal(reservationRoot.get("advertisement"), advertisementRoot),
+                            criteriaBuilder.or(
+                            criteriaBuilder.between(reservationRoot.get("dateFrom"), advertisementMultisearch.getDateFrom(), advertisementMultisearch.getDateTo()),
+                            criteriaBuilder.between(reservationRoot.get("dateTo"), advertisementMultisearch.getDateFrom(), advertisementMultisearch.getDateTo()))
+                    ));
+            Predicate numBedsPredicate = criteriaBuilder.greaterThan(advertisementRoot.get("numBeds"), subquery);
+            predicateList.add(numBedsPredicate);
+        }
         return criteriaBuilder.and(predicateList.toArray(new Predicate[0]));
     }
+
+
 
 
     private void setOrder(AdvertisementMultisearch advertisementMultisearch,

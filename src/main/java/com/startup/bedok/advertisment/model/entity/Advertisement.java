@@ -36,7 +36,8 @@ public class Advertisement {
     private double roomArea;
     private int numBeds;
     private double price;
-    @OneToMany
+
+    @OneToMany(mappedBy = "advertisement")
     private List<Reservation> reservations;
     private double firstStageDiscount;
     private double secondStageDiscount;

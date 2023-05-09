@@ -142,11 +142,20 @@ public class AdvertisementService {
                         photos = photos.stream().limit(5).collect(Collectors.toList());
                     List<Binary> advertisementPhotos = advertisementPhotoService
                             .getPhotos(photos).stream().map(AdvertisementPhoto::getImage).toList();
-
-                    return advertisementMapper
-                            .mapAdvertisementToAdvertisementShort(advertisement,
-                                    advertisementPhotos,
-                                    userResponse);
+                    if(advertisementMultisearch.getDateTo() == null || advertisementMultisearch.getDateFrom() ==null) {
+                        return advertisementMapper
+                                .mapAdvertisementToAdvertisementShort(advertisement,
+                                        advertisementPhotos,
+                                        userResponse);
+                    }
+                    else {
+                        return advertisementMapper
+                                .mapAdvertisementToAdvertisementShortWithDate(advertisement,
+                                        advertisementPhotos,
+                                        userResponse,
+                                        advertisementMultisearch.getDateFrom(),
+                                        advertisementMultisearch.getDateTo());
+                    }
                 }).toList();
         return new PageImpl<>(listOfAdvertisements, pageOfAdvertisements.getPageable(),
                 pageOfAdvertisements.getTotalElements());

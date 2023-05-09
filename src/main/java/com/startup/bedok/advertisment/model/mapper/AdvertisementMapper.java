@@ -5,6 +5,7 @@ import com.startup.bedok.advertisment.model.entity.District;
 import com.startup.bedok.advertisment.model.request.AdvertisementRequest;
 import com.startup.bedok.advertisment.model.response.AdvertisementResponse;
 import com.startup.bedok.advertisment.model.response.AdvertisementShort;
+import com.startup.bedok.reservation.model.entity.Reservation;
 import com.startup.bedok.user.model.UserResponse;
 import com.startup.bedok.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.bson.types.Binary;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -90,6 +92,39 @@ public class AdvertisementMapper {
                 advertisement.isActive()
         );
     }
+    public AdvertisementShort mapAdvertisementToAdvertisementShortWithDate(Advertisement advertisement, List<Binary> photo, UserResponse userResponse, LocalDate dateFrom, LocalDate dateTo) {
+        return new AdvertisementShort(
+                advertisement.getId(),
+                advertisement.getTitle(),
+                advertisement.getCity(),
+                advertisement.getDistrict().getName(),
+                advertisement.getNumBeds(),
+                advertisement.getRoomDescription(),
+                advertisement.getRoomGender(),
+                advertisement.getReservations()
+                        .stream()
+                        .filter(reservation -> compareDateOfReservationToDateOfSearch(reservation, dateFrom, dateTo))
+                        .map(reservation -> mapGuestToGuestResponse(reservation.getGuest()))
+                        .toList(),
+                advertisement.getPrice(),
+                advertisement.getStreetName(),
+                advertisement.getRoomArea(),
+                userResponse,
+                photo,
+                advertisement.isIronRoom(),
+                advertisement.isHooverRoom(),
+                advertisement.isTelevisionRoom(),
+                advertisement.isRadioRoom(),
+                advertisement.isBalconyRoom(),
+                advertisement.isIronShared(),
+                advertisement.isHooverShared(),
+                advertisement.isTelevisionShared(),
+                advertisement.isRadioShared(),
+                advertisement.isBalconyShared(),
+                advertisement.isActive()
+        );
+    }
+
 
 
     public Advertisement mapAdvertisementRequestToAdvertisement(AdvertisementRequest advertisementRequest, District district) {
@@ -159,6 +194,13 @@ public class AdvertisementMapper {
         advertisement.setRentalRulesObject(addRentalRules(request.getRentalRules()));
         advertisement.setUpdateDate(Instant.now().getEpochSecond());
         return advertisement;
+    }
+
+    private boolean compareDateOfReservationToDateOfSearch(Reservation reservation, LocalDate dateForm,LocalDate dateTo){
+        return reservation.getDateTo().equals(dateForm)
+                || (dateForm.isAfter(reservation.getDateFrom()) && dateForm.isBefore(reservation.getDateTo()))
+                || (dateTo.isAfter(reservation.getDateFrom()) && dateTo.isBefore(reservation.getDateTo()))
+                || (dateForm.isBefore(reservation.getDateFrom()) && dateTo.isAfter(reservation.getDateTo()));
     }
 
     private static String addRentalRules(List<String> rentalRules){

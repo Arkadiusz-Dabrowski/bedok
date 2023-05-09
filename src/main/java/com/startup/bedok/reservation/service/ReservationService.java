@@ -34,7 +34,7 @@ public class ReservationService {
             throw new NoFreeBedsException();
         }
         Guest guest = guestService.createGuest(anonymousReservationRequest.guestName(), anonymousReservationRequest.age(), anonymousReservationRequest.language());
-        Reservation reservation =  reservationRepository.save(new Reservation(guest, anonymousReservationRequest.dateFrom(), anonymousReservationRequest.dateTo()));
+        Reservation reservation =  reservationRepository.save(new Reservation(guest, anonymousReservationRequest.dateFrom(), anonymousReservationRequest.dateTo(), advertisement));
         advertisement.getReservations().add(reservation);
         return reservation.getId();
     }
@@ -47,7 +47,7 @@ public class ReservationService {
         }
         ApplicationUser user = userService.getUserByID(userReservationRequest.userId());
         Guest guest = guestService.createGuest(user.getName(), (LocalDate.now().getYear() - user.getDateOfBirth().getYear()), user.getLanguage());
-        Reservation reservation =  reservationRepository.save(new Reservation(guest, userReservationRequest.dateFrom(), userReservationRequest.dateTo()));
+        Reservation reservation =  reservationRepository.save(new Reservation(guest, userReservationRequest.dateFrom(), userReservationRequest.dateTo(), advertisement));
         reservation.setUser(user);
         advertisement.getReservations().add(reservation);
         return reservation.getId();

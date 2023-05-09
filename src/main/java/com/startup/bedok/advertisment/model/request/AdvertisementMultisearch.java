@@ -4,6 +4,7 @@ import com.sun.istack.NotNull;
 import lombok.Data;
 import org.springframework.data.domain.Sort;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -18,6 +19,8 @@ public class AdvertisementMultisearch {
     private List<String> sharedEquipment;
     private List<String> paymentType;
     private List<String> rentalRules;
+    private LocalDate dateFrom;
+    private LocalDate dateTo;
     private int pageNumber = 0;
     private int pageSize = 10;
     private Sort.Direction direction = Sort.DEFAULT_DIRECTION;
