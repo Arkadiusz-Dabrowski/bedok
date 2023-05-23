@@ -65,5 +65,9 @@ public class UserService {
     }
 
 
-
+    public ApplicationUser getUserByEmail(String email) {
+        return userRepository.findByPhone(email)
+                .orElseGet(() -> userRepository.findByEmail(email)
+                        .orElseThrow(() -> new RuntimeException("there is no user with selkected email or phone number")));
+    }
 }

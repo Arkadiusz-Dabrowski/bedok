@@ -26,8 +26,7 @@ public class Advertisement {
     private UUID hostId;
     private String city;
     private String title;
-    @OneToOne
-    private District district;
+    private String district;
     @Enumerated
     private RoomGender roomGender;
     private String postCode;
@@ -66,7 +65,7 @@ public class Advertisement {
     public Advertisement(UUID hostId,
                          String title,
                          String city,
-                         District district,
+                         String district,
                          RoomGender roomGender,
                          String postCode,
                          String streetName,

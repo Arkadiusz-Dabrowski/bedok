@@ -3,7 +3,6 @@ package com.startup.bedok.datahelper;
 import com.github.javafaker.Faker;
 import com.startup.bedok.advertisment.model.entity.Advertisement;
 import com.startup.bedok.advertisment.model.entity.AdvertisementPhoto;
-import com.startup.bedok.advertisment.model.entity.District;
 import com.startup.bedok.advertisment.model.entity.RoomPhoto;
 import com.startup.bedok.advertisment.model.enumerated.RoomGender;
 import com.startup.bedok.advertisment.repository.AdvertisementRepository;
@@ -28,7 +27,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -105,13 +106,12 @@ public class DataGenerator {
 
     @Transactional
     public void createSomeAdvertisementData(){
-        District district = districtRepository.findAll().stream().findAny().get();
         List<Advertisement> advertisements = IntStream.rangeClosed(1, 3)
                 .mapToObj(i -> new Advertisement(
                         getHostUUID(),
                         faker.ancient().hero(),
                         faker.address().city(),
-                        district,
+                        faker.address().state(),
                         faker.options().option(RoomGender.class),
                         faker.address().zipCode(),
                         faker.address().streetName(),

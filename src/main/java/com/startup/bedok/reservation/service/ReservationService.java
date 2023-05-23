@@ -35,6 +35,8 @@ public class ReservationService {
         }
         Guest guest = guestService.createGuest(anonymousReservationRequest.guestName(), anonymousReservationRequest.age(), anonymousReservationRequest.language());
         Reservation reservation =  reservationRepository.save(new Reservation(guest, anonymousReservationRequest.dateFrom(), anonymousReservationRequest.dateTo(), advertisement));
+        reservation.setPaid(true);
+        reservation.setAccepted(true);
         advertisement.getReservations().add(reservation);
         return reservation.getId();
     }
@@ -42,7 +44,7 @@ public class ReservationService {
     @Transactional
     public UUID createUserReservation(UserReservationRequest userReservationRequest){
         Advertisement advertisement = advertisementService.getAdvertisementById(userReservationRequest.advertisementId());
-        if((advertisement.getNumBeds() - advertisement.getReservations().size()) < 1) {
+        if(!checkBeedsAvaiability(userReservationRequest.dateFrom(), userReservationRequest.dateTo(), advertisement)) {
             throw new NoFreeBedsException();
         }
         ApplicationUser user = userService.getUserByID(userReservationRequest.userId());
@@ -51,5 +53,15 @@ public class ReservationService {
         reservation.setUser(user);
         advertisement.getReservations().add(reservation);
         return reservation.getId();
+    }
+
+    private boolean checkBeedsAvaiability(LocalDate dateFrom, LocalDate dateTo, Advertisement advertisement){
+        int numberOfFreeBeds = advertisement.getReservations().stream().filter(reservation -> {
+            return reservation.getDateTo().equals(dateFrom)
+                    || (dateFrom.isAfter(reservation.getDateFrom()) && dateFrom.isBefore(reservation.getDateTo()))
+                    || (dateTo.isAfter(reservation.getDateFrom()) && dateTo.isBefore(reservation.getDateTo()))
+                    || (dateFrom.isBefore(reservation.getDateFrom()) && dateTo.isAfter(reservation.getDateTo()));
+        }).toList().size();
+        return advertisement.getNumBeds() > numberOfFreeBeds;
     }
 }

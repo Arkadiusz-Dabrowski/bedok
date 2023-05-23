@@ -1,7 +1,6 @@
 package com.startup.bedok.advertisment.model.mapper;
 
 import com.startup.bedok.advertisment.model.entity.Advertisement;
-import com.startup.bedok.advertisment.model.entity.District;
 import com.startup.bedok.advertisment.model.request.AdvertisementRequest;
 import com.startup.bedok.advertisment.model.response.AdvertisementResponse;
 import com.startup.bedok.advertisment.model.response.AdvertisementShort;
@@ -30,6 +29,7 @@ public class AdvertisementMapper {
                 userService.getUserResponseByID(advertisement.getHostId()),
                 advertisement.getTitle(),
                 advertisement.getCity(),
+                advertisement.getDistrict(),
                 advertisement.getPostCode(),
                 advertisement.getStreetName(),
                 photos,
@@ -66,7 +66,7 @@ public class AdvertisementMapper {
                 advertisement.getId(),
                 advertisement.getTitle(),
                 advertisement.getCity(),
-                advertisement.getDistrict().getName(),
+                advertisement.getDistrict(),
                 advertisement.getNumBeds(),
                 advertisement.getRoomDescription(),
                 advertisement.getRoomGender(),
@@ -97,7 +97,7 @@ public class AdvertisementMapper {
                 advertisement.getId(),
                 advertisement.getTitle(),
                 advertisement.getCity(),
-                advertisement.getDistrict().getName(),
+                advertisement.getDistrict(),
                 advertisement.getNumBeds(),
                 advertisement.getRoomDescription(),
                 advertisement.getRoomGender(),
@@ -127,12 +127,12 @@ public class AdvertisementMapper {
 
 
 
-    public Advertisement mapAdvertisementRequestToAdvertisement(AdvertisementRequest advertisementRequest, District district) {
+    public Advertisement mapAdvertisementRequestToAdvertisement(AdvertisementRequest advertisementRequest) {
         return new Advertisement(
                 advertisementRequest.getHostId(),
                 advertisementRequest.getTitle(),
                 advertisementRequest.getCity(),
-                district,
+                advertisementRequest.getDistrict(),
                 advertisementRequest.getGenderRoom(),
                 advertisementRequest.getPostCode(),
                 advertisementRequest.getStreetName(),
@@ -163,9 +163,9 @@ public class AdvertisementMapper {
     }
 
     public Advertisement updateAdvertisementFromRequest(Advertisement advertisement,
-                                                        AdvertisementRequest request, District district) {
+                                                        AdvertisementRequest request) {
         advertisement.setTitle(request.getTitle());
-        advertisement.setDistrict(district);
+        advertisement.setDistrict(request.getDistrict());
         advertisement.setRoomGender(request.getGenderRoom());
         advertisement.setPostCode(request.getPostCode());
         advertisement.setStreetName(request.getStreetName());
@@ -196,11 +196,11 @@ public class AdvertisementMapper {
         return advertisement;
     }
 
-    private boolean compareDateOfReservationToDateOfSearch(Reservation reservation, LocalDate dateForm,LocalDate dateTo){
-        return reservation.getDateTo().equals(dateForm)
-                || (dateForm.isAfter(reservation.getDateFrom()) && dateForm.isBefore(reservation.getDateTo()))
+    private boolean compareDateOfReservationToDateOfSearch(Reservation reservation, LocalDate dateFrom,LocalDate dateTo){
+        return reservation.getDateTo().equals(dateFrom)
+                || (dateFrom.isAfter(reservation.getDateFrom()) && dateFrom.isBefore(reservation.getDateTo()))
                 || (dateTo.isAfter(reservation.getDateFrom()) && dateTo.isBefore(reservation.getDateTo()))
-                || (dateForm.isBefore(reservation.getDateFrom()) && dateTo.isAfter(reservation.getDateTo()));
+                || (dateFrom.isBefore(reservation.getDateFrom()) && dateTo.isAfter(reservation.getDateTo()));
     }
 
     private static String addRentalRules(List<String> rentalRules){
@@ -210,7 +210,15 @@ public class AdvertisementMapper {
         return "";
     }
 
-    private Integer calculatePrice(Advertisement advertisement){
-        return null;
+    private double calculatePrice(Advertisement advertisement, LocalDate dateFrom, LocalDate dateTo){
+        int daysOfRental = dateTo.compareTo(dateFrom);
+        if(daysOfRental > 30)
+            return advertisement.getFourthStageDiscount();
+        if(daysOfRental > 20)
+            return advertisement.getThirdStageDiscount();
+        if(daysOfRental > 10)
+            return advertisement.getSecondStageDiscount();
+
+        return advertisement.getFirstStageDiscount();
     }
 }

@@ -28,7 +28,10 @@ public class Reservation {
     private ApplicationUser user;
     @ManyToOne
     @JoinColumn(name = "advertisement_fk")
-    Advertisement advertisement;
+    private Advertisement advertisement;
+    private Boolean paid;
+    private Boolean accepted;
+
 
     public Reservation(Guest guest, LocalDate dateFrom, LocalDate dateTo, Advertisement advertisement) {
         this.guest = guest;

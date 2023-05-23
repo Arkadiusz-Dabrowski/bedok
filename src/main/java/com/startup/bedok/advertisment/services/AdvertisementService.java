@@ -49,10 +49,8 @@ public class AdvertisementService {
     @Transactional
     public UUID createAdvertisement(AdvertisementRequest advertisementRequest) {
         userService.checkIfHostExists(advertisementRequest.getHostId());
-        District district = districtRepository.findByName(advertisementRequest.getDistrict())
-                .orElseThrow(() -> new RuntimeException(String.format("District with name %s not exists", advertisementRequest.getDistrict())));
         return advertisementRepository
-                .save(advertisementMapper.mapAdvertisementRequestToAdvertisement(advertisementRequest, district))
+                .save(advertisementMapper.mapAdvertisementRequestToAdvertisement(advertisementRequest))
                 .getId();
     }
 
@@ -60,9 +58,7 @@ public class AdvertisementService {
     public Advertisement updateAdvertisement(AdvertisementRequest advertisementRequest, UUID advertisementId) {
         Advertisement advertisement = advertisementRepository.findById(advertisementId)
                 .orElseThrow(() -> new AdvertisementNoExistsException(advertisementId.toString()));
-        District district = districtRepository.findByName(advertisementRequest.getDistrict())
-                .orElseThrow(() -> new RuntimeException(String.format("District with name %s not exists", advertisementRequest.getDistrict())));
-        return advertisementMapper.updateAdvertisementFromRequest(advertisement, advertisementRequest, district);
+        return advertisementMapper.updateAdvertisementFromRequest(advertisement, advertisementRequest);
     }
 
     @Transactional

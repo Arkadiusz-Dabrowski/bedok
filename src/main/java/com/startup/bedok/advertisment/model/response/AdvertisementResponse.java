@@ -23,6 +23,8 @@ public class AdvertisementResponse {
     @NotNull
     private String city;
     @NotNull
+    private String district;
+    @NotNull
     private String postCode;
     @NotNull
     private String hostStreet;
