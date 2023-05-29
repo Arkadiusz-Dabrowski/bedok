@@ -1,10 +1,11 @@
 package com.startup.bedok.user.controller;
 
-import com.startup.bedok.security.JwtTokenUtil;
+import com.startup.bedok.config.JwtTokenUtil;
 import com.startup.bedok.user.model.ApplicationUser;
 import com.startup.bedok.user.model.LoginDTO;
 import com.startup.bedok.user.model.UserDTO;
 import com.startup.bedok.user.model.UserResponse;
+import com.startup.bedok.user.notification.Notification;
 import com.startup.bedok.user.service.UserPhotoService;
 import com.startup.bedok.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -39,6 +41,12 @@ public class UserController {
         String token = jwtTokenUtil.generateToken(user);
 
         return ResponseEntity.ok(token);
+    }
+
+    @GetMapping("notifications")
+    public ResponseEntity<List<Notification>> getNotifications(@RequestHeader("Authorization") String token){
+        UUID userId = jwtTokenUtil.getUserIdFromToken(token);
+        return ResponseEntity.ok(userService.getNotificationsByUser(userId));
     }
 
     @GetMapping

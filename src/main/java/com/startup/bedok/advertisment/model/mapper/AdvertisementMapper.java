@@ -15,6 +15,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import static com.startup.bedok.guest.model.GuestMapper.mapGuestToGuestResponse;
 
@@ -127,9 +128,10 @@ public class AdvertisementMapper {
 
 
 
-    public Advertisement mapAdvertisementRequestToAdvertisement(AdvertisementRequest advertisementRequest) {
+    public Advertisement mapAdvertisementRequestToAdvertisement(AdvertisementRequest advertisementRequest,
+                                                                UUID userId) {
         return new Advertisement(
-                advertisementRequest.getHostId(),
+                userId,
                 advertisementRequest.getTitle(),
                 advertisementRequest.getCity(),
                 advertisementRequest.getDistrict(),

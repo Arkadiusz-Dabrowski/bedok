@@ -1,49 +1,75 @@
 package com.startup.bedok.config;
 
-import io.jsonwebtoken.ExpiredJwtException;
+import com.startup.bedok.user.model.ApplicationUser;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.SignatureException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @Component
 public class JwtTokenUtil {
 
-    private final String secret = "secret";
+    @Value("${jwt.secret}")
+    private String jwtSecret;
 
+    public String generateToken(ApplicationUser user) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("id", user.getId());
+        claims.put("name", user.getName());
+        claims.put("email", user.getEmail());
 
-    public String generateToken(String username) {
         Date now = new Date();
-        Date expirationDate = new Date(now.getTime() + 3600000); // 1 hour
+        Date expiryDate = new Date(now.getTime() + 86400000L); // 1 day
+
         return Jwts.builder()
-                .setSubject(username)
+                .setClaims(claims)
                 .setIssuedAt(now)
-                .setExpiration(expirationDate)
-                .signWith(SignatureAlgorithm.HS512, secret)
+                .setExpiration(expiryDate)
+                .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
 
-    public String getUsernameFromToken(String token) {
-        return Jwts.parser()
-                .setSigningKey(secret)
+    public UUID getUserIdFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(jwtSecret)
                 .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+                .getBody();
+
+        return UUID.fromString(claims.get("id", String.class));
+    }
+
+    public String getUsernameFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(jwtSecret)
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.get("name", String.class);
+    }
+
+    public boolean validateToken(String token, UserDetails userDetails) {
+        UUID userId = getUserIdFromToken(token);
+        return userId.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
     public boolean validateToken(String token) {
-        try {
-            Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
-            return true;
-        } catch (SignatureException ex) {
-            // Invalid signature
-        } catch (ExpiredJwtException ex) {
-            // Token expired
-        } catch (Exception ex) {
-            // Other exceptions
-        }
-        return false;
+        return getUserIdFromToken(token) != null;
+    }
+
+    private boolean isTokenExpired(String token) {
+        Date expiration = Jwts.parser()
+                .setSigningKey(jwtSecret)
+                .parseClaimsJws(token)
+                .getBody()
+                .getExpiration();
+
+        return expiration.before(new Date());
     }
 }

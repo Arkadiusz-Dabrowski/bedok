@@ -5,4 +5,4 @@ import lombok.Getter;
 import java.time.LocalDate;
 import java.util.UUID;
 
-public record UserReservationRequest(UUID userId, UUID advertisementId, LocalDate dateFrom, LocalDate dateTo) { }
+public record UserReservationRequest(UUID advertisementId, LocalDate dateFrom, LocalDate dateTo) { }

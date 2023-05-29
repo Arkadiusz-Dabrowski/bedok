@@ -17,12 +17,14 @@ public class ReservationController {
     private final ReservationService reservationService;
 
     @PostMapping("anonymous")
-    public ResponseEntity<UUID> createAnonymousReservation(@RequestBody AnonymousReservationRequest anonymousReservationRequest){
-        return ResponseEntity.ok(reservationService.createAnonymousReservation(anonymousReservationRequest));
+    public ResponseEntity<UUID> createAnonymousReservation(@RequestBody AnonymousReservationRequest anonymousReservationRequest,
+                                                           @RequestHeader("Authorization") String token){
+        return ResponseEntity.ok(reservationService.createAnonymousReservation(anonymousReservationRequest, token));
     }
 
     @PostMapping("user")
-    public ResponseEntity<UUID> createUserReservation(@RequestBody UserReservationRequest userReservationRequest){
-       return ResponseEntity.ok(reservationService.createUserReservation(userReservationRequest));
+    public ResponseEntity<UUID> createUserReservation(@RequestBody UserReservationRequest userReservationRequest,
+                                                      @RequestHeader("Authorization") String token){
+       return ResponseEntity.ok(reservationService.createUserReservation(userReservationRequest, token));
     }
 }

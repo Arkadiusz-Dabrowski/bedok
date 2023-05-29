@@ -13,8 +13,8 @@ import java.util.UUID;
 
 @Entity
 @NoArgsConstructor
-@Getter
 @Setter
+@Getter
 public class Reservation {
 
     @Id

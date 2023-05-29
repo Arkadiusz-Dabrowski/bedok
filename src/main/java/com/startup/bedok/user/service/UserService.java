@@ -1,11 +1,14 @@
 package com.startup.bedok.user.service;
 
 import com.startup.bedok.datahelper.DataGenerator;
+import com.startup.bedok.config.JwtTokenUtil;
 import com.startup.bedok.user.exception.HostNoExistsException;
 import com.startup.bedok.user.mapper.UserMapperImpl;
 import com.startup.bedok.user.model.ApplicationUser;
 import com.startup.bedok.user.model.UserDTO;
 import com.startup.bedok.user.model.UserResponse;
+import com.startup.bedok.user.notification.Notification;
+import com.startup.bedok.user.notification.NotificationService;
 import com.startup.bedok.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.Binary;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -23,6 +27,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserPhotoService userPhotoService;
     private final DataGenerator dataGenerator;
+    private final NotificationService notificationService;
+    private final JwtTokenUtil jwtTokenUtil;
 
     @Transactional
     public UUID registerUser(UserDTO userDTO) throws IOException {
@@ -50,6 +56,11 @@ public class UserService {
         return UserMapperImpl.userToUserResponse(user, userPhoto);
     }
 
+    public List<Notification> getNotificationsByUser(UUID userId){
+        ApplicationUser user = userRepository.getById(userId);
+        return notificationService.getNotificationsByUser(user);
+    }
+
     public ApplicationUser getUserByID(UUID id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException(String.format("there is no user with uuid: '%s'", id)));
@@ -68,6 +79,11 @@ public class UserService {
     public ApplicationUser getUserByEmail(String email) {
         return userRepository.findByPhone(email)
                 .orElseGet(() -> userRepository.findByEmail(email)
-                        .orElseThrow(() -> new RuntimeException("there is no user with selkected email or phone number")));
+                        .orElseThrow(() -> new RuntimeException("there is no user with selected email or phone number")));
+    }
+
+    private ApplicationUser getUserFromToken(String token) {
+        UUID userId = jwtTokenUtil.getUserIdFromToken(token);
+        return getUserByID(userId);
     }
 }

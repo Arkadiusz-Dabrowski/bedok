@@ -12,6 +12,7 @@ import java.util.UUID;
 
 @Getter
 @Entity
+@Setter
 @NoArgsConstructor
 public class Guest {
     @Id

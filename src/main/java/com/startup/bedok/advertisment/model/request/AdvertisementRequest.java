@@ -25,8 +25,6 @@ public class AdvertisementRequest {
     private RoomGender genderRoom;
     private List<String> guests;
     @NotNull
-    private UUID hostId;
-    @NotNull
     private String postCode;
     @NotNull
     private String streetName;

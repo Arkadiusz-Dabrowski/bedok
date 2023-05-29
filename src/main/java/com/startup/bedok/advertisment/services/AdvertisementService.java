@@ -15,6 +15,7 @@ import com.startup.bedok.advertisment.repository.AdvertisementRepository;
 import com.startup.bedok.advertisment.repository.DistrictRepository;
 import com.startup.bedok.advertisment.repository.RoomPhotosRepository;
 import com.startup.bedok.datahelper.DataGenerator;
+import com.startup.bedok.config.JwtTokenUtil;
 import com.startup.bedok.user.model.UserResponse;
 import com.startup.bedok.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -45,19 +46,24 @@ public class AdvertisementService {
     private final RoomPhotosRepository roomPhotosRepository;
     private final DataGenerator dataGenerator;
     private final DistrictRepository districtRepository;
-
+    private final JwtTokenUtil jwtTokenUtil;
     @Transactional
-    public UUID createAdvertisement(AdvertisementRequest advertisementRequest) {
-        userService.checkIfHostExists(advertisementRequest.getHostId());
+    public UUID createAdvertisement(AdvertisementRequest advertisementRequest, String token) {
+        UUID userId = jwtTokenUtil.getUserIdFromToken(token);
+        userService.checkIfHostExists(userId);
         return advertisementRepository
-                .save(advertisementMapper.mapAdvertisementRequestToAdvertisement(advertisementRequest))
+                .save(advertisementMapper.mapAdvertisementRequestToAdvertisement(advertisementRequest, userId))
                 .getId();
     }
 
     @Transactional
-    public Advertisement updateAdvertisement(AdvertisementRequest advertisementRequest, UUID advertisementId) {
+    public Advertisement updateAdvertisement(AdvertisementRequest advertisementRequest, UUID advertisementId, String token) {
+        UUID userId = jwtTokenUtil.getUserIdFromToken(token);
         Advertisement advertisement = advertisementRepository.findById(advertisementId)
                 .orElseThrow(() -> new AdvertisementNoExistsException(advertisementId.toString()));
+        if(!advertisement.getHostId().equals(userId)) {
+            throw new IllegalArgumentException("Advertisement does not belong to user");
+        }
         return advertisementMapper.updateAdvertisementFromRequest(advertisement, advertisementRequest);
     }
 

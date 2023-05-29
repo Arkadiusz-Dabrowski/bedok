@@ -28,13 +28,16 @@ public class AdvertisementController {
     private final AdvertisementService advertisementService;
 
     @PostMapping
-    private ResponseEntity<UUID> createAdvertisement(@RequestBody AdvertisementRequest advertisementRequest) {
-        return ResponseEntity.ok(advertisementService.createAdvertisement(advertisementRequest));
+    private ResponseEntity<UUID> createAdvertisement(@RequestBody AdvertisementRequest advertisementRequest,
+                                                     @RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(advertisementService.createAdvertisement(advertisementRequest, token));
     }
 
     @PutMapping
-    private ResponseEntity<Advertisement> updateAdvertisement(@RequestBody AdvertisementRequest advertisementRequest, @RequestParam UUID advertisementId) {
-        return ResponseEntity.ok(advertisementService.updateAdvertisement(advertisementRequest, advertisementId));
+    private ResponseEntity<Advertisement> updateAdvertisement(@RequestBody AdvertisementRequest advertisementRequest,
+                                                              @RequestParam UUID advertisementId,
+                                                              @RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(advertisementService.updateAdvertisement(advertisementRequest, advertisementId, token));
     }
 
     @GetMapping

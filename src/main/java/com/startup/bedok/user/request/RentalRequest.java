@@ -18,5 +18,4 @@ public class RentalRequest {
     private LocalDate dateOfReservation;
     @OneToOne
     private Reservation reservation;
-
 }
