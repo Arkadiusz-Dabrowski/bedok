@@ -6,6 +6,7 @@ import com.startup.bedok.user.model.ApplicationUser;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.LazyCollection;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -26,7 +27,7 @@ public class Reservation {
     private LocalDate dateTo;
     @ManyToOne
     private ApplicationUser user;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "advertisement_fk")
     private Advertisement advertisement;
     private Boolean paid;
@@ -38,5 +39,7 @@ public class Reservation {
         this.dateFrom = dateFrom;
         this.dateTo = dateTo;
         this.advertisement = advertisement;
+        this.paid = false;
+        this.accepted = false;
     }
 }

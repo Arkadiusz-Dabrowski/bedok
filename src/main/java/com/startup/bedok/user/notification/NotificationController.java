@@ -1,10 +1,10 @@
 package com.startup.bedok.user.notification;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -23,5 +23,10 @@ public class NotificationController {
     @PutMapping("decline")
     public UUID declineNotificationAcceptance(UUID notificationId){
         return notificationService.declineNotificationAcceptance(notificationId);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<NotificationDTO>> getUserNotifications(@RequestHeader("Authorization") String token){
+        return ResponseEntity.ok(notificationService.getUserNotifications(token));
     }
 }

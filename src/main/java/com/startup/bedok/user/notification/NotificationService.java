@@ -1,5 +1,6 @@
 package com.startup.bedok.user.notification;
 
+import com.startup.bedok.config.JwtTokenUtil;
 import com.startup.bedok.payment.Payment;
 import com.startup.bedok.payment.PaymentService;
 import com.startup.bedok.payment.PaymentStatus;
@@ -18,6 +19,8 @@ import java.util.UUID;
 public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final PaymentService paymentService;
+    private final NotificationMapper notificationMapper;
+    private final JwtTokenUtil jwtTokenUtil;
 
     @Transactional
     public void createNotification(Reservation reservation, ApplicationUser user, NotificationType notificationType){
@@ -86,5 +89,12 @@ public class NotificationService {
             return reservation.getAdvertisement().getSecondStageDiscount()*numberOfDays;
         }
         return reservation.getAdvertisement().getFirstStageDiscount()*numberOfDays;
+    }
+
+    public List<NotificationDTO> getUserNotifications(String token) {
+        UUID userId = jwtTokenUtil.getUserIdFromToken(token);
+        return notificationRepository.findAllByUserId(userId).stream()
+                .map(notificationMapper::mapToNotificationDTO).toList();
+
     }
 }

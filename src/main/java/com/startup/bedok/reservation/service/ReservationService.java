@@ -8,6 +8,7 @@ import com.startup.bedok.reservation.exceptions.NoFreeBedsException;
 import com.startup.bedok.reservation.model.entity.Reservation;
 import com.startup.bedok.reservation.model.request.AnonymousReservationRequest;
 import com.startup.bedok.reservation.model.request.UserReservationRequest;
+import com.startup.bedok.reservation.model.response.ReservationDTO;
 import com.startup.bedok.reservation.repository.ReservationRepository;
 import com.startup.bedok.config.JwtTokenUtil;
 import com.startup.bedok.user.model.ApplicationUser;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -31,6 +33,7 @@ public class ReservationService {
     private final UserService userService;
     private final NotificationService notificationService;
     private final JwtTokenUtil jwtTokenUtil;
+    private final ReservationMapper reservationMapper;
 
     @Transactional
     public UUID createAnonymousReservation(AnonymousReservationRequest anonymousReservationRequest, String token){
@@ -65,6 +68,27 @@ public class ReservationService {
         ApplicationUser host = userService.getUserByID(advertisement.getHostId());
         notificationService.createNotification(reservation, host, NotificationType.ACCEPTANCE);
         return reservation.getId();
+    }
+
+    public List<ReservationDTO> getReservationsByUserId(String token){
+        return reservationRepository.findAllByUserId(jwtTokenUtil.getUserIdFromToken(token)).stream()
+                .map(reservationMapper::mapToReservationDTO).toList();
+    }
+
+    public List<ReservationDTO> getReservationsByAdvertisementId(UUID advertisementId, String token){
+        Advertisement advertisement = advertisementService.getAdvertisementById(advertisementId);
+        if(!advertisement.getHostId().equals(jwtTokenUtil.getUserIdFromToken(token))){
+            throw new IllegalArgumentException("Advertisement does not belong to user");
+        }
+        return reservationRepository.findAllByAdvertisementId(advertisement.getId()).stream()
+                .map(reservationMapper::mapToReservationDTO).toList();
+    }
+
+    public List<ReservationDTO> getReservationsByHostId(String token) {
+        UUID userId = jwtTokenUtil.getUserIdFromToken(token);
+        return reservationRepository.findAll().stream()
+                .filter(reservation -> reservation.getAdvertisement().getHostId().equals(userId))
+                .map(reservationMapper::mapToReservationDTO).toList();
     }
 
     private boolean checkBeedsAvaiability(LocalDate dateFrom, LocalDate dateTo, Advertisement advertisement){
