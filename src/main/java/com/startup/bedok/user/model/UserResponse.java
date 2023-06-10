@@ -14,11 +14,13 @@ public class UserResponse {
     private String email;
     private String phone;
     private Binary photo;
+    private GenderEnum gender;
 
-    public UserResponse(String hostName, String hostEmail, String hostPhone, Binary photo) {
+    public UserResponse(String hostName, String hostEmail, String hostPhone, Binary photo, GenderEnum gender) {
         this.name = hostName;
         this.email = hostEmail;
         this.phone = hostPhone;
         this.photo = photo;
+        this.gender = gender;
     }
 }

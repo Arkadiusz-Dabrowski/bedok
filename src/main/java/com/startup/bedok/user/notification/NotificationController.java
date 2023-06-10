@@ -25,8 +25,13 @@ public class NotificationController {
         return notificationService.declineNotificationAcceptance(notificationId);
     }
 
-    @GetMapping
-    public ResponseEntity<List<NotificationDTO>> getUserNotifications(@RequestHeader("Authorization") String token){
-        return ResponseEntity.ok(notificationService.getUserNotifications(token));
+    @GetMapping("acceptance")
+    public ResponseEntity<List<NotificationAcceptanceDTO>> getUserAcceptanceNotifications(@RequestHeader("Authorization") String token){
+        return ResponseEntity.ok(notificationService.getUserAcceptanceNotifications(token));
+    }
+
+    @GetMapping("acceptance")
+    public ResponseEntity<List<NotificationPaymentDTO>> getUserPaymentNotifications(@RequestHeader("Authorization") String token){
+        return ResponseEntity.ok(notificationService.getUserPaymentNotifications(token));
     }
 }

@@ -10,6 +10,7 @@ import com.startup.bedok.advertisment.repository.DistrictRepository;
 import com.startup.bedok.advertisment.repository.RoomPhotosRepository;
 import com.startup.bedok.advertisment.services.AdvertisementPhotoService;
 import com.startup.bedok.user.model.ApplicationUser;
+import com.startup.bedok.user.model.GenderEnum;
 import com.startup.bedok.user.repository.UserPhotoRepository;
 import com.startup.bedok.user.repository.UserRepository;
 import com.startup.bedok.user.service.UserPhotoService;
@@ -52,13 +53,18 @@ public class DataGenerator {
         List<ApplicationUser> users = IntStream.rangeClosed(1, 20)
                 .mapToObj(i -> new ApplicationUser(
                         faker.name().name(),
+                        GenderEnum.MALE,
                         faker.internet().password(),
                         faker.internet().emailAddress(),
                         faker.phoneNumber().phoneNumber(),
                         null,
                         LocalDate.now().minusYears(faker.number().numberBetween(20,40))
                                 .minusMonths(faker.number().numberBetween(2,8)),
-                        "polski"
+                        "polski",
+                        faker.bool().bool(),
+                        faker.bool().bool(),
+                        faker.bool().bool(),
+                        faker.bool().bool()
                 )).toList();
         userRepository.saveAll(users);
     }

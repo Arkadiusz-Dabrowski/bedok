@@ -2,6 +2,7 @@ package com.startup.bedok.guest.model.entity;
 
 import com.startup.bedok.advertisment.model.entity.Advertisement;
 import com.startup.bedok.user.model.ApplicationUser;
+import com.sun.istack.NotNull;
 import lombok.*;
 
 import javax.persistence.*;
@@ -17,11 +18,18 @@ import java.util.UUID;
 public class Guest {
     @Id
     @GeneratedValue
-    @ToString.Exclude
     private UUID id;
+    private UUID tenantId;
     private String name;
     private Integer age;
     private String language;
+
+    public Guest(String name, UUID tenantId, Integer age, String language) {
+        this.name = name;
+        this.tenantId = tenantId;
+        this.age = age;
+        this.language = language;
+    }
 
     public Guest(String name, Integer age, String language) {
         this.name = name;

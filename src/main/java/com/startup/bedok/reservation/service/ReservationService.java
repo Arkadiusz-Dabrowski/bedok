@@ -45,7 +45,7 @@ public class ReservationService {
         if((advertisement.getNumBeds() - advertisement.getReservations().size()) < 1) {
             throw new NoFreeBedsException();
         }
-        Guest guest = guestService.createGuest(anonymousReservationRequest.guestName(), anonymousReservationRequest.age(), anonymousReservationRequest.language());
+        Guest guest = guestService.createGuest(anonymousReservationRequest.guestName(), null, anonymousReservationRequest.age(), anonymousReservationRequest.language());
         Reservation reservation =  reservationRepository.save(new Reservation(guest, anonymousReservationRequest.dateFrom(), anonymousReservationRequest.dateTo(), advertisement));
         reservation.setPaid(true);
         reservation.setAccepted(true);
@@ -55,13 +55,13 @@ public class ReservationService {
 
     @Transactional
     public UUID createUserReservation(UserReservationRequest userReservationRequest, String token){
-        UUID userId = jwtTokenUtil.getUserIdFromToken(token);
+        UUID tenantId = jwtTokenUtil.getUserIdFromToken(token);
         Advertisement advertisement = advertisementService.getAdvertisementById(userReservationRequest.advertisementId());
         if(!checkBeedsAvaiability(userReservationRequest.dateFrom(), userReservationRequest.dateTo(), advertisement)) {
             throw new NoFreeBedsException();
         }
-        ApplicationUser user = userService.getUserByID(userId);
-        Guest guest = guestService.createGuest(user.getName(), (LocalDate.now().getYear() - user.getDateOfBirth().getYear()), user.getLanguage());
+        ApplicationUser user = userService.getUserByID(tenantId);
+        Guest guest = guestService.createGuest(user.getName(),tenantId, (LocalDate.now().getYear() - user.getDateOfBirth().getYear()), user.getLanguage());
         Reservation reservation =  reservationRepository.save(new Reservation(guest, userReservationRequest.dateFrom(), userReservationRequest.dateTo(), advertisement));
         reservation.setUser(user);
         advertisement.getReservations().add(reservation);

@@ -69,11 +69,13 @@ public class NotificationService {
         return notificationRepository.save(notification).getId();
     }
     private void checkIfNotificationCanBeAccepted(Notification notification){
-        if (notification.getCreatedDate().plusDays(1).isBefore(LocalDateTime.now())){
-            throw new RuntimeException("Notification is too old");
-        }
         if(notification.isModified()){
             throw new RuntimeException("Notification has already been modified");
+        }
+        if (notification.getCreatedDate().plusHours(24).isBefore(LocalDateTime.now())){
+            throw new RuntimeException("Notification is too old");
+        } else {
+            notification.getReservation().setAccepted(true);
         }
     }
 
@@ -91,10 +93,17 @@ public class NotificationService {
         return reservation.getAdvertisement().getFirstStageDiscount()*numberOfDays;
     }
 
-    public List<NotificationDTO> getUserNotifications(String token) {
+    public List<NotificationAcceptanceDTO> getUserAcceptanceNotifications(String token) {
         UUID userId = jwtTokenUtil.getUserIdFromToken(token);
-        return notificationRepository.findAllByUserId(userId).stream()
-                .map(notificationMapper::mapToNotificationDTO).toList();
 
+        return notificationRepository.findAllByUserId(userId).stream()
+                .map(notificationMapper::mapToNotificationAcceptanceDTO).toList();
+    }
+
+    public List<NotificationPaymentDTO> getUserPaymentNotifications(String token) {
+        UUID userId = jwtTokenUtil.getUserIdFromToken(token);
+
+        return notificationRepository.findAllByUserId(userId).stream()
+                .map(notificationMapper::mapToNotificationPaymentDTO).toList();
     }
 }

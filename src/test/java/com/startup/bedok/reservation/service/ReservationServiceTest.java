@@ -63,7 +63,7 @@ class ReservationServiceTest {
 
         Guest guest = new Guest("John Doe", 30, "English");
         guest.setId(UUID.randomUUID());
-        when(guestService.createGuest(request.guestName(), request.age(), request.language())).thenReturn(guest);
+        when(guestService.createGuest(request.guestName(), null, request.age(), request.language())).thenReturn(guest);
 
         Reservation savedReservation = new Reservation(guest, request.dateFrom(), request.dateTo(), advertisement);
         savedReservation.setId(UUID.randomUUID());
@@ -81,7 +81,7 @@ class ReservationServiceTest {
         assertEquals(1, advertisement.getReservations().size());
 
         verify(advertisementService).getAdvertisementById(advertisementId);
-        verify(guestService).createGuest(request.guestName(), request.age(), request.language());
+        verify(guestService).createGuest(request.guestName(), null, request.age(), request.language());
         verify(reservationRepository).save(any(Reservation.class));
     }
 
@@ -108,7 +108,7 @@ class ReservationServiceTest {
         assertThrows(NoFreeBedsException.class, () -> reservationService.createAnonymousReservation(request, "token"));
 
         verify(advertisementService).getAdvertisementById(advertisementId);
-        verify(guestService, never()).createGuest(any(), anyInt(), any());
+        verify(guestService, never()).createGuest(any(), null, anyInt(), any());
         verify(reservationRepository, never()).save(any(Reservation.class));
     }
 

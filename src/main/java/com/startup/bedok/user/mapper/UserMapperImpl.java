@@ -13,12 +13,17 @@ public class UserMapperImpl {
     static public ApplicationUser hostDTOtoHost(UserDTO userDTO, String photoId) {
         return new ApplicationUser(
                 userDTO.getName(),
+                userDTO.getGender(),
                 encryptPassword(userDTO.getPassword()),
                 userDTO.getEmail(),
                 userDTO.getPhone(),
                 photoId,
                 userDTO.getDateOfBirth(),
-                userDTO.getLanguage()
+                userDTO.getLanguage(),
+                userDTO.isViber(),
+                userDTO.isSignal(),
+                userDTO.isWhatsapp(),
+                userDTO.isTelegram()
         );
     }
 
@@ -27,7 +32,8 @@ public class UserMapperImpl {
                 user.getName(),
                 user.getEmail(),
                 user.getPhone(),
-                hostPhoto
+                hostPhoto,
+                user.getGender()
         );
     }
 

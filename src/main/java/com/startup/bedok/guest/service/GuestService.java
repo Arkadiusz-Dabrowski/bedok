@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class GuestService {
@@ -13,7 +15,7 @@ public class GuestService {
     GuestRepository guestRepository;
 
 
-    public Guest createGuest(String guestName, Integer age, String language) {
-        return guestRepository.save(new Guest(guestName, age, language));
+    public Guest createGuest(String guestName, UUID tenantId, Integer age, String language) {
+        return guestRepository.save(new Guest(guestName, tenantId, age, language));
     }
 }
