@@ -27,7 +27,7 @@ public class UserController {
     private final JwtTokenUtil jwtTokenUtil;
 
     @PostMapping("register")
-    private ResponseEntity<UUID> registerUser(@Validated UserDTO userDTO) throws IOException {
+    private ResponseEntity<UUID> registerUser(@Validated @RequestBody UserDTO userDTO) throws IOException {
         return ResponseEntity.ok(userService.registerUser(userDTO));
     }
 

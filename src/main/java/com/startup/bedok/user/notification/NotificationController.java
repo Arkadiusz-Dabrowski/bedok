@@ -14,9 +14,8 @@ public class NotificationController {
 
     private final NotificationService notificationService;
 
-    @RequestMapping
     @PutMapping("accept")
-    public UUID approveNotificationAcceptance(UUID notificationId){
+    public UUID approveNotificationAcceptance(@RequestHeader UUID notificationId){
         return notificationService.approveNotificationAcceptance(notificationId);
     }
 
@@ -30,7 +29,7 @@ public class NotificationController {
         return ResponseEntity.ok(notificationService.getUserAcceptanceNotifications(token));
     }
 
-    @GetMapping("acceptance")
+    @GetMapping("payment")
     public ResponseEntity<List<NotificationPaymentDTO>> getUserPaymentNotifications(@RequestHeader("Authorization") String token){
         return ResponseEntity.ok(notificationService.getUserPaymentNotifications(token));
     }
