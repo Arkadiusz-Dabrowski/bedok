@@ -50,7 +50,7 @@ public class UserController {
     }
 
     @GetMapping
-    private UserResponse getUser(UUID id) {
+    private UserResponse getUser(@RequestParam UUID id) {
         return userService.getUserResponseByID(id);
     }
 
