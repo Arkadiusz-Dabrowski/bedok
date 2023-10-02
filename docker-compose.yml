@@ -28,27 +28,6 @@ services:
         source: ./mongodb_data
         target: /data/db
   # APP*****************************************
-  springbootapp:
-    image: 1c50e6e20ab6
-    network_mode: bridge
-    container_name: springbootapp
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/postgres
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=admin
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-      - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/bedok
-      - SPRING_DATA_MONGODB_DATABASE=bedok
-    expose:
-      - 8080
-    ports:
-      - 8080:8080
-    depends_on:
-      - postgres
-      - mongo
-    links:
-      - postgres
-      - mongo
 volumes:
   postgres-data:
   mongodb_data_container:
