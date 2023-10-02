@@ -15,7 +15,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=bedok
   mongo:
-    image: arkadiuszdabrowski/mongodb:tagname
+    image: arkadiuszdabrowski/mongodb:v5.0
     network_mode: bridge
     hostname: mongo
     container_name: mongo
