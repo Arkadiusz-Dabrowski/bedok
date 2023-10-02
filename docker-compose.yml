@@ -23,10 +23,6 @@ services:
       - 27017
     ports:
       - 27017:27017
-    volumes:
-      - type: bind
-        source: ./mongodb_data
-        target: /data/db
   # APP*****************************************
 volumes:
   postgres-data:
