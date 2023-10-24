@@ -25,7 +25,6 @@ public class ApplicationUser  {
     private String password;
 
     @NotNull
-    @UniqueElements
     private String email;
     @NotNull
     private String phone;
