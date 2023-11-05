@@ -22,6 +22,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("advertisement")
 @RequiredArgsConstructor
+@CrossOrigin("*")
 @Api(tags = {SpringFoxConfig.BOOK_TAG})
 public class AdvertisementController {
 

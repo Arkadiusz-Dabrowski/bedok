@@ -3,8 +3,6 @@ package com.startup.bedok.user.model;
 import com.sun.istack.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.UniqueElements;
-
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -25,8 +23,10 @@ public class ApplicationUser  {
     private String password;
 
     @NotNull
+    @Column(unique = true)
     private String email;
     @NotNull
+    @Column(unique = true)
     private String phone;
     private String photoId;
     @NotNull
