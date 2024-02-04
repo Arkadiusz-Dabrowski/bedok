@@ -37,7 +37,7 @@ public class UserMapperImpl {
         );
     }
 
-    private static String encryptPassword(String plainPassword) {
+    public static String encryptPassword(String plainPassword) {
         BCryptPasswordEncoder bCryptPasswordEncoder =
                 new BCryptPasswordEncoder(10, new SecureRandom());
         return bCryptPasswordEncoder.encode(plainPassword);

@@ -1,10 +1,11 @@
 package com.startup.bedok.user.service;
 
-import com.startup.bedok.datahelper.DataGenerator;
 import com.startup.bedok.config.JwtTokenUtil;
+import com.startup.bedok.datahelper.DataGenerator;
 import com.startup.bedok.user.exception.HostNoExistsException;
 import com.startup.bedok.user.mapper.UserMapperImpl;
 import com.startup.bedok.user.model.ApplicationUser;
+import com.startup.bedok.user.model.LoginDTO;
 import com.startup.bedok.user.model.UserDTO;
 import com.startup.bedok.user.model.UserResponse;
 import com.startup.bedok.user.notification.Notification;
@@ -12,6 +13,8 @@ import com.startup.bedok.user.notification.NotificationService;
 import com.startup.bedok.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.Binary;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +57,16 @@ public class UserService {
         userPhoto = userPhotoService.getPhoto(photoId);
 
         return UserMapperImpl.userToUserResponse(user, userPhoto);
+    }
+
+    public ResponseEntity<String> login(LoginDTO loginDTO) {
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        ApplicationUser user = getUserByEmail(loginDTO.getEmail());
+        if (user == null || !bCryptPasswordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
+            return ResponseEntity.badRequest().body("Invalid email or password");
+        }
+        String token = jwtTokenUtil.generateToken(user);
+        return ResponseEntity.ok(token);
     }
 
     public List<Notification> getNotificationsByUser(UUID userId){

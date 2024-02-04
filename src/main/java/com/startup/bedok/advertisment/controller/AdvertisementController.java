@@ -6,8 +6,6 @@ import com.startup.bedok.advertisment.model.request.AdvertisementRequest;
 import com.startup.bedok.advertisment.model.response.AdvertisementShort;
 import com.startup.bedok.advertisment.model.response.AdvertisementResponse;
 import com.startup.bedok.advertisment.services.AdvertisementService;
-import com.startup.bedok.config.SpringFoxConfig;
-import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +21,6 @@ import java.util.UUID;
 @RequestMapping("advertisement")
 @RequiredArgsConstructor
 @CrossOrigin("*")
-@Api(tags = {SpringFoxConfig.BOOK_TAG})
 public class AdvertisementController {
 
     private final AdvertisementService advertisementService;

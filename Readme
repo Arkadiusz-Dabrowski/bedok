@@ -1,5 +1,5 @@
-localhost:8080/user/random - tworzenie hostow
-localhost:8080/advertisement/random - tworzenie ogloszen/ moga wystapic bledy, wtedy trzeba powtorzyclocalhost:8080/advertisement/random - tworzenie ogloszen/ moga wystapic bledy, wtedy trzeba powtorzyc
-localhost:8080/advertisement/all/photos - dodaje po zdjeciu do kazdego ogloszenia
+POST /host/random - tworzenie hostow
+POST /advertisement/random - tworzenie randomowych ogloszen
+POST /advertisement/randomPhotos - dodaje randomowym po zdjeciu do kazdego ogloszenia
 
 
