@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("reservation")
+    @RequestMapping("reservation")
 @RequiredArgsConstructor
 public class ReservationController {
 
@@ -37,13 +37,13 @@ public class ReservationController {
     }
 
     @GetMapping("advertisement")
-    public ResponseEntity<List<ReservationDTO>> getAdvertisementReservation(@RequestHeader("Authorization") String token,
+    public ResponseEntity<List<ReservationDTO>> getAdvertisementReservations(@RequestHeader("Authorization") String token,
                                                                @RequestParam UUID advertisementId){
         return ResponseEntity.ok(reservationService.getReservationsByAdvertisementId(advertisementId, token));
     }
 
     @GetMapping("host")
-    public ResponseEntity<List<ReservationDTO>> getHostReservation(@RequestHeader("Authorization") String token){
+    public ResponseEntity<List<ReservationDTO>> getHostReservations(@RequestHeader("Authorization") String token){
         return ResponseEntity.ok(reservationService.getReservationsByHostId(token));
     }
 }

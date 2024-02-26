@@ -1,4 +1,4 @@
-package com.startup.bedok.advertisment.exception;
+package com.startup.bedok.exceptions;
 
 public class AdvertisementNotExistsException extends RuntimeException{
 

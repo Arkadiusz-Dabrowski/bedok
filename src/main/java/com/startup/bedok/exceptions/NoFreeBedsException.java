@@ -1,4 +1,4 @@
-package com.startup.bedok.reservation.exceptions;
+package com.startup.bedok.exceptions;
 
 public class NoFreeBedsException extends RuntimeException{
 

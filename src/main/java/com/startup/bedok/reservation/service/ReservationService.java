@@ -4,7 +4,7 @@ import com.startup.bedok.advertisment.model.entity.Advertisement;
 import com.startup.bedok.advertisment.services.AdvertisementService;
 import com.startup.bedok.guest.model.entity.Guest;
 import com.startup.bedok.guest.service.GuestService;
-import com.startup.bedok.reservation.exceptions.NoFreeBedsException;
+import com.startup.bedok.exceptions.NoFreeBedsException;
 import com.startup.bedok.reservation.model.entity.Reservation;
 import com.startup.bedok.reservation.model.request.AnonymousReservationRequest;
 import com.startup.bedok.reservation.model.request.UserReservationRequest;

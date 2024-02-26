@@ -58,6 +58,7 @@ public class NotificationService {
 
     private UUID createPaymentNotification(Notification acceptanceNotification){
         Double finalPrice = calculatePayment(acceptanceNotification.getReservation());
+        //user may not exists
         Notification notification = Notification.createNotification(acceptanceNotification.getReservation(),
                 NotificationType.PAYMENT,
                 acceptanceNotification.getUser());

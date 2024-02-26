@@ -1,6 +1,6 @@
 package com.startup.bedok.advertisment.services;
 
-import com.startup.bedok.advertisment.exception.AdvertisementPhotoNoExistsException;
+import com.startup.bedok.exceptions.AdvertisementPhotoNoExistsException;
 import com.startup.bedok.advertisment.model.entity.Advertisement;
 import com.startup.bedok.advertisment.model.entity.AdvertisementPhoto;
 import com.startup.bedok.advertisment.model.entity.RoomPhoto;

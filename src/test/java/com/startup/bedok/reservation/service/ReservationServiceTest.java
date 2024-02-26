@@ -1,27 +1,14 @@
 package com.startup.bedok.reservation.service;
 
-import com.startup.bedok.advertisment.model.entity.Advertisement;
 import com.startup.bedok.advertisment.services.AdvertisementService;
-import com.startup.bedok.guest.model.entity.Guest;
 import com.startup.bedok.guest.service.GuestService;
-import com.startup.bedok.reservation.exceptions.NoFreeBedsException;
-import com.startup.bedok.reservation.model.entity.Reservation;
-import com.startup.bedok.reservation.model.request.AnonymousReservationRequest;
 import com.startup.bedok.reservation.repository.ReservationRepository;
 import com.startup.bedok.user.notification.NotificationService;
 import com.startup.bedok.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class ReservationServiceTest {
 

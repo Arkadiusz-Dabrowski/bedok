@@ -1,4 +1,4 @@
-package com.startup.bedok.user.exception;
+package com.startup.bedok.exceptions;
 
 public class UserNoExistsException extends RuntimeException{
 

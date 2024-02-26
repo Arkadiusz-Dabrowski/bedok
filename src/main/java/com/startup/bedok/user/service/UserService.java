@@ -2,7 +2,10 @@ package com.startup.bedok.user.service;
 
 import com.startup.bedok.config.JwtTokenUtil;
 import com.startup.bedok.datahelper.DataGenerator;
-import com.startup.bedok.user.exception.HostNoExistsException;
+import com.startup.bedok.exceptions.HostNoExistsException;
+import com.startup.bedok.exceptions.UserNoExistsException;
+import com.startup.bedok.exceptions.UserWithSelectedEmailAlreadyExistsException;
+import com.startup.bedok.exceptions.UserWithSelectedPhoneAlreadyExistsException;
 import com.startup.bedok.user.mapper.UserMapperImpl;
 import com.startup.bedok.user.model.ApplicationUser;
 import com.startup.bedok.user.model.LoginDTO;
@@ -13,10 +16,10 @@ import com.startup.bedok.user.notification.NotificationService;
 import com.startup.bedok.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.Binary;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
@@ -33,19 +36,21 @@ public class UserService {
     private final NotificationService notificationService;
     private final JwtTokenUtil jwtTokenUtil;
 
-    @Transactional
-    public UUID registerUser(UserDTO userDTO) throws IOException {
-        try {
+    public UUID registerUser(UserDTO userDTO) throws IOException{
             String photoId = null;
             if(userDTO.getHostPhoto() != null) {
                 photoId = userPhotoService.savePhoto(userDTO.getHostPhoto().getBytes(),
                         userDTO.getName());
             }
             ApplicationUser user = UserMapperImpl.hostDTOtoHost(userDTO, photoId);
-            return userRepository.save(user).getId();
-        } catch (IOException ioException) {
-            throw new IOException("Error during host creation", ioException.getCause());
-        }
+            try {
+                return userRepository.save(user).getId();
+            } catch (DataIntegrityViolationException e) {
+                if(e.getCause().getCause().getMessage().contains(user.getEmail()))
+                throw new UserWithSelectedEmailAlreadyExistsException(user.getEmail());
+                else
+                    throw new UserWithSelectedPhoneAlreadyExistsException(user.getPhone());
+            }
     }
 
     public UserResponse getUserResponseByID(UUID id) {
@@ -60,13 +65,17 @@ public class UserService {
     }
 
     public ResponseEntity<String> login(LoginDTO loginDTO) {
-        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        ApplicationUser user = getUserByEmail(loginDTO.getEmail());
-        if (user == null || !bCryptPasswordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
-            return ResponseEntity.badRequest().body("Invalid email or password");
+        try {
+            BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+            ApplicationUser user = getUserByEmail(loginDTO.getEmail());
+            if (user == null || !bCryptPasswordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
+                return ResponseEntity.badRequest().body("Invalid email or password");
+            }
+            String token = jwtTokenUtil.generateToken(user);
+            return ResponseEntity.ok(token);
+        }catch (Exception e){
+            throw new RuntimeException(e.getMessage());
         }
-        String token = jwtTokenUtil.generateToken(user);
-        return ResponseEntity.ok(token);
     }
 
     public List<Notification> getNotificationsByUser(UUID userId){
@@ -76,7 +85,7 @@ public class UserService {
 
     public ApplicationUser getUserByID(UUID id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(String.format("there is no user with uuid: '%s'", id)));
+                .orElseThrow(() -> new UserNoExistsException(id.toString()));
     }
 
     public void checkIfHostExists(UUID id) {
