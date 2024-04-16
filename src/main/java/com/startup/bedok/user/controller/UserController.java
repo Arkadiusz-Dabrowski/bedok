@@ -2,6 +2,7 @@ package com.startup.bedok.user.controller;
 
 import com.startup.bedok.config.JwtTokenUtil;
 import com.startup.bedok.user.model.LoginDTO;
+import com.startup.bedok.user.model.LoginResponse;
 import com.startup.bedok.user.model.UserDTO;
 import com.startup.bedok.user.model.UserResponse;
 import com.startup.bedok.user.notification.Notification;
@@ -9,6 +10,7 @@ import com.startup.bedok.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -29,9 +31,14 @@ public class UserController {
         return ResponseEntity.ok(userService.registerUser(userDTO));
     }
 
+    @PostMapping("photo/{id}")
+    private ResponseEntity<String> addUserPhoto(@PathVariable UUID id, @RequestParam("file") MultipartFile photo) throws IOException {
+        return ResponseEntity.ok(userService.addPhotoToUser(id, photo));
+    }
+
     @PostMapping("login")
-    public ResponseEntity<String> login(@RequestBody LoginDTO loginDTO) {
-        return userService.login(loginDTO);
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginDTO loginDTO) {
+        return ResponseEntity.ok(userService.login(loginDTO));
     }
 
     @GetMapping("notifications")

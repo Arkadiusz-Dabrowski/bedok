@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -31,9 +32,9 @@ public class AdvertisementController {
         return ResponseEntity.ok(advertisementService.createAdvertisement(advertisementRequest, token));
     }
 
-    @PutMapping
+    @PutMapping("{advertisementId}")
     private ResponseEntity<Advertisement> updateAdvertisement(@RequestBody AdvertisementRequest advertisementRequest,
-                                                              @RequestParam UUID advertisementId,
+                                                              @PathVariable UUID advertisementId,
                                                               @RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(advertisementService.updateAdvertisement(advertisementRequest, advertisementId, token));
     }
@@ -44,8 +45,8 @@ public class AdvertisementController {
     }
 
     @GetMapping("host")
-    private ResponseEntity<List<AdvertisementShort>> getAdvertisementListByHostId(@RequestParam UUID hostId) {
-        return ResponseEntity.ok(advertisementService.getAdvertisementListByHostId(hostId));
+    private ResponseEntity<List<AdvertisementShort>> getAdvertisementListByHostId(@RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(advertisementService.getAdvertisementListByHostId(token));
     }
 
     @PostMapping("criteria")
@@ -54,8 +55,8 @@ public class AdvertisementController {
         return ResponseEntity.ok(advertisementService.findAllWithFilters(advertisementMultisearch));
     }
 
-    @GetMapping("details")
-    private ResponseEntity<AdvertisementResponse> getAdvertisementByDetails(@RequestParam UUID advertisementId) {
+    @GetMapping("details/{advertisementId}")
+    private ResponseEntity<AdvertisementResponse> getAdvertisementByDetails(@PathVariable UUID advertisementId) {
         return ResponseEntity.ok(advertisementService.getAdvertisementDTOById(advertisementId));
     }
 
@@ -64,15 +65,14 @@ public class AdvertisementController {
         return ResponseEntity.ok(advertisementService.getAdvertisementsList());
     }
 
-    @PutMapping("photos")
-    private ResponseEntity<String> addPhotosToAdvertisement(List<MultipartFile> photos, @RequestParam UUID advertisementId) {
+    @PutMapping("photos/{advertisementId}")
+    private ResponseEntity<String> addPhotosToAdvertisement(List<MultipartFile> photos, @PathVariable UUID advertisementId) {
         return ResponseEntity.ok(advertisementService.saveRoomPhotos(photos, advertisementId));
     }
 
     @PostMapping("random")
-    private ResponseEntity<String> createSomeRandomAdvertisements(){
-        advertisementService.createSomeRandomAdvertisements();
-        return ResponseEntity.ok("ok");
+    private ResponseEntity<List<Advertisement>> createSomeRandomAdvertisements(){
+        return ResponseEntity.ok(advertisementService.createSomeRandomAdvertisements());
     }
 
     @PostMapping("randomPhotos")

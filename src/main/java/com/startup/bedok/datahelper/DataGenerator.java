@@ -111,7 +111,7 @@ public class DataGenerator {
     }
 
     @Transactional
-    public void createSomeAdvertisementData(){
+    public List<Advertisement> createSomeAdvertisementData(){
         List<Advertisement> advertisements = IntStream.rangeClosed(1, 3)
                 .mapToObj(i -> new Advertisement(
                         getHostUUID(),
@@ -145,7 +145,7 @@ public class DataGenerator {
                         faker.bool().bool(),
                         faker.leagueOfLegends().quote()
                 )).toList();
-        advertisementRepository.saveAll(advertisements);
+        return advertisementRepository.saveAll(advertisements);
     }
 
     private UUID getHostUUID(){

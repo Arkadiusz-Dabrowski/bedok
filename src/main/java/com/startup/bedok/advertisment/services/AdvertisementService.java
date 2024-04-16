@@ -24,8 +24,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +50,7 @@ public class AdvertisementService {
     private final DistrictRepository districtRepository;
     private final JwtTokenUtil jwtTokenUtil;
     @Transactional
-    public UUID createAdvertisement(AdvertisementRequest advertisementRequest, String token) {
+    public UUID createAdvertisement(@Valid AdvertisementRequest advertisementRequest, String token) {
         UUID userId = jwtTokenUtil.getUserIdFromToken(token);
         userService.checkIfHostExists(userId);
         return advertisementRepository
@@ -57,7 +59,7 @@ public class AdvertisementService {
     }
 
     @Transactional
-    public Advertisement updateAdvertisement(AdvertisementRequest advertisementRequest, UUID advertisementId, String token) {
+    public Advertisement updateAdvertisement(@Valid AdvertisementRequest advertisementRequest, UUID advertisementId, String token) {
         UUID userId = jwtTokenUtil.getUserIdFromToken(token);
         Advertisement advertisement = advertisementRepository.findById(advertisementId)
                 .orElseThrow(() -> new AdvertisementNoExistsException(advertisementId.toString()));
@@ -115,7 +117,8 @@ public class AdvertisementService {
     }
 
 
-    public List<AdvertisementShort> getAdvertisementListByHostId(UUID hostId) {
+    public List<AdvertisementShort> getAdvertisementListByHostId(String token) {
+        UUID hostId = jwtTokenUtil.getUserIdFromToken(token);
         userService.checkIfHostExists(hostId);
         return advertisementRepository.findAllByHostId(hostId).stream()
                 .map(advertisement -> {
@@ -163,8 +166,8 @@ public class AdvertisementService {
                 pageOfAdvertisements.getTotalElements());
     }
 
-    public void createSomeRandomAdvertisements() {
-        dataGenerator.createSomeAdvertisementData();
+    public List<Advertisement> createSomeRandomAdvertisements() {
+        return dataGenerator.createSomeAdvertisementData();
     }
 
     public String createSomePhotosForRandomAdvertisements() throws IOException {

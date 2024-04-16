@@ -30,6 +30,7 @@ public class UserMapperImpl {
     static public UserResponse userToUserResponse(ApplicationUser user, Binary hostPhoto) {
         return new UserResponse(
                 user.getName(),
+                user.getId(),
                 user.getEmail(),
                 user.getPhone(),
                 hostPhoto,

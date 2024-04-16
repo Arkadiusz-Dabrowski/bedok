@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 
-public record AdvertisementShort(@NotNull UUID advertisementId, @NotNull String title, @NotNull String city, @NotNull String district,
+public record AdvertisementShort(@NotNull UUID advertisementId, @NotNull UUID hostId, @NotNull String title, @NotNull String city, @NotNull String district,
                                  @NotNull Integer numBeds, String description, RoomGender roomGender,
                                  List<GuestResponse> guests, Double price, String street, @NotNull Double roomArea,
                                  @NotNull UserResponse userResponse, @NotNull List<Binary> mainPhotos,

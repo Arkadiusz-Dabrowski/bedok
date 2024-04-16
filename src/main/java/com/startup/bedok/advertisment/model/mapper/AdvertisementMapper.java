@@ -65,6 +65,7 @@ public class AdvertisementMapper {
     public AdvertisementShort mapAdvertisementToAdvertisementShort(Advertisement advertisement, List<Binary> photo, UserResponse userResponse) {
         return new AdvertisementShort(
                 advertisement.getId(),
+                userResponse.getId(),
                 advertisement.getTitle(),
                 advertisement.getCity(),
                 advertisement.getDistrict(),
@@ -93,9 +94,11 @@ public class AdvertisementMapper {
                 advertisement.isActive()
         );
     }
+
     public AdvertisementShort mapAdvertisementToAdvertisementShortWithDate(Advertisement advertisement, List<Binary> photo, UserResponse userResponse, LocalDate dateFrom, LocalDate dateTo) {
         return new AdvertisementShort(
                 advertisement.getId(),
+                userResponse.getId(),
                 advertisement.getTitle(),
                 advertisement.getCity(),
                 advertisement.getDistrict(),
@@ -125,7 +128,6 @@ public class AdvertisementMapper {
                 advertisement.isActive()
         );
     }
-
 
 
     public Advertisement mapAdvertisementRequestToAdvertisement(AdvertisementRequest advertisementRequest,
@@ -175,10 +177,22 @@ public class AdvertisementMapper {
         advertisement.setRoomArea(request.getRoomArea());
         advertisement.setNumBeds(request.getNumBeds());
         advertisement.setPrice(request.getPrice());
-        advertisement.setFirstStageDiscount(request.getFirstStageDiscount());
-        advertisement.setSecondStageDiscount(request.getSecondStageDiscount());
-        advertisement.setThirdStageDiscount(request.getThirdStageDiscount());
-        advertisement.setFourthStageDiscount(request.getFourthStageDiscount());
+        if (request.getFirstStageDiscount() != null)
+            advertisement.setFirstStageDiscount(request.getFirstStageDiscount());
+        else
+            advertisement.setFirstStageDiscount(0.0);
+        if (request.getSecondStageDiscount() != null)
+            advertisement.setSecondStageDiscount(request.getSecondStageDiscount());
+        else
+            advertisement.setSecondStageDiscount(0.0);
+        if (request.getThirdStageDiscount() != null)
+            advertisement.setThirdStageDiscount(request.getThirdStageDiscount());
+        else
+            advertisement.setThirdStageDiscount(0.0);
+        if (request.getFourthStageDiscount() != null)
+            advertisement.setFourthStageDiscount(request.getFourthStageDiscount());
+        else
+            advertisement.setFourthStageDiscount(0.0);
         advertisement.setSharedBeds(request.getSharedBeds());
         advertisement.setLanguage(request.getLanguage());
         advertisement.setIronRoom(request.isIronRoom());
@@ -198,27 +212,27 @@ public class AdvertisementMapper {
         return advertisement;
     }
 
-    private boolean compareDateOfReservationToDateOfSearch(Reservation reservation, LocalDate dateFrom,LocalDate dateTo){
+    private boolean compareDateOfReservationToDateOfSearch(Reservation reservation, LocalDate dateFrom, LocalDate dateTo) {
         return reservation.getDateTo().equals(dateFrom)
                 || (dateFrom.isAfter(reservation.getDateFrom()) && dateFrom.isBefore(reservation.getDateTo()))
                 || (dateTo.isAfter(reservation.getDateFrom()) && dateTo.isBefore(reservation.getDateTo()))
                 || (dateFrom.isBefore(reservation.getDateFrom()) && dateTo.isAfter(reservation.getDateTo()));
     }
 
-    private static String addRentalRules(List<String> rentalRules){
-        if(!rentalRules.isEmpty())
-        return String.join(",", rentalRules);
+    private static String addRentalRules(List<String> rentalRules) {
+        if (!rentalRules.isEmpty())
+            return String.join(",", rentalRules);
 
         return "";
     }
 
-    private double calculatePrice(Advertisement advertisement, LocalDate dateFrom, LocalDate dateTo){
+    private double calculatePrice(Advertisement advertisement, LocalDate dateFrom, LocalDate dateTo) {
         int daysOfRental = dateTo.compareTo(dateFrom);
-        if(daysOfRental > 30)
+        if (daysOfRental > 30)
             return advertisement.getFourthStageDiscount();
-        if(daysOfRental > 20)
+        if (daysOfRental > 20)
             return advertisement.getThirdStageDiscount();
-        if(daysOfRental > 10)
+        if (daysOfRental > 10)
             return advertisement.getSecondStageDiscount();
 
         return advertisement.getFirstStageDiscount();
