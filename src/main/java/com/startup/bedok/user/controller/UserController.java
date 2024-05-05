@@ -1,10 +1,7 @@
 package com.startup.bedok.user.controller;
 
 import com.startup.bedok.config.JwtTokenUtil;
-import com.startup.bedok.user.model.LoginDTO;
-import com.startup.bedok.user.model.LoginResponse;
-import com.startup.bedok.user.model.UserDTO;
-import com.startup.bedok.user.model.UserResponse;
+import com.startup.bedok.user.model.*;
 import com.startup.bedok.user.notification.Notification;
 import com.startup.bedok.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +24,7 @@ public class UserController {
     private final JwtTokenUtil jwtTokenUtil;
 
     @PostMapping("register")
-    private ResponseEntity<UUID> registerUser(@Valid @RequestBody UserDTO userDTO) throws IOException {
+    private ResponseEntity<RegistrationResponse> registerUser(@Valid @RequestBody UserDTO userDTO) throws IOException {
         return ResponseEntity.ok(userService.registerUser(userDTO));
     }
 

@@ -37,9 +37,16 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(MissingRequestHeaderException.class)
-    public ResponseEntity<Object> handleException(MissingRequestHeaderException ex) {
+    public ResponseEntity<Object> handleMissingRequestHeaderException(MissingRequestHeaderException ex) {
         CustomException apiError =
                 new CustomException(HttpStatus.METHOD_NOT_ALLOWED, String.format("%s header needed", ex.getHeaderName()));
         return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.METHOD_NOT_ALLOWED);
+    }
+
+    @ExceptionHandler({AuthenticationException.class})
+    public ResponseEntity<Object> handleAuthenticationException(AuthenticationException ex) {
+        CustomException apiError =
+                new CustomException(HttpStatus.UNAUTHORIZED, ex.getMessage());
+        return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.UNAUTHORIZED);
     }
 }

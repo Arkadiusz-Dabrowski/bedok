@@ -1,6 +1,7 @@
 package com.startup.bedok.user.notification;
 
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.converters.models.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,12 +17,12 @@ public class NotificationController {
     private final NotificationService notificationService;
 
     @PutMapping("accept")
-    public UUID approveNotificationAcceptance(@RequestHeader UUID notificationId){
+    public UUID approveNotificationAcceptance(@RequestHeader("Authorization") String token, @RequestHeader UUID notificationId){
         return notificationService.approveNotificationAcceptance(notificationId);
     }
 
     @PutMapping("decline")
-    public UUID declineNotificationAcceptance(UUID notificationId){
+    public UUID declineNotificationAcceptance(@RequestHeader("Authorization") String token, UUID notificationId){
         return notificationService.declineNotificationAcceptance(notificationId);
     }
 

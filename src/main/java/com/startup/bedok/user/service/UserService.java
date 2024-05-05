@@ -2,10 +2,7 @@ package com.startup.bedok.user.service;
 
 import com.startup.bedok.config.JwtTokenUtil;
 import com.startup.bedok.datahelper.DataGenerator;
-import com.startup.bedok.exceptions.HostNoExistsException;
-import com.startup.bedok.exceptions.UserNoExistsException;
-import com.startup.bedok.exceptions.UserWithSelectedEmailAlreadyExistsException;
-import com.startup.bedok.exceptions.UserWithSelectedPhoneAlreadyExistsException;
+import com.startup.bedok.exceptions.*;
 import com.startup.bedok.user.mapper.UserMapperImpl;
 import com.startup.bedok.user.model.*;
 import com.startup.bedok.user.notification.Notification;
@@ -14,7 +11,6 @@ import com.startup.bedok.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.Binary;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,7 +31,7 @@ public class UserService {
     private final NotificationService notificationService;
     private final JwtTokenUtil jwtTokenUtil;
 
-    public UUID registerUser(UserDTO userDTO) throws IOException {
+    public RegistrationResponse registerUser(UserDTO userDTO) throws IOException {
         String photoId = null;
         if (userDTO.getHostPhoto() != null) {
             photoId = userPhotoService.savePhoto(userDTO.getHostPhoto().getBytes(),
@@ -43,7 +39,7 @@ public class UserService {
         }
         ApplicationUser user = UserMapperImpl.hostDTOtoHost(userDTO, photoId);
         try {
-            return userRepository.save(user).getId();
+            return new RegistrationResponse(userRepository.save(user).getId());
         } catch (DataIntegrityViolationException e) {
             if (e.getCause().getCause().getMessage().contains(user.getEmail()))
                 throw new UserWithSelectedEmailAlreadyExistsException(user.getEmail());
@@ -79,12 +75,12 @@ public class UserService {
             BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
             ApplicationUser user = getUserByEmail(loginDTO.getEmail());
             if (user == null || !bCryptPasswordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
-                throw new RuntimeException("login data is incorrect");
+                throw new AuthenticationException();
             }
             String token = jwtTokenUtil.generateToken(user);
             return new LoginResponse(token);
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            throw new AuthenticationException();
         }
     }
 

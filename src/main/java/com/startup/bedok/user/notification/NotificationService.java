@@ -23,17 +23,17 @@ public class NotificationService {
     private final JwtTokenUtil jwtTokenUtil;
 
     @Transactional
-    public void createNotification(Reservation reservation, ApplicationUser user, NotificationType notificationType){
+    public void createNotification(Reservation reservation, ApplicationUser user, NotificationType notificationType) {
         Notification notification = Notification.createNotification(reservation, notificationType, user);
         notificationRepository.save(notification);
     }
 
 
-    public Notification getNotificationById(UUID id){
+    public Notification getNotificationById(UUID id) {
         return notificationRepository.findById(id).orElseThrow(() -> new RuntimeException(String.format("there is no notification with uuid: '%s'", id)));
     }
 
-    public List<Notification> getNotificationsByUser(ApplicationUser user){
+    public List<Notification> getNotificationsByUser(ApplicationUser user) {
         return notificationRepository.findAllByUser(user);
     }
 
@@ -56,7 +56,7 @@ public class NotificationService {
         return createPaymentNotification(notification);
     }
 
-    private UUID createPaymentNotification(Notification acceptanceNotification){
+    private UUID createPaymentNotification(Notification acceptanceNotification) {
         Double finalPrice = calculatePayment(acceptanceNotification.getReservation());
         //user may not exists
         Notification notification = Notification.createNotification(acceptanceNotification.getReservation(),
@@ -69,29 +69,30 @@ public class NotificationService {
         notification.setPayment(payment);
         return notificationRepository.save(notification).getId();
     }
-    private void checkIfNotificationCanBeAccepted(Notification notification){
-        if(notification.isModified()){
+
+    private void checkIfNotificationCanBeAccepted(Notification notification) {
+        if (notification.isModified()) {
             throw new RuntimeException("Notification has already been modified");
         }
-        if (notification.getCreatedDate().plusHours(24).isBefore(LocalDateTime.now())){
+        if (notification.getCreatedDate().plusHours(24).isBefore(LocalDateTime.now())) {
             throw new RuntimeException("Notification is too old");
         } else {
             notification.getReservation().setAccepted(true);
         }
     }
 
-    private Double calculatePayment(Reservation reservation){
+    private Double calculatePayment(Reservation reservation) {
         long numberOfDays = reservation.getDateFrom().toEpochDay() - reservation.getDateTo().toEpochDay();
-        if(numberOfDays > 30){
-            return reservation.getAdvertisement().getFourthStageDiscount()*numberOfDays;
+        if (numberOfDays > 30) {
+            return reservation.getAdvertisement().getFourthStageDiscount() * numberOfDays;
         }
-        if(numberOfDays > 20){
-            return reservation.getAdvertisement().getThirdStageDiscount()*numberOfDays;
+        if (numberOfDays > 20) {
+            return reservation.getAdvertisement().getThirdStageDiscount() * numberOfDays;
         }
-        if(numberOfDays > 10){
-            return reservation.getAdvertisement().getSecondStageDiscount()*numberOfDays;
+        if (numberOfDays > 10) {
+            return reservation.getAdvertisement().getSecondStageDiscount() * numberOfDays;
         }
-        return reservation.getAdvertisement().getFirstStageDiscount()*numberOfDays;
+        return reservation.getAdvertisement().getFirstStageDiscount() * numberOfDays;
     }
 
     public List<NotificationAcceptanceDTO> getUserAcceptanceNotifications(String token) {
