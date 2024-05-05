@@ -18,12 +18,12 @@ public class NotificationController {
 
     @PutMapping("accept")
     public UUID approveNotificationAcceptance(@RequestHeader("Authorization") String token, @RequestHeader UUID notificationId){
-        return notificationService.approveNotificationAcceptance(notificationId);
+        return notificationService.approveNotificationAcceptance(notificationId, token);
     }
 
     @PutMapping("decline")
     public UUID declineNotificationAcceptance(@RequestHeader("Authorization") String token, UUID notificationId){
-        return notificationService.declineNotificationAcceptance(notificationId);
+        return notificationService.declineNotificationAcceptance(notificationId, token);
     }
 
     @GetMapping("acceptance")

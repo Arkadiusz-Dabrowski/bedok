@@ -38,8 +38,9 @@ public class NotificationService {
     }
 
     @Transactional
-    public UUID approveNotificationAcceptance(UUID notificationId) {
+    public UUID approveNotificationAcceptance(UUID notificationId, String token) {
         Notification notification = getNotificationById(notificationId);
+        validateToken(notification.getUser().getId(), token);
         checkIfNotificationCanBeAccepted(notification);
         notification.setModified(true);
         notification.setAccepted(true);
@@ -48,8 +49,9 @@ public class NotificationService {
     }
 
     @Transactional
-    public UUID declineNotificationAcceptance(UUID notificationId) {
+    public UUID declineNotificationAcceptance(UUID notificationId,String token) {
         Notification notification = getNotificationById(notificationId);
+        validateToken(notification.getUser().getId(), token);
         notification.setModified(true);
         notification.setAccepted(false);
         notification.setModifiedDate(LocalDateTime.now());
@@ -107,5 +109,12 @@ public class NotificationService {
 
         return notificationRepository.findAllByUserId(userId).stream()
                 .map(notificationMapper::mapToNotificationPaymentDTO).toList();
+    }
+
+    private void validateToken(UUID userId, String token){
+        UUID userIdFromToken = jwtTokenUtil.getUserIdFromToken(token);
+        if(!userIdFromToken.equals(userId)){
+            throw new RuntimeException("Authorization Error");
+        }
     }
 }
