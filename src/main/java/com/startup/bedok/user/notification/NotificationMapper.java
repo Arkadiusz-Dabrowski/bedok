@@ -16,11 +16,7 @@ public class NotificationMapper {
 
         public NotificationAcceptanceDTO mapToNotificationAcceptanceDTO(Notification notification){
             ApplicationUser user = notification.getReservation().getUser();
-            return new NotificationAcceptanceDTO(reservationMapper.mapToReservationDTO(notification.getReservation()),
-                    notification.getCreatedDate(),
-                    notification.getNotificationType(),
-                    user.getName(), user.getLanguage(), user.isViber(),  user.isSignal(), user.isWhatsapp(), user.isTelegram(),
-                    LocalDate.now().getYear() - user.getDateOfBirth().getYear());
+            return new NotificationAcceptanceDTO(notification, user, reservationMapper.mapToReservationDTO(notification.getReservation()));
         }
 
     public NotificationPaymentDTO mapToNotificationPaymentDTO(Notification notification) {
