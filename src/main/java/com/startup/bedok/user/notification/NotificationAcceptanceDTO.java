@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @NoArgsConstructor
 @Setter
@@ -16,6 +17,7 @@ public class NotificationAcceptanceDTO {
 
 
     private ReservationDTO reservationDTO;
+    private UUID notificationId;
     private LocalDateTime createdDate;
     private NotificationType type;
     private String userName;
@@ -28,6 +30,7 @@ public class NotificationAcceptanceDTO {
 
     public NotificationAcceptanceDTO(Notification notification, ApplicationUser user, ReservationDTO reservationDTO) {
         this.setReservationDTO(reservationDTO);
+        this.setNotificationId(notification.getId());
         this.setCreatedDate(notification.getCreatedDate());
         this.setType(notification.getNotificationType());
         this.setUserName(notification.getUser().getName());

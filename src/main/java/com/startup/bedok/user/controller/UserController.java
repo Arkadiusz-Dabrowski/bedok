@@ -3,6 +3,7 @@ package com.startup.bedok.user.controller;
 import com.startup.bedok.config.JwtTokenUtil;
 import com.startup.bedok.user.model.*;
 import com.startup.bedok.user.notification.Notification;
+import com.startup.bedok.user.notification.NotificationAcceptanceDTO;
 import com.startup.bedok.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -39,9 +40,8 @@ public class UserController {
     }
 
     @GetMapping("notifications")
-    public ResponseEntity<List<Notification>> getNotifications(@RequestHeader("Authorization") String token){
-        UUID userId = jwtTokenUtil.getUserIdFromToken(token);
-        return ResponseEntity.ok(userService.getNotificationsByUser(userId));
+    public ResponseEntity<List<NotificationAcceptanceDTO>> getNotifications(@RequestHeader("Authorization") String token){
+        return ResponseEntity.ok(userService.getNotificationsByUser(token));
     }
 
     @GetMapping

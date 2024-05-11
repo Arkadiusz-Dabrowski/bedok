@@ -1,56 +1,54 @@
 package com.startup.bedok.advertisment.model.request;
 
 import com.startup.bedok.advertisment.model.enumerated.RoomGender;
-import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.UUID;
 
 @AllArgsConstructor
 @Setter
 @Getter
 @NoArgsConstructor
 public class AdvertisementRequest {
-    @NotNull
+    @NotBlank(message = "field title, can't be empty")
     private String title;
-    @NotNull
+    @NotBlank(message = "field district, can't be empty")
     private String district;
-    @NotNull
+    @NotBlank(message = "field city, can't be empty")
     private String city;
     @NotNull
     private RoomGender genderRoom;
     private List<String> guests;
-    @NotNull
+    @NotBlank(message = "field postCode, can't be empty")
     private String postCode;
-    @NotNull
+    @NotBlank(message = "field streetName, can't be empty")
     private String streetName;
     private String roomShortDescription;
     private String roomDescription;
-    @NotNull
+    @NotNull(message = "field roomArea, can't be empty")
     private Double roomArea;
-    @NotNull
+    @NotNull(message = "field numBeds, can't be empty")
     private Integer numBeds;
-    @NotNull
+    @NotNull(message = "field usedBeds, can't be empty")
     private Integer usedBeds;
-    @NotNull
+    @NotNull(message = "field price, can't be empty")
     private Integer price;
-    @NotNull
+    @NotNull(message = "field firstStageDiscount, can't be empty")
     private Double firstStageDiscount;
-    @NotNull
+    @NotNull(message = "field secondStageDiscount, can't be empty")
     private Double secondStageDiscount;
-    @NotNull
+    @NotNull(message = "field thirdStageDiscount, can't be empty")
     private Double thirdStageDiscount;
-    @NotNull
+    @NotNull(message = "field fourthStageDiscount, can't be empty")
     private Double fourthStageDiscount;
-    @NotNull
+    @NotNull(message = "field sharedBeds, can't be empty")
     private Boolean sharedBeds;
-    @NotNull
+    @NotBlank(message = "field language, can't be empty")
     private String language;
     private boolean ironRoom;
     private boolean hooverRoom;

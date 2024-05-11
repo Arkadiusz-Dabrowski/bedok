@@ -6,6 +6,7 @@ import com.startup.bedok.exceptions.*;
 import com.startup.bedok.user.mapper.UserMapperImpl;
 import com.startup.bedok.user.model.*;
 import com.startup.bedok.user.notification.Notification;
+import com.startup.bedok.user.notification.NotificationAcceptanceDTO;
 import com.startup.bedok.user.notification.NotificationService;
 import com.startup.bedok.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -84,9 +85,8 @@ public class UserService {
         }
     }
 
-    public List<Notification> getNotificationsByUser(UUID userId) {
-        ApplicationUser user = userRepository.getById(userId);
-        return notificationService.getNotificationsByUser(user);
+    public List<NotificationAcceptanceDTO> getNotificationsByUser(String token) {
+        return notificationService.getUserAcceptanceNotifications(token);
     }
 
     public ApplicationUser getUserByID(UUID id) {
