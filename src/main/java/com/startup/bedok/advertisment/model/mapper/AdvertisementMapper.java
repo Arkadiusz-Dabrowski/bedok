@@ -2,6 +2,7 @@ package com.startup.bedok.advertisment.model.mapper;
 
 import com.startup.bedok.advertisment.model.entity.Advertisement;
 import com.startup.bedok.advertisment.model.request.AdvertisementRequest;
+import com.startup.bedok.advertisment.model.request.AdvertisementUpdateRequest;
 import com.startup.bedok.advertisment.model.response.AdvertisementResponse;
 import com.startup.bedok.advertisment.model.response.AdvertisementShort;
 import com.startup.bedok.reservation.model.entity.Reservation;
@@ -167,7 +168,7 @@ public class AdvertisementMapper {
     }
 
     public Advertisement updateAdvertisementFromRequest(Advertisement advertisement,
-                                                        AdvertisementRequest request) {
+                                                        AdvertisementUpdateRequest request) {
         advertisement.setTitle(request.getTitle());
         advertisement.setDistrict(request.getDistrict());
         advertisement.setRoomGender(request.getGenderRoom());

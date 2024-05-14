@@ -7,6 +7,7 @@ import com.startup.bedok.advertisment.model.entity.RoomPhoto;
 import com.startup.bedok.advertisment.model.mapper.AdvertisementMapper;
 import com.startup.bedok.advertisment.model.request.AdvertisementMultisearch;
 import com.startup.bedok.advertisment.model.request.AdvertisementRequest;
+import com.startup.bedok.advertisment.model.request.AdvertisementUpdateRequest;
 import com.startup.bedok.advertisment.model.response.AdvertisementResponse;
 import com.startup.bedok.advertisment.model.response.AdvertisementShort;
 import com.startup.bedok.advertisment.repository.AdvertisementCriteriaRepository;
@@ -24,7 +25,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
@@ -59,7 +59,7 @@ public class AdvertisementService {
     }
 
     @Transactional
-    public Advertisement updateAdvertisement(@Valid AdvertisementRequest advertisementRequest, UUID advertisementId, String token) {
+    public Advertisement updateAdvertisement(@Valid AdvertisementUpdateRequest advertisementRequest, UUID advertisementId, String token) {
         UUID userId = jwtTokenUtil.getUserIdFromToken(token);
         Advertisement advertisement = advertisementRepository.findById(advertisementId)
                 .orElseThrow(() -> new AdvertisementNoExistsException(advertisementId.toString()));

@@ -3,6 +3,7 @@ package com.startup.bedok.advertisment.controller;
 import com.startup.bedok.advertisment.model.entity.Advertisement;
 import com.startup.bedok.advertisment.model.request.AdvertisementMultisearch;
 import com.startup.bedok.advertisment.model.request.AdvertisementRequest;
+import com.startup.bedok.advertisment.model.request.AdvertisementUpdateRequest;
 import com.startup.bedok.advertisment.model.response.AdvertisementShort;
 import com.startup.bedok.advertisment.model.response.AdvertisementResponse;
 import com.startup.bedok.advertisment.services.AdvertisementService;
@@ -33,7 +34,7 @@ public class AdvertisementController {
     }
 
     @PutMapping("{advertisementId}")
-    private ResponseEntity<Advertisement> updateAdvertisement(@Valid @RequestBody AdvertisementRequest advertisementRequest,
+    private ResponseEntity<Advertisement> updateAdvertisement(@Valid @RequestBody AdvertisementUpdateRequest advertisementRequest,
                                                               @PathVariable UUID advertisementId,
                                                               @RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(advertisementService.updateAdvertisement(advertisementRequest, advertisementId, token));

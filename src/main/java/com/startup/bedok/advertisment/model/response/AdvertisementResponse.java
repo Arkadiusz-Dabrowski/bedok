@@ -16,33 +16,21 @@ import java.util.List;
 @Getter
 public class AdvertisementResponse {
 
-    @NotNull
     private UserResponse host;
-    @NotNull
     private String title;
-    @NotNull
     private String city;
-    @NotNull
     private String district;
-    @NotNull
     private String postCode;
-    @NotNull
     private String hostStreet;
-    @NotNull
     private List<Binary> roomPhotos;
 
     private String roomDescription;
     private RoomGender roomGender;
     private List<GuestResponse> guestsList;
-    @NotNull
     private Double roomArea;
-    @NotNull
     private Integer numBeds;
-    @NotNull
     private Double price;
-    @NotNull
     private Boolean sharedBeds;
-    @NotNull
     private String language;
     private boolean ironRoom;
     private boolean hooverRoom;
