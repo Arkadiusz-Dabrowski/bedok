@@ -21,7 +21,7 @@ public class AdvertisementUpdateRequest {
     private String district;
     @NotBlank(message = "field city, can't be empty")
     private String city;
-    @NotNull
+    @NotNull(message = "field genderRoom, can't be empty(MALE, FEMALE, OTHER)")
     private RoomGender genderRoom;
     private List<String> guests;
     @NotBlank(message = "field postCode, can't be empty")
