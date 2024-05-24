@@ -22,7 +22,7 @@ public class AdvertisementRequest {
     @NotBlank(message = "field city, can't be empty")
     private String city;
     @NotNull
-    private RoomGender genderRoom;
+    private RoomGender roomGender;
     private List<String> guests;
     @NotBlank(message = "field postCode, can't be empty")
     private String postCode;

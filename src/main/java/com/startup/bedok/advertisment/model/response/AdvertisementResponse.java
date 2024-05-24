@@ -21,7 +21,7 @@ public class AdvertisementResponse {
     private String city;
     private String district;
     private String postCode;
-    private String hostStreet;
+    private String streetName;
     private List<Binary> roomPhotos;
 
     private String roomDescription;

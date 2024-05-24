@@ -138,7 +138,7 @@ public class AdvertisementMapper {
                 advertisementRequest.getTitle(),
                 advertisementRequest.getCity(),
                 advertisementRequest.getDistrict(),
-                advertisementRequest.getGenderRoom(),
+                advertisementRequest.getRoomGender(),
                 advertisementRequest.getPostCode(),
                 advertisementRequest.getStreetName(),
                 advertisementRequest.getRoomDescription(),
@@ -171,7 +171,7 @@ public class AdvertisementMapper {
                                                         AdvertisementUpdateRequest request) {
         advertisement.setTitle(request.getTitle());
         advertisement.setDistrict(request.getDistrict());
-        advertisement.setRoomGender(request.getGenderRoom());
+        advertisement.setRoomGender(request.getRoomGender());
         advertisement.setPostCode(request.getPostCode());
         advertisement.setStreetName(request.getStreetName());
         advertisement.setRoomDescription(request.getRoomDescription());
