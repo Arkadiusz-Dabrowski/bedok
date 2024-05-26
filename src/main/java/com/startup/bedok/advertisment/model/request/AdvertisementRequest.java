@@ -34,8 +34,6 @@ public class AdvertisementRequest {
     private Double roomArea;
     @NotNull(message = "field numBeds, can't be empty")
     private Integer numBeds;
-    @NotNull(message = "field usedBeds, can't be empty")
-    private Integer usedBeds;
     @NotNull(message = "field price, can't be empty")
     private Integer price;
     @NotNull(message = "field firstStageDiscount, can't be empty")

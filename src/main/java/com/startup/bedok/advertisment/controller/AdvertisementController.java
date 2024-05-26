@@ -34,7 +34,7 @@ public class AdvertisementController {
     }
 
     @PutMapping("{advertisementId}")
-    private ResponseEntity<Advertisement> updateAdvertisement(@Valid @RequestBody AdvertisementUpdateRequest advertisementRequest,
+    private ResponseEntity<AdvertisementResponse> updateAdvertisement(@Valid @RequestBody AdvertisementUpdateRequest advertisementRequest,
                                                               @PathVariable UUID advertisementId,
                                                               @RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(advertisementService.updateAdvertisement(advertisementRequest, advertisementId, token));

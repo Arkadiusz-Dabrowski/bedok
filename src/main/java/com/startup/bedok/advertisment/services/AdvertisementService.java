@@ -59,14 +59,15 @@ public class AdvertisementService {
     }
 
     @Transactional
-    public Advertisement updateAdvertisement(@Valid AdvertisementUpdateRequest advertisementRequest, UUID advertisementId, String token) {
+    public AdvertisementResponse updateAdvertisement(@Valid AdvertisementUpdateRequest advertisementRequest, UUID advertisementId, String token) {
         UUID userId = jwtTokenUtil.getUserIdFromToken(token);
         Advertisement advertisement = advertisementRepository.findById(advertisementId)
                 .orElseThrow(() -> new AdvertisementNoExistsException(advertisementId.toString()));
         if(!advertisement.getHostId().equals(userId)) {
             throw new IllegalArgumentException("Advertisement does not belong to user");
         }
-        return advertisementMapper.updateAdvertisementFromRequest(advertisement, advertisementRequest);
+        Advertisement advertisementEntity = advertisementMapper.updateAdvertisementFromRequest(advertisement, advertisementRequest);
+        return advertisementMapper.mapAdvertisementToAdvertisementDTO(advertisementEntity, null);
     }
 
     @Transactional

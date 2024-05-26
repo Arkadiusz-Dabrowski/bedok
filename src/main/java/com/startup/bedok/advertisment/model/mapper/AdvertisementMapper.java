@@ -170,6 +170,7 @@ public class AdvertisementMapper {
     public Advertisement updateAdvertisementFromRequest(Advertisement advertisement,
                                                         AdvertisementUpdateRequest request) {
         advertisement.setTitle(request.getTitle());
+        advertisement.setCity(request.getCity());
         advertisement.setDistrict(request.getDistrict());
         advertisement.setRoomGender(request.getRoomGender());
         advertisement.setPostCode(request.getPostCode());
