@@ -60,6 +60,11 @@ public class UserService {
         return photoId;
     }
 
+    public UserResponse getUserResponseFromToken(String token) {
+        UUID id = getUserIdFromToken(token);
+        return getUserResponseByID(id);
+    }
+
     public UserResponse getUserResponseByID(UUID id) {
         ApplicationUser user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException(String.format("there is no user with uuid: '%s'", id)));
@@ -110,8 +115,7 @@ public class UserService {
                         .orElseThrow(() -> new RuntimeException("there is no user with selected email or phone number")));
     }
 
-    private ApplicationUser getUserFromToken(String token) {
-        UUID userId = jwtTokenUtil.getUserIdFromToken(token);
-        return getUserByID(userId);
+    private UUID getUserIdFromToken(String token) {
+        return jwtTokenUtil.getUserIdFromToken(token);
     }
 }

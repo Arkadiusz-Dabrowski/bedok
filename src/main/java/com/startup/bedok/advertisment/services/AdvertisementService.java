@@ -8,6 +8,7 @@ import com.startup.bedok.advertisment.model.mapper.AdvertisementMapper;
 import com.startup.bedok.advertisment.model.request.AdvertisementMultisearch;
 import com.startup.bedok.advertisment.model.request.AdvertisementRequest;
 import com.startup.bedok.advertisment.model.request.AdvertisementUpdateRequest;
+import com.startup.bedok.advertisment.model.response.AdvertisementChangeStatusResponse;
 import com.startup.bedok.advertisment.model.response.AdvertisementResponse;
 import com.startup.bedok.advertisment.model.response.AdvertisementShort;
 import com.startup.bedok.advertisment.repository.AdvertisementCriteriaRepository;
@@ -60,12 +61,9 @@ public class AdvertisementService {
 
     @Transactional
     public AdvertisementResponse updateAdvertisement(@Valid AdvertisementUpdateRequest advertisementRequest, UUID advertisementId, String token) {
-        UUID userId = jwtTokenUtil.getUserIdFromToken(token);
         Advertisement advertisement = advertisementRepository.findById(advertisementId)
                 .orElseThrow(() -> new AdvertisementNoExistsException(advertisementId.toString()));
-        if(!advertisement.getHostId().equals(userId)) {
-            throw new IllegalArgumentException("Advertisement does not belong to user");
-        }
+        isAdvertisementBelongToUser(token,advertisement);
         Advertisement advertisementEntity = advertisementMapper.updateAdvertisementFromRequest(advertisement, advertisementRequest);
         return advertisementMapper.mapAdvertisementToAdvertisementDTO(advertisementEntity, null);
     }
@@ -97,6 +95,7 @@ public class AdvertisementService {
     @Transactional
     public List<AdvertisementShort> getAdvertisementsList() {
         return advertisementRepository.findAll().stream()
+                .filter(Advertisement::isActive)
                 .map(advertisement -> {
                     UserResponse userResponse = userService
                             .getUserResponseByID(advertisement.getHostId());
@@ -140,6 +139,7 @@ public class AdvertisementService {
         Page<Advertisement> pageOfAdvertisements = advertisementCriteriaRepository
                 .findAllWithFilters(advertisementMultisearch);
         List<AdvertisementShort> listOfAdvertisements = pageOfAdvertisements.stream()
+                .filter(Advertisement::isActive)
                 .map(advertisement -> {
                     UserResponse userResponse = userService
                             .getUserResponseByID(advertisement.getHostId());
@@ -177,23 +177,42 @@ public class AdvertisementService {
 
 
     @Transactional
-    public UUID deleteAdvertisementById(UUID id) {
+    public AdvertisementChangeStatusResponse deleteAdvertisementById(UUID id, String token) {
         Advertisement advertisementToDelete = advertisementRepository.findById(id)
                 .orElseThrow(() -> new AdvertisementNoExistsException(id.toString()));
+        isAdvertisementBelongToUser(token,advertisementToDelete);
         roomPhotosRepository.findAllByAdvertisementId(id).forEach(photo -> {
             advertisementPhotoService.deletePhotoFromAdvertisement(photo);
             roomPhotosRepository.delete(photo);
         });
         advertisementRepository.delete(advertisementToDelete);
-        return id;
+        return new AdvertisementChangeStatusResponse(String.format("Your advertisement with title: %s is deleted", advertisementToDelete.getTitle()));
     }
 
     @Transactional
-    public UUID deactivateAdvertisementById(UUID id) {
+    public AdvertisementChangeStatusResponse deactivateAdvertisementById(UUID id, String token) {
         Advertisement advertisementToDeactivate = advertisementRepository.findById(id)
                 .orElseThrow(() -> new AdvertisementNoExistsException(id.toString()));
+        isAdvertisementBelongToUser(token,advertisementToDeactivate);
         advertisementToDeactivate.setActive(false);
-        return id;
+        return new AdvertisementChangeStatusResponse(String.format("Your advertisement with title: %s is deactivated", advertisementToDeactivate.getTitle()));
+    }
+
+    @Transactional
+    public AdvertisementChangeStatusResponse activateAdvertisementById(UUID id, String token) {
+        Advertisement advertisementToActivate = advertisementRepository.findById(id)
+                .orElseThrow(() -> new AdvertisementNoExistsException(id.toString()));
+        isAdvertisementBelongToUser(token,advertisementToActivate);
+        advertisementToActivate.setActive(true);
+        return new AdvertisementChangeStatusResponse(String.format("Your advertisement with title: %s is activated", advertisementToActivate.getTitle()));
+
+    }
+
+    private void isAdvertisementBelongToUser(String token, Advertisement advertisement){
+        UUID userId = jwtTokenUtil.getUserIdFromToken(token);
+        if(!advertisement.getHostId().equals(userId)) {
+            throw new IllegalArgumentException("Advertisement does not belong to user");
+        }
     }
 
     public Map<String, List<String>> getDistrictsCollection() {

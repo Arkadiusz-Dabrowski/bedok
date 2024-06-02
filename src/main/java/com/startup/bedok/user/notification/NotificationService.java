@@ -64,11 +64,13 @@ public class NotificationService {
         Notification notification = Notification.createNotification(acceptanceNotification.getReservation(),
                 NotificationType.PAYMENT,
                 acceptanceNotification.getUser());
-        Payment payment = paymentService.createPayment(new Payment(finalPrice,
-                "http://google.com",
-                PaymentStatus.WAITING,
-                LocalDateTime.now()));
-        notification.setPayment(payment);
+        if(finalPrice != 0.0) {
+            Payment payment = paymentService.createPayment(new Payment(finalPrice,
+                    "http://google.com",
+                    PaymentStatus.WAITING,
+                    LocalDateTime.now()));
+            notification.setPayment(payment);
+        }
         return notificationRepository.save(notification).getId();
     }
 

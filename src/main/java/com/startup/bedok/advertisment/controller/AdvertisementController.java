@@ -4,6 +4,7 @@ import com.startup.bedok.advertisment.model.entity.Advertisement;
 import com.startup.bedok.advertisment.model.request.AdvertisementMultisearch;
 import com.startup.bedok.advertisment.model.request.AdvertisementRequest;
 import com.startup.bedok.advertisment.model.request.AdvertisementUpdateRequest;
+import com.startup.bedok.advertisment.model.response.AdvertisementChangeStatusResponse;
 import com.startup.bedok.advertisment.model.response.AdvertisementShort;
 import com.startup.bedok.advertisment.model.response.AdvertisementResponse;
 import com.startup.bedok.advertisment.services.AdvertisementService;
@@ -81,14 +82,22 @@ public class AdvertisementController {
         return ResponseEntity.ok(advertisementService.createSomePhotosForRandomAdvertisements());
     }
 
-    @DeleteMapping("delete")
-    private ResponseEntity<String> deleteAdvertisementById(UUID id) {
-       return ResponseEntity.ok(advertisementService.deleteAdvertisementById(id).toString());
+    @DeleteMapping("delete/{advertisementId}")
+    private ResponseEntity<AdvertisementChangeStatusResponse> deleteAdvertisementById(@PathVariable UUID advertisementId,
+                                                           @RequestHeader("Authorization") String token) {
+       return ResponseEntity.ok(advertisementService.deleteAdvertisementById(advertisementId, token));
     }
 
-    @PutMapping("deactivate")
-    private ResponseEntity<String> deactivateAdvertisementById(UUID id) {
-        return ResponseEntity.ok(advertisementService.deactivateAdvertisementById(id).toString());
+    @PatchMapping("deactivate/{advertisementId}")
+    private ResponseEntity<AdvertisementChangeStatusResponse> deactivateAdvertisementById(@PathVariable UUID advertisementId,
+                                                               @RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(advertisementService.deactivateAdvertisementById(advertisementId, token));
+    }
+
+    @PatchMapping("activate/{advertisementId}")
+    private ResponseEntity<AdvertisementChangeStatusResponse> activateAdvertisementById(@PathVariable UUID advertisementId,
+                                                                                        @RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(advertisementService.activateAdvertisementById(advertisementId, token));
     }
 
     @GetMapping("district")

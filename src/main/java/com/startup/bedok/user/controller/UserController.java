@@ -22,7 +22,6 @@ import java.util.UUID;
 public class UserController {
 
     private final UserService userService;
-    private final JwtTokenUtil jwtTokenUtil;
 
     @PostMapping("register")
     private ResponseEntity<RegistrationResponse> registerUser(@Valid @RequestBody UserDTO userDTO) throws IOException {
@@ -45,8 +44,8 @@ public class UserController {
     }
 
     @GetMapping
-    private UserResponse getUser(@RequestParam UUID id) {
-        return userService.getUserResponseByID(id);
+    private ResponseEntity<UserResponse> getUser(@RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(userService.getUserResponseFromToken(token));
     }
 
     @PostMapping("random")
