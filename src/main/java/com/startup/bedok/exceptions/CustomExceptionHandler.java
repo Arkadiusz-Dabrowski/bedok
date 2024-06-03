@@ -62,6 +62,20 @@ public class CustomExceptionHandler {
         return new ResponseEntity<>(getErrorsMap(errors), new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(NoFreeBedsException.class)
+    public ResponseEntity<Object> handleNoFreeBedsException(NoFreeBedsException ex) {
+        CustomException apiError =
+                new CustomException(HttpStatus.CONFLICT, ex.getMessage());
+        return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(InvalidDateRangeException.class)
+    public ResponseEntity<Object> handleInvalidDateRangeException(InvalidDateRangeException ex) {
+        CustomException apiError =
+                new CustomException(HttpStatus.CONFLICT, ex.getMessage());
+        return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.CONFLICT);
+    }
+
     private Map<String, List<String>> getErrorsMap(List<String> errors) {
         Map<String, List<String>> errorResponse = new HashMap<>();
         errorResponse.put("errors", errors);

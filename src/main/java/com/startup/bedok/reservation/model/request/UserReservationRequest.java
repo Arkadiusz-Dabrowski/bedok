@@ -1,7 +1,5 @@
 package com.startup.bedok.reservation.model.request;
 
-import lombok.Getter;
-
 import java.time.LocalDate;
 import java.util.UUID;
 

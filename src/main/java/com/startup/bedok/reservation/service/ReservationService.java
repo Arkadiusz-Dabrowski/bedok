@@ -92,10 +92,10 @@ public class ReservationService {
     }
 
     private boolean checkBeedsAvaiability(LocalDate dateFrom, LocalDate dateTo, Advertisement advertisement){
-        int numberOfFreeBeds = advertisement.getReservations().stream().filter(reservation -> reservation.getDateTo().equals(dateFrom)
-                || (dateFrom.isAfter(reservation.getDateFrom()) && dateFrom.isBefore(reservation.getDateTo()))
-                || (dateTo.isAfter(reservation.getDateFrom()) && dateTo.isBefore(reservation.getDateTo()))
-                || (dateFrom.isBefore(reservation.getDateFrom()) && dateTo.isAfter(reservation.getDateTo()))).toList().size();
-        return advertisement.getNumBeds() > numberOfFreeBeds;
+        long num = advertisement.getReservations().stream().filter(reservation -> (dateFrom.equals(reservation.getDateFrom())) || dateTo.isEqual(reservation.getDateTo())
+                || (dateFrom.isBefore(reservation.getDateFrom()) && dateTo.isAfter(reservation.getDateFrom()))
+                || (dateFrom.isAfter(reservation.getDateFrom()) && !dateFrom.isAfter(reservation.getDateTo()))
+        ).count();
+        return num < advertisement.getNumBeds();
     }
 }

@@ -30,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -140,6 +141,11 @@ public class AdvertisementService {
                 .findAllWithFilters(advertisementMultisearch);
         List<AdvertisementShort> listOfAdvertisements = pageOfAdvertisements.stream()
                 .filter(Advertisement::isActive)
+                .filter(advertisement -> {
+                    if (advertisementMultisearch.getDateTo() != null)
+                        return checkIfRoomIsFreeInSelectedDate(advertisement, advertisementMultisearch.getDateFrom(), advertisementMultisearch.getDateTo());
+                    return true;
+                })
                 .map(advertisement -> {
                     UserResponse userResponse = userService
                             .getUserResponseByID(advertisement.getHostId());
@@ -148,20 +154,10 @@ public class AdvertisementService {
                         photos = photos.stream().limit(5).collect(Collectors.toList());
                     List<Binary> advertisementPhotos = advertisementPhotoService
                             .getPhotos(photos).stream().map(AdvertisementPhoto::getImage).toList();
-                    if(advertisementMultisearch.getDateTo() == null || advertisementMultisearch.getDateFrom() ==null) {
                         return advertisementMapper
                                 .mapAdvertisementToAdvertisementShort(advertisement,
                                         advertisementPhotos,
                                         userResponse);
-                    }
-                    else {
-                        return advertisementMapper
-                                .mapAdvertisementToAdvertisementShortWithDate(advertisement,
-                                        advertisementPhotos,
-                                        userResponse,
-                                        advertisementMultisearch.getDateFrom(),
-                                        advertisementMultisearch.getDateTo());
-                    }
                 }).toList();
         return new PageImpl<>(listOfAdvertisements, pageOfAdvertisements.getPageable(),
                 pageOfAdvertisements.getTotalElements());
@@ -213,6 +209,14 @@ public class AdvertisementService {
         if(!advertisement.getHostId().equals(userId)) {
             throw new IllegalArgumentException("Advertisement does not belong to user");
         }
+    }
+
+    private boolean checkIfRoomIsFreeInSelectedDate(Advertisement advertisement,LocalDate dateFrom, LocalDate dateTo){
+        return advertisement.getReservations().stream().filter(reservation -> (dateFrom.equals(reservation.getDateFrom())) || dateTo.isEqual(reservation.getDateTo())
+                        || (dateFrom.isBefore(reservation.getDateFrom()) && dateTo.isAfter(reservation.getDateFrom()))
+                        || (dateFrom.isAfter(reservation.getDateFrom()) && !dateFrom.isAfter(reservation.getDateTo()))
+                )
+                .count() < advertisement.getNumBeds();
     }
 
     public Map<String, List<String>> getDistrictsCollection() {

@@ -53,7 +53,7 @@ public class AdvertisementController {
 
     @PostMapping("criteria")
     private ResponseEntity<Page<AdvertisementShort>> getAdvertisementListByMultiSearch(
-            @RequestBody AdvertisementMultisearch advertisementMultisearch) {
+            @RequestBody @Valid AdvertisementMultisearch advertisementMultisearch) {
         return ResponseEntity.ok(advertisementService.findAllWithFilters(advertisementMultisearch));
     }
 

@@ -1,6 +1,6 @@
 package com.startup.bedok.advertisment.model.request;
 
-import com.sun.istack.NotNull;
+import com.startup.bedok.advertisment.validator.ValidDateRange;
 import lombok.Data;
 import org.springframework.data.domain.Sort;
 
@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Data
+@ValidDateRange
 public class AdvertisementMultisearch {
 
     private String location;

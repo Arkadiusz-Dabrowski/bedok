@@ -96,41 +96,6 @@ public class AdvertisementMapper {
         );
     }
 
-    public AdvertisementShort mapAdvertisementToAdvertisementShortWithDate(Advertisement advertisement, List<Binary> photo, UserResponse userResponse, LocalDate dateFrom, LocalDate dateTo) {
-        return new AdvertisementShort(
-                advertisement.getId(),
-                userResponse.getId(),
-                advertisement.getTitle(),
-                advertisement.getCity(),
-                advertisement.getDistrict(),
-                advertisement.getNumBeds(),
-                advertisement.getRoomDescription(),
-                advertisement.getRoomGender(),
-                advertisement.getReservations()
-                        .stream()
-                        .filter(reservation -> compareDateOfReservationToDateOfSearch(reservation, dateFrom, dateTo))
-                        .map(reservation -> mapGuestToGuestResponse(reservation.getGuest()))
-                        .toList(),
-                advertisement.getPrice(),
-                advertisement.getStreetName(),
-                advertisement.getRoomArea(),
-                userResponse,
-                photo,
-                advertisement.isIronRoom(),
-                advertisement.isHooverRoom(),
-                advertisement.isTelevisionRoom(),
-                advertisement.isRadioRoom(),
-                advertisement.isBalconyRoom(),
-                advertisement.isIronShared(),
-                advertisement.isHooverShared(),
-                advertisement.isTelevisionShared(),
-                advertisement.isRadioShared(),
-                advertisement.isBalconyShared(),
-                advertisement.isActive()
-        );
-    }
-
-
     public Advertisement mapAdvertisementRequestToAdvertisement(AdvertisementRequest advertisementRequest,
                                                                 UUID userId) {
         return new Advertisement(
@@ -212,13 +177,6 @@ public class AdvertisementMapper {
         advertisement.setRentalRulesObject(addRentalRules(request.getRentalRules()));
         advertisement.setUpdateDate(Instant.now().getEpochSecond());
         return advertisement;
-    }
-
-    private boolean compareDateOfReservationToDateOfSearch(Reservation reservation, LocalDate dateFrom, LocalDate dateTo) {
-        return reservation.getDateTo().equals(dateFrom)
-                || (dateFrom.isAfter(reservation.getDateFrom()) && dateFrom.isBefore(reservation.getDateTo()))
-                || (dateTo.isAfter(reservation.getDateFrom()) && dateTo.isBefore(reservation.getDateTo()))
-                || (dateFrom.isBefore(reservation.getDateFrom()) && dateTo.isAfter(reservation.getDateTo()));
     }
 
     private static String addRentalRules(List<String> rentalRules) {
