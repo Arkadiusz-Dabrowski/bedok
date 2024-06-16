@@ -51,6 +51,7 @@ public class AdvertisementMapper {
                 advertisement.isTelevisionRoom(),
                 advertisement.isRadioRoom(),
                 advertisement.isBalconyRoom(),
+                advertisement.isBathroom(),
                 advertisement.isIronShared(),
                 advertisement.isHooverShared(),
                 advertisement.isTelevisionShared(),
@@ -87,6 +88,7 @@ public class AdvertisementMapper {
                 advertisement.isTelevisionRoom(),
                 advertisement.isRadioRoom(),
                 advertisement.isBalconyRoom(),
+                advertisement.isBathroom(),
                 advertisement.isIronShared(),
                 advertisement.isHooverShared(),
                 advertisement.isTelevisionShared(),
@@ -121,6 +123,7 @@ public class AdvertisementMapper {
                 advertisementRequest.isTelevisionRoom(),
                 advertisementRequest.isRadioRoom(),
                 advertisementRequest.isBalconyRoom(),
+                advertisementRequest.isBathroom(),
                 advertisementRequest.isIronShared(),
                 advertisementRequest.isHooverShared(),
                 advertisementRequest.isTelevisionShared(),
@@ -167,6 +170,7 @@ public class AdvertisementMapper {
         advertisement.setTelevisionRoom(request.isTelevisionRoom());
         advertisement.setRadioRoom(request.isRadioRoom());
         advertisement.setBalconyRoom(request.isBalconyRoom());
+        advertisement.setBathroom(request.isBathroom());
         advertisement.setIronShared(request.isIronShared());
         advertisement.setHooverShared(request.isHooverShared());
         advertisement.setTelevisionShared(request.isTelevisionShared());

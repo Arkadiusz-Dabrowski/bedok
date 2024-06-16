@@ -2,7 +2,6 @@ package com.startup.bedok.advertisment.model.request;
 
 import com.startup.bedok.advertisment.validator.ValidDateRange;
 import lombok.Data;
-import org.springframework.data.domain.Sort;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -15,6 +14,7 @@ public class AdvertisementMultisearch {
     private Double roomAreaFrom;
     private Double roomAreaTo;
     private List<String> language;
+    private int numberOfClients;
 
     private List<String> roomEquipment;
     private List<String> sharedEquipment;
@@ -22,8 +22,7 @@ public class AdvertisementMultisearch {
     private List<String> rentalRules;
     private LocalDate dateFrom;
     private LocalDate dateTo;
+    private boolean active = true;
     private int pageNumber = 0;
     private int pageSize = 10;
-    private Sort.Direction direction = Sort.DEFAULT_DIRECTION;
-    private String sortBy = "uploadDate";
 }

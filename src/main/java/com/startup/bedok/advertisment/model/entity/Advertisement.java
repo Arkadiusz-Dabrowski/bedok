@@ -22,6 +22,10 @@ public class Advertisement {
     @Id
     @GeneratedValue
     private UUID id;
+
+    @ManyToOne
+    @JoinColumn(name="advertisement_group_id")
+    private AdvertisementGroup advertisementGroup;
     private UUID hostId;
     private String city;
     private String title;
@@ -54,6 +58,8 @@ public class Advertisement {
     private boolean radioShared;
     private boolean balconyShared;
     private boolean cache;
+    @Column(columnDefinition = "boolean default false")
+    private boolean bathroom;
     private boolean transfer;
     private String rentalRulesObject;
     private Long uploadDate;
@@ -83,6 +89,7 @@ public class Advertisement {
                          boolean televisionRoom,
                          boolean radioRoom,
                          boolean balconyRoom,
+                         boolean bathroom,
                          boolean ironShared,
                          boolean hooverShared,
                          boolean televisionShared,
@@ -113,6 +120,7 @@ public class Advertisement {
         this.televisionRoom = televisionRoom;
         this.radioRoom = radioRoom;
         this.balconyRoom = balconyRoom;
+        this.bathroom = bathroom;
         this.ironShared = ironShared;
         this.hooverShared = hooverShared;
         this.televisionShared = televisionShared;

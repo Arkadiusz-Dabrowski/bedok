@@ -1,12 +1,14 @@
 package com.startup.bedok.advertisment.controller;
 
 import com.startup.bedok.advertisment.model.entity.Advertisement;
+import com.startup.bedok.advertisment.model.entity.AdvertisementGroup;
+import com.startup.bedok.advertisment.model.request.AdvertisementGroupCreate;
 import com.startup.bedok.advertisment.model.request.AdvertisementMultisearch;
 import com.startup.bedok.advertisment.model.request.AdvertisementRequest;
 import com.startup.bedok.advertisment.model.request.AdvertisementUpdateRequest;
 import com.startup.bedok.advertisment.model.response.AdvertisementChangeStatusResponse;
-import com.startup.bedok.advertisment.model.response.AdvertisementShort;
 import com.startup.bedok.advertisment.model.response.AdvertisementResponse;
+import com.startup.bedok.advertisment.model.response.AdvertisementShort;
 import com.startup.bedok.advertisment.services.AdvertisementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -36,8 +38,8 @@ public class AdvertisementController {
 
     @PutMapping("{advertisementId}")
     private ResponseEntity<AdvertisementResponse> updateAdvertisement(@Valid @RequestBody AdvertisementUpdateRequest advertisementRequest,
-                                                              @PathVariable UUID advertisementId,
-                                                              @RequestHeader("Authorization") String token) {
+                                                                      @PathVariable UUID advertisementId,
+                                                                      @RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(advertisementService.updateAdvertisement(advertisementRequest, advertisementId, token));
     }
 
@@ -57,6 +59,19 @@ public class AdvertisementController {
         return ResponseEntity.ok(advertisementService.findAllWithFilters(advertisementMultisearch));
     }
 
+    @PostMapping("available")
+    public Page<AdvertisementGroup> getAvailableGroups(
+            @RequestBody AdvertisementMultisearch advertisementMultisearch) {
+        return advertisementService.getAvailableGroups(advertisementMultisearch);
+    }
+
+    @PostMapping("group")
+    public UUID createAdvertisementGroup(
+            @RequestBody AdvertisementGroupCreate advertisementGroupCreate) {
+        return advertisementService.createAdvertisementGroup(advertisementGroupCreate);
+    }
+
+
     @GetMapping("details/{advertisementId}")
     private ResponseEntity<AdvertisementResponse> getAdvertisementByDetails(@PathVariable UUID advertisementId) {
         return ResponseEntity.ok(advertisementService.getAdvertisementDTOById(advertisementId));
@@ -73,7 +88,7 @@ public class AdvertisementController {
     }
 
     @PostMapping("random")
-    private ResponseEntity<List<Advertisement>> createSomeRandomAdvertisements(){
+    private ResponseEntity<List<Advertisement>> createSomeRandomAdvertisements() {
         return ResponseEntity.ok(advertisementService.createSomeRandomAdvertisements());
     }
 
@@ -84,13 +99,13 @@ public class AdvertisementController {
 
     @DeleteMapping("delete/{advertisementId}")
     private ResponseEntity<AdvertisementChangeStatusResponse> deleteAdvertisementById(@PathVariable UUID advertisementId,
-                                                           @RequestHeader("Authorization") String token) {
-       return ResponseEntity.ok(advertisementService.deleteAdvertisementById(advertisementId, token));
+                                                                                      @RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(advertisementService.deleteAdvertisementById(advertisementId, token));
     }
 
     @PatchMapping("deactivate/{advertisementId}")
     private ResponseEntity<AdvertisementChangeStatusResponse> deactivateAdvertisementById(@PathVariable UUID advertisementId,
-                                                               @RequestHeader("Authorization") String token) {
+                                                                                          @RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(advertisementService.deactivateAdvertisementById(advertisementId, token));
     }
 
@@ -101,7 +116,7 @@ public class AdvertisementController {
     }
 
     @GetMapping("district")
-    private ResponseEntity<Map<String, List<String>>> getDistrictsCollection(){
+    private ResponseEntity<Map<String, List<String>>> getDistrictsCollection() {
         return ResponseEntity.ok(advertisementService.getDistrictsCollection());
     }
 }

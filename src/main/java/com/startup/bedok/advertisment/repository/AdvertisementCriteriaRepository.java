@@ -88,16 +88,16 @@ public class AdvertisementCriteriaRepository {
     private void setOrder(AdvertisementMultisearch advertisementMultisearch,
                           CriteriaQuery<Advertisement> criteriaQuery,
                           Root<Advertisement> advertisementRoot) {
-        if(advertisementMultisearch.getDirection().equals(Sort.Direction.ASC)){
-            criteriaQuery.orderBy(criteriaBuilder.asc(advertisementRoot.get(advertisementMultisearch.getSortBy())));
-        } else {
-            criteriaQuery.orderBy(criteriaBuilder.desc(advertisementRoot.get(advertisementMultisearch.getSortBy())));
-        }
+//        if(advertisementMultisearch.getDirection().equals(Sort.Direction.ASC)){
+//            criteriaQuery.orderBy(criteriaBuilder.asc(advertisementRoot.get(advertisementMultisearch.getSortBy())));
+//        } else {
+//            criteriaQuery.orderBy(criteriaBuilder.desc(advertisementRoot.get(advertisementMultisearch.getSortBy())));
+//        }
     }
 
     private Pageable getPageable(AdvertisementMultisearch advertisementMultisearch) {
-        Sort sort = Sort.by(advertisementMultisearch.getDirection(), advertisementMultisearch.getSortBy());
-        return PageRequest.of(advertisementMultisearch.getPageNumber(), advertisementMultisearch.getPageSize(), sort);
+//        Sort sort = Sort.by(advertisementMultisearch.getDirection(), advertisementMultisearch.getSortBy());
+        return PageRequest.of(advertisementMultisearch.getPageNumber(), advertisementMultisearch.getPageSize());
     }
 
     private long getAdvertisementCount(Predicate predicate) {

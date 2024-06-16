@@ -143,6 +143,7 @@ public class DataGenerator {
                         faker.bool().bool(),
                         faker.bool().bool(),
                         faker.bool().bool(),
+                        faker.bool().bool(),
                         faker.leagueOfLegends().quote()
                 )).toList();
         return advertisementRepository.saveAll(advertisements);
@@ -151,4 +152,5 @@ public class DataGenerator {
     private UUID getHostUUID(){
         return userRepository.findAll().get(faker.number().numberBetween(0,5)).getId();
     }
+
 }

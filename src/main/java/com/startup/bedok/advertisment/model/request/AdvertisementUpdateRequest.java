@@ -48,6 +48,7 @@ public class AdvertisementUpdateRequest {
     private boolean televisionRoom;
     private boolean radioRoom;
     private boolean balconyRoom;
+    private boolean bathroom;
     private boolean ironShared;
     private boolean hooverShared;
     private boolean televisionShared;

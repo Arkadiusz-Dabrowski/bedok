@@ -1,8 +1,8 @@
 package com.startup.bedok.user.controller;
 
-import com.startup.bedok.config.JwtTokenUtil;
+import com.startup.bedok.email.EmailService;
+import com.startup.bedok.global.SimpleResponse;
 import com.startup.bedok.user.model.*;
-import com.startup.bedok.user.notification.Notification;
 import com.startup.bedok.user.notification.NotificationAcceptanceDTO;
 import com.startup.bedok.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +22,7 @@ import java.util.UUID;
 public class UserController {
 
     private final UserService userService;
+    private final EmailService emailService;
 
     @PostMapping("register")
     private ResponseEntity<RegistrationResponse> registerUser(@Valid @RequestBody UserDTO userDTO) throws IOException {
@@ -52,6 +53,17 @@ public class UserController {
     private ResponseEntity<String> createSomeRandomHost(){
         userService.createSomeRandomUsers();
         return ResponseEntity.ok("ok");
+    }
+
+    @PostMapping("/reset-password")
+    public SimpleResponse resetPassword(@RequestParam String email) {
+        return userService.generateNewPasswordAndSendToUser(email);
+    }
+
+    @PostMapping("/change-password")
+    public SimpleResponse changePassword(@RequestHeader("Authorization") String token,
+                                         @RequestBody ChangePasswordDTO changePasswordDTO) {
+        return userService.changePassword(changePasswordDTO, token);
     }
 
 }
