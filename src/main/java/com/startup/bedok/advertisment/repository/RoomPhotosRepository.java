@@ -11,4 +11,5 @@ import java.util.UUID;
 public interface RoomPhotosRepository extends JpaRepository<RoomPhoto, UUID> {
     List<RoomPhoto> findAllByAdvertisementId(UUID advertisamentId);
 
+    void deleteByPhotoId(String photoId);
 }

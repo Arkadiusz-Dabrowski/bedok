@@ -1,6 +1,7 @@
 package com.startup.bedok.advertisment.model.response;
 
 import com.startup.bedok.advertisment.model.enumerated.RoomGender;
+import com.startup.bedok.global.PhotoResponse;
 import com.startup.bedok.guest.model.response.GuestResponse;
 import com.startup.bedok.user.model.UserResponse;
 import com.sun.istack.NotNull;
@@ -22,7 +23,7 @@ public class AdvertisementResponse {
     private String district;
     private String postCode;
     private String streetName;
-    private List<Binary> roomPhotos;
+    private List<PhotoResponse> roomPhotos;
 
     private String roomDescription;
     private RoomGender roomGender;

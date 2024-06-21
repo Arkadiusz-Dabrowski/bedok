@@ -5,6 +5,7 @@ import com.startup.bedok.advertisment.model.request.AdvertisementRequest;
 import com.startup.bedok.advertisment.model.request.AdvertisementUpdateRequest;
 import com.startup.bedok.advertisment.model.response.AdvertisementResponse;
 import com.startup.bedok.advertisment.model.response.AdvertisementShort;
+import com.startup.bedok.global.PhotoResponse;
 import com.startup.bedok.reservation.model.entity.Reservation;
 import com.startup.bedok.user.model.UserResponse;
 import com.startup.bedok.user.service.UserService;
@@ -26,7 +27,7 @@ public class AdvertisementMapper {
 
     private final UserService userService;
 
-    public AdvertisementResponse mapAdvertisementToAdvertisementDTO(Advertisement advertisement, List<Binary> photos) {
+    public AdvertisementResponse mapAdvertisementToAdvertisementDTO(Advertisement advertisement, List<PhotoResponse> photos) {
         return new AdvertisementResponse(
                 userService.getUserResponseByID(advertisement.getHostId()),
                 advertisement.getTitle(),

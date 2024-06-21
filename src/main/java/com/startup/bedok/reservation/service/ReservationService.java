@@ -40,7 +40,7 @@ public class ReservationService {
         UUID userId = jwtTokenUtil.getUserIdFromToken(token);
         Advertisement advertisement = advertisementService.getAdvertisementById(anonymousReservationRequest.advertisementId());
         if(!advertisement.getHostId().equals(userId)) {
-            throw new IllegalArgumentException("Advertisement does not belong to user");
+            throw new IllegalArgumentException("Advertisement does not belong dateTo user");
         }
         if((advertisement.getNumBeds() - advertisement.getReservations().size()) < 1) {
             throw new NoFreeBedsException();
@@ -78,7 +78,7 @@ public class ReservationService {
     public List<ReservationDTO> getReservationsByAdvertisementId(UUID advertisementId, String token){
         Advertisement advertisement = advertisementService.getAdvertisementById(advertisementId);
         if(!advertisement.getHostId().equals(jwtTokenUtil.getUserIdFromToken(token))){
-            throw new IllegalArgumentException("Advertisement does not belong to user");
+            throw new IllegalArgumentException("Advertisement does not belong dateTo user");
         }
         return reservationRepository.findAllByAdvertisementId(advertisement.getId()).stream()
                 .map(reservationMapper::mapToReservationDTO).toList();

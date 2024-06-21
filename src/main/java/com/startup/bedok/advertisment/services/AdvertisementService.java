@@ -2,22 +2,23 @@ package com.startup.bedok.advertisment.services;
 
 import com.startup.bedok.advertisment.model.entity.*;
 import com.startup.bedok.advertisment.model.mapper.AdvertisementMapper;
-import com.startup.bedok.advertisment.model.request.AdvertisementGroupCreate;
-import com.startup.bedok.advertisment.model.request.AdvertisementMultisearch;
-import com.startup.bedok.advertisment.model.request.AdvertisementRequest;
-import com.startup.bedok.advertisment.model.request.AdvertisementUpdateRequest;
-import com.startup.bedok.advertisment.model.response.AdvertisementChangeStatusResponse;
-import com.startup.bedok.advertisment.model.response.AdvertisementResponse;
-import com.startup.bedok.advertisment.model.response.AdvertisementShort;
+import com.startup.bedok.advertisment.model.request.*;
+import com.startup.bedok.advertisment.model.response.*;
 import com.startup.bedok.advertisment.repository.*;
 import com.startup.bedok.config.JwtTokenUtil;
 import com.startup.bedok.datahelper.DataGenerator;
 import com.startup.bedok.exceptions.AdvertisementNoExistsException;
+import com.startup.bedok.global.PhotoResponse;
+import com.startup.bedok.global.SimpleResponse;
 import com.startup.bedok.user.model.UserResponse;
 import com.startup.bedok.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.message.SimpleMessage;
 import org.bson.types.Binary;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,9 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -48,12 +47,12 @@ public class AdvertisementService {
     private final JwtTokenUtil jwtTokenUtil;
 
     @Transactional
-    public UUID createAdvertisement(@Valid AdvertisementRequest advertisementRequest, String token) {
+    public AdvertisementCreateResponse createAdvertisement(@Valid AdvertisementRequest advertisementRequest, String token) {
         UUID userId = jwtTokenUtil.getUserIdFromToken(token);
         userService.checkIfHostExists(userId);
-        return advertisementRepository
+        return new AdvertisementCreateResponse(advertisementRepository
                 .save(advertisementMapper.mapAdvertisementRequestToAdvertisement(advertisementRequest, userId))
-                .getId();
+                .getId().toString());
     }
 
     @Transactional
@@ -71,13 +70,16 @@ public class AdvertisementService {
                 .findById(advertisementId)
                 .orElseThrow(() -> new AdvertisementNoExistsException(advertisementId.toString()));
         List<RoomPhoto> roomPhotos = roomPhotosRepository.findAllByAdvertisementId(advertisementId);
-        List<Binary> photos = advertisementPhotoService
+        List<PhotoResponse> photos = advertisementPhotoService
                 .getPhotosByIds(roomPhotos
                         .stream()
                         .map(RoomPhoto::getPhotoId)
                         .collect(Collectors.toList()))
                 .stream()
-                .map(AdvertisementPhoto::getImage)
+                .map(photo -> {
+                    Binary image = photo.getImage();
+                    return new PhotoResponse(photo.getId(), image);
+                })
                 .collect(Collectors.toList());
         return advertisementMapper.mapAdvertisementToAdvertisementDTO(advertisement, photos);
     }
@@ -107,10 +109,11 @@ public class AdvertisementService {
                 .collect(Collectors.toList());
     }
 
-    public String saveRoomPhotos(List<MultipartFile> photos, UUID advertisementId) {
+    public SimpleResponse saveRoomPhotos(List<MultipartFile> photos, UUID advertisementId) {
         Advertisement advertisement = advertisementRepository.findById(advertisementId)
                 .orElseThrow(() -> new AdvertisementNoExistsException(advertisementId.toString()));
-        return advertisementPhotoService.saveAdvertisementPhotos(photos, advertisement).toString();
+         advertisementPhotoService.saveAdvertisementPhotos(photos, advertisement).forEach(photo -> roomPhotosRepository.save(new RoomPhoto(photo.getPhotoId(), advertisement)));
+         return new SimpleResponse("Photos are uploaded sucesfully");
     }
 
 
@@ -138,7 +141,7 @@ public class AdvertisementService {
         List<AdvertisementShort> listOfAdvertisements = pageOfAdvertisements.stream()
                 .filter(advertisement -> {
                     if (advertisementMultisearch.getDateTo() != null)
-                        return checkIfRoomIsFreeInSelectedDate(advertisement, advertisementMultisearch.getDateFrom(), advertisementMultisearch.getDateTo());
+                        return checkIfRoomIsFreeInSelectedDate(advertisement, advertisementMultisearch.getDateFrom(), advertisementMultisearch.getDateTo()).bedsNumber() > 0;
                     return true;
                 })
                 .map(advertisement -> {
@@ -202,16 +205,17 @@ public class AdvertisementService {
     private void isAdvertisementBelongToUser(String token, Advertisement advertisement) {
         UUID userId = jwtTokenUtil.getUserIdFromToken(token);
         if (!advertisement.getHostId().equals(userId)) {
-            throw new IllegalArgumentException("Advertisement does not belong to user");
+            throw new IllegalArgumentException("Advertisement does not belong dateTo user");
         }
     }
 
-    private boolean checkIfRoomIsFreeInSelectedDate(Advertisement advertisement, LocalDate dateFrom, LocalDate dateTo) {
-        return advertisement.getReservations().stream().filter(reservation -> (dateFrom.equals(reservation.getDateFrom())) || dateTo.isEqual(reservation.getDateTo())
+    private AdvertisementFromGroupResponse checkIfRoomIsFreeInSelectedDate(Advertisement advertisement, LocalDate dateFrom, LocalDate dateTo) {
+        int numberOfFreeBeds = (int) (advertisement.getNumBeds() - advertisement.getReservations().stream().filter(reservation -> (dateFrom.equals(reservation.getDateFrom())) || dateTo.isEqual(reservation.getDateTo())
                         || (dateFrom.isBefore(reservation.getDateFrom()) && dateTo.isAfter(reservation.getDateFrom()))
                         || (dateFrom.isAfter(reservation.getDateFrom()) && !dateFrom.isAfter(reservation.getDateTo()))
                 )
-                .count() < advertisement.getNumBeds();
+                .count());
+        return new AdvertisementFromGroupResponse(advertisement.getId(), advertisement.getTitle(), numberOfFreeBeds, advertisement.getCity(), advertisement.getId());
     }
 
     public Map<String, List<String>> getDistrictsCollection() {
@@ -234,8 +238,56 @@ public class AdvertisementService {
     @Transactional
     public UUID createAdvertisementGroup(AdvertisementGroupCreate advertisementGroupCreate) {
         List<Advertisement> advertisements = advertisementGroupCreate.getAdvertisementsId().stream().map(this::getAdvertisementById).toList();
-        AdvertisementGroup advertisementGroup =  advertisementGroupRepository.save(new AdvertisementGroup(advertisementGroupCreate.getHostId(), advertisementGroupCreate.getCity(), advertisementGroupCreate.getTitle(), advertisementGroupCreate.getDescription(), advertisements));
+        AdvertisementGroup advertisementGroup = advertisementGroupRepository.save(new AdvertisementGroup(advertisementGroupCreate.getHostId(), advertisementGroupCreate.getCity(), advertisementGroupCreate.getTitle(), advertisementGroupCreate.getDescription(), advertisements));
         advertisements.forEach(advertisement -> advertisement.setAdvertisementGroup(advertisementGroup));
-        return  UUID.randomUUID();
-        }
+        return UUID.randomUUID();
+    }
+
+    public List<AdvertisementGroupResponse> getGroupedAdvertisements(AdvertisementGroupSearch advertisementGroupSearch) {
+        List<AdvertisementFromGroupResponse> advertisementsWithousGroup = new LinkedList<>();
+        advertisementRepository.findAllWithoutGroup().forEach(advertisement -> {
+            AdvertisementFromGroupResponse response = checkIfRoomIsFreeInSelectedDate(advertisement, advertisementGroupSearch.dateFrom(), advertisementGroupSearch.dateTo());
+            if (response.bedsNumber() >= advertisementGroupSearch.numberOfBeds())
+                advertisementsWithousGroup.add(response);
+        });
+        List<AdvertisementGroupResponse> firstPart = advertisementsWithousGroup.stream()
+                .map(response -> new AdvertisementGroupResponse(response.title(), response.city(), response.hostId(),
+                        advertisementGroupSearch.numberOfBeds(), List.of(response.advertisementID()))).collect(Collectors.toList());
+        List<AdvertisementGroupResponse> secondPart = advertisementGroupRepository.findAll().stream().map(group -> {
+            return filterAdvertisementsFromGroup(advertisementGroupSearch.dateFrom(), advertisementGroupSearch.dateTo(), group, advertisementGroupSearch.numberOfBeds());
+        }).filter(Objects::nonNull).toList();
+        firstPart.addAll(secondPart);
+        return firstPart;
+    }
+
+    private AdvertisementGroupResponse filterAdvertisementsFromGroup(LocalDate from, LocalDate to, AdvertisementGroup advertisementGroup, int numberOfBedsNeeded) {
+        AdvertisementGroupResponse groupResponse = new AdvertisementGroupResponse(advertisementGroup.getTitle(),
+                advertisementGroup.getCity(), advertisementGroup.getHostId(), 0, new ArrayList<>());
+
+        advertisementGroup.getAdvertisements().stream()
+                .map(advertisement -> checkIfRoomIsFreeInSelectedDate(advertisement, from, to))
+                .filter(response -> response.bedsNumber() > 0)
+                .forEach(x -> {
+                    groupResponse.setNumOfBeds(groupResponse.getNumOfBeds() + x.bedsNumber());
+                    groupResponse.getAdvertisementsId().add(x.advertisementID());
+                });
+
+        if (numberOfBedsNeeded >= groupResponse.getNumOfBeds())
+            return groupResponse;
+
+        return null;
+    }
+
+    @Transactional
+    public List<RoomPhoto> deletePhotosFromAdvertisement(DeleteAdvertisementPhotoRequest deleteAdvertisementPhotoRequest,
+                                                       UUID advertisementId,
+                                                       String token) {
+        Advertisement advertisement = advertisementRepository.findById(advertisementId).orElseThrow(() -> new AdvertisementNoExistsException(advertisementId));
+        isAdvertisementBelongToUser(token, advertisement);
+        deleteAdvertisementPhotoRequest.photoIds().forEach(id -> {
+            roomPhotosRepository.deleteByPhotoId(id);
+            advertisementPhotoService.deletePhotoFromAdvertisement(id);
+        });
+        return roomPhotosRepository.findAllByAdvertisementId(advertisementId);
+    }
 }

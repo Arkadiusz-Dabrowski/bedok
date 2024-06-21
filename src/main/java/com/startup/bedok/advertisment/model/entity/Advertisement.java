@@ -28,6 +28,7 @@ public class Advertisement {
     private AdvertisementGroup advertisementGroup;
     private UUID hostId;
     private String city;
+    @Column(unique = true)
     private String title;
     private String district;
     @Enumerated

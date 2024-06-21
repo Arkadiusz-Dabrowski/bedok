@@ -15,8 +15,8 @@ public class RoomPhoto {
     @Id
     @GeneratedValue
     private UUID id;
+    @Column(unique = true)
     private String photoId;
-
     @ManyToOne
     private Advertisement advertisement;
 

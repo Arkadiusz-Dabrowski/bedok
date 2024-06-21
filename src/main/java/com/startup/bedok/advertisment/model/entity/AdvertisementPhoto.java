@@ -13,6 +13,7 @@ public class AdvertisementPhoto {
     @Id
     @GeneratedValue
     private String id;
+    private String title;
     private Binary image;
 
 

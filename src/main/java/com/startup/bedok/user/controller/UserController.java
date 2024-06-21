@@ -29,9 +29,10 @@ public class UserController {
         return ResponseEntity.ok(userService.registerUser(userDTO));
     }
 
-    @PostMapping("photo/{id}")
-    private ResponseEntity<String> addUserPhoto(@PathVariable UUID id, @RequestParam("file") MultipartFile photo) throws IOException {
-        return ResponseEntity.ok(userService.addPhotoToUser(id, photo));
+    @PostMapping("photo")
+    private ResponseEntity<SimpleResponse> addUserPhoto(@RequestHeader("Authorization") String token,
+                                                @RequestParam MultipartFile photo) {
+        return ResponseEntity.ok(userService.addPhotoToUser(token, photo));
     }
 
     @PostMapping("login")

@@ -1,15 +1,11 @@
 package com.startup.bedok.advertisment.controller;
 
 import com.startup.bedok.advertisment.model.entity.Advertisement;
-import com.startup.bedok.advertisment.model.entity.AdvertisementGroup;
-import com.startup.bedok.advertisment.model.request.AdvertisementGroupCreate;
-import com.startup.bedok.advertisment.model.request.AdvertisementMultisearch;
-import com.startup.bedok.advertisment.model.request.AdvertisementRequest;
-import com.startup.bedok.advertisment.model.request.AdvertisementUpdateRequest;
-import com.startup.bedok.advertisment.model.response.AdvertisementChangeStatusResponse;
-import com.startup.bedok.advertisment.model.response.AdvertisementResponse;
-import com.startup.bedok.advertisment.model.response.AdvertisementShort;
+import com.startup.bedok.advertisment.model.entity.RoomPhoto;
+import com.startup.bedok.advertisment.model.request.*;
+import com.startup.bedok.advertisment.model.response.*;
 import com.startup.bedok.advertisment.services.AdvertisementService;
+import com.startup.bedok.global.SimpleResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -31,8 +27,8 @@ public class AdvertisementController {
     private final AdvertisementService advertisementService;
 
     @PostMapping
-    private ResponseEntity<UUID> createAdvertisement(@Valid @RequestBody AdvertisementRequest advertisementRequest,
-                                                     @RequestHeader("Authorization") String token) {
+    private ResponseEntity<AdvertisementCreateResponse> createAdvertisement(@Valid @RequestBody AdvertisementRequest advertisementRequest,
+                                                                            @RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(advertisementService.createAdvertisement(advertisementRequest, token));
     }
 
@@ -59,10 +55,10 @@ public class AdvertisementController {
         return ResponseEntity.ok(advertisementService.findAllWithFilters(advertisementMultisearch));
     }
 
-    @PostMapping("available")
-    public Page<AdvertisementGroup> getAvailableGroups(
-            @RequestBody AdvertisementMultisearch advertisementMultisearch) {
-        return advertisementService.getAvailableGroups(advertisementMultisearch);
+    @PostMapping("find-groups")
+    public List<AdvertisementGroupResponse> getAvailableGroups(
+            @RequestBody AdvertisementGroupSearch advertisementGroupSearch) {
+        return advertisementService.getGroupedAdvertisements(advertisementGroupSearch);
     }
 
     @PostMapping("group")
@@ -82,9 +78,17 @@ public class AdvertisementController {
         return ResponseEntity.ok(advertisementService.getAdvertisementsList());
     }
 
-    @PutMapping("photos/{advertisementId}")
-    private ResponseEntity<String> addPhotosToAdvertisement(List<MultipartFile> photos, @PathVariable UUID advertisementId) {
+    @PostMapping("{advertisementId}/photos")
+    private ResponseEntity<SimpleResponse> addPhotosToAdvertisement(@RequestParam("photos") List<MultipartFile> photos,
+                                                                    @PathVariable UUID advertisementId) {
         return ResponseEntity.ok(advertisementService.saveRoomPhotos(photos, advertisementId));
+    }
+
+    @DeleteMapping("{advertisementId}/photo")
+    private ResponseEntity<List<RoomPhoto>> deletePhotosFromAdvertisement(@RequestBody DeleteAdvertisementPhotoRequest deleteAdvertisementPhotoRequest,
+                                                                          @PathVariable UUID advertisementId,
+                                                                          @RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(advertisementService.deletePhotosFromAdvertisement(deleteAdvertisementPhotoRequest, advertisementId, token));
     }
 
     @PostMapping("random")

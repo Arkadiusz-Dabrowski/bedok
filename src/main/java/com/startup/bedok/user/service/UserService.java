@@ -58,14 +58,19 @@ public class UserService {
     }
 
     @Transactional
-    public String addPhotoToUser(UUID id, MultipartFile photo) throws IOException {
+    public SimpleResponse addPhotoToUser(String token, MultipartFile photo)  {
+        UUID id = getUserIdFromToken(token);
         ApplicationUser user = userRepository.findById(id).orElseThrow(() -> new UserNoExistsException(id.toString()));
         String photoId;
-        photoId = userPhotoService.savePhoto(photo.getBytes(),
-                user.getName());
+        try {
+            photoId = userPhotoService.savePhoto(photo.getBytes(),
+                    user.getName());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         user.setPhotoId(photoId);
         userRepository.save(user);
-        return photoId;
+        return new SimpleResponse("User photo - updated");
     }
 
     public UserResponse getUserResponseFromToken(String token) {
@@ -130,7 +135,7 @@ public class UserService {
     @Transactional
     public SimpleResponse generateNewPasswordAndSendToUser(String email){
         ApplicationUser user = getUserByEmail(email);
-        String message = "Twoje nowe hasło to: ";
+        String message = "Twoje nowe hasło dateTo: ";
         String upperCaseLetters = RandomStringUtils.random(6, 65, 90, true, true);
         String lowerCaseLetters = RandomStringUtils.random(6, 97, 122, true, true);
         String combinedChars = upperCaseLetters.concat(lowerCaseLetters);

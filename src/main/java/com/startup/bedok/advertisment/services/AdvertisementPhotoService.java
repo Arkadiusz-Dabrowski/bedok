@@ -65,6 +65,10 @@ public class AdvertisementPhotoService {
         advertisementPhotoRepository.deleteById(roomPhoto.getPhotoId());
     }
 
+    public void deletePhotoFromAdvertisement(String id) {
+        advertisementPhotoRepository.deleteById(id);
+    }
+
     public List<AdvertisementPhoto> getPhotos(List<RoomPhoto> photos) {
         return photos.stream().map(photo -> {
             return advertisementPhotoRepository.findById(photo.getPhotoId()).orElseThrow(() -> new AdvertisementPhotoNoExistsException(photo.getPhotoId()));
