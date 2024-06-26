@@ -22,7 +22,6 @@ import java.util.UUID;
 public class UserController {
 
     private final UserService userService;
-    private final EmailService emailService;
 
     @PostMapping("register")
     private ResponseEntity<RegistrationResponse> registerUser(@Valid @RequestBody UserDTO userDTO) throws IOException {
@@ -31,8 +30,8 @@ public class UserController {
 
     @PostMapping("photo")
     private ResponseEntity<SimpleResponse> addUserPhoto(@RequestHeader("Authorization") String token,
-                                                @RequestParam MultipartFile photo) {
-        return ResponseEntity.ok(userService.addPhotoToUser(token, photo));
+                                                @RequestParam MultipartFile file) {
+        return ResponseEntity.ok(userService.addPhotoToUser(token, file));
     }
 
     @PostMapping("login")
