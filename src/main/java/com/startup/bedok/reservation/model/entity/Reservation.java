@@ -1,12 +1,12 @@
 package com.startup.bedok.reservation.model.entity;
 
 import com.startup.bedok.advertisment.model.entity.Advertisement;
+import com.startup.bedok.advertisment.model.entity.AdvertisementGroup;
 import com.startup.bedok.guest.model.entity.Guest;
 import com.startup.bedok.user.model.ApplicationUser;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.LazyCollection;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -30,6 +30,10 @@ public class Reservation {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "advertisement_fk")
     private Advertisement advertisement;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "advertisement_group_fk")
+    private AdvertisementGroup advertisementGroup;
     private Boolean paid;
     private Boolean accepted;
 

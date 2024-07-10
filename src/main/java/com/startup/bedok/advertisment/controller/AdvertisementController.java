@@ -49,16 +49,16 @@ public class AdvertisementController {
         return ResponseEntity.ok(advertisementService.getAdvertisementListByHostId(token));
     }
 
+    @PostMapping("group/criteria")
+    private ResponseEntity<Page<AdvertisementGroupCriteriaResponse>> getGroupsOfAdvertisementListByMultiSearch(
+            @RequestBody @Valid AdvertisementMultisearch advertisementMultisearch) {
+        return ResponseEntity.ok(advertisementService.findAllGroupsWithFilters(advertisementMultisearch));
+    }
+
     @PostMapping("criteria")
     private ResponseEntity<Page<AdvertisementShort>> getAdvertisementListByMultiSearch(
             @RequestBody @Valid AdvertisementMultisearch advertisementMultisearch) {
         return ResponseEntity.ok(advertisementService.findAllWithFilters(advertisementMultisearch));
-    }
-
-    @PostMapping("find-groups")
-    public List<AdvertisementGroupResponse> getAvailableGroups(
-            @RequestBody AdvertisementGroupSearch advertisementGroupSearch) {
-        return advertisementService.getGroupedAdvertisements(advertisementGroupSearch);
     }
 
     @PostMapping("group")

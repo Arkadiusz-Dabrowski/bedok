@@ -2,10 +2,14 @@ package com.startup.bedok.advertisment.repository;
 
 import com.startup.bedok.advertisment.model.entity.Advertisement;
 import com.startup.bedok.advertisment.model.request.AdvertisementMultisearch;
+import com.startup.bedok.advertisment.model.response.AdvertisementGroupCriteriaResponse;
 import com.startup.bedok.reservation.model.entity.Reservation;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -39,9 +43,42 @@ public class AdvertisementCriteriaRepository {
         return new PageImpl<>(typedQuery.getResultList(), pageable, advertisementCount);
     }
 
+    public Page<AdvertisementGroupCriteriaResponse> findAllWithFiltersForGroup(AdvertisementMultisearch advertisementMultisearch) {
+        CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+        CriteriaQuery<AdvertisementGroupCriteriaResponse> criteriaQuery = criteriaBuilder.createQuery(AdvertisementGroupCriteriaResponse.class);
+        Root<Advertisement> ad = criteriaQuery.from(Advertisement.class); // More descriptive alias
+
+        Subquery<Long> subquery = criteriaQuery.subquery(Long.class);
+        Root<Reservation> reservationRoot = subquery.from(Reservation.class);
+        subquery.select(criteriaBuilder.count(reservationRoot.get("id")))
+                .where(criteriaBuilder.and(
+                        criteriaBuilder.equal(reservationRoot.get("advertisementGroup"), ad.get("advertisementGroup"))
+                ));
+        // Group by advertisementGroupId
+        criteriaQuery.groupBy(ad.get("advertisementGroup"));
+
+        // Select advertisementGroupId and count of records
+        criteriaQuery.select(criteriaBuilder.construct(
+                AdvertisementGroupCriteriaResponse.class,
+                ad.get("advertisementGroup").get("advertisementGroupId"), // AdvertisementGroup
+                criteriaBuilder.sum(ad.get("numBeds")) // Count of numBeds
+        ));
+
+        criteriaQuery.having(criteriaBuilder.greaterThanOrEqualTo(criteriaBuilder.sum(ad.get("numBeds")), subquery.getSelection()));
+
+        TypedQuery<AdvertisementGroupCriteriaResponse> typedQuery = entityManager.createQuery(criteriaQuery);
+
+        typedQuery.setFirstResult(advertisementMultisearch.getPageNumber() * advertisementMultisearch.getPageSize());
+        typedQuery.setMaxResults(advertisementMultisearch.getPageSize());
+
+        Pageable pageable = getPageable(advertisementMultisearch);
+        return new PageImpl<>(typedQuery.getResultList(), pageable, typedQuery.getResultList().size());
+    }
+
     private Predicate getPredicate(AdvertisementMultisearch advertisementMultisearch,
                                    Root<Advertisement> advertisementRoot, CriteriaQuery query) {
         List<Predicate> predicateList = new ArrayList<>();
+        criteriaBuilder = session.getCriteriaBuilder();
 
         if(advertisementMultisearch.getLocation() != null){
             predicateList.add(criteriaBuilder.or(
@@ -73,16 +110,19 @@ public class AdvertisementCriteriaRepository {
                     .where(criteriaBuilder.and(
                             criteriaBuilder.equal(reservationRoot.get("advertisement"), advertisementRoot),
                             criteriaBuilder.or(
-                            criteriaBuilder.between(reservationRoot.get("dateFrom"), advertisementMultisearch.getDateFrom(), advertisementMultisearch.getDateTo()),
-                            criteriaBuilder.between(reservationRoot.get("dateTo"), advertisementMultisearch.getDateFrom(), advertisementMultisearch.getDateTo()))
+                            criteriaBuilder.lessThanOrEqualTo(reservationRoot.get("dateFrom"), advertisementMultisearch.getDateTo()),
+                            criteriaBuilder.greaterThanOrEqualTo(reservationRoot.get("dateTo"), advertisementMultisearch.getDateFrom()))
                     ));
-            Predicate numBedsPredicate = criteriaBuilder.greaterThan(advertisementRoot.get("numBeds"), subquery);
+            Expression<Long> totalCountPlusNumber = criteriaBuilder.sum(
+                    subquery.getSelection(),
+                    criteriaBuilder.literal((long) advertisementMultisearch.getNumberOfClients())
+            );
+
+            Predicate numBedsPredicate = criteriaBuilder.greaterThanOrEqualTo(advertisementRoot.get("numBeds"), totalCountPlusNumber);
             predicateList.add(numBedsPredicate);
         }
         return criteriaBuilder.and(predicateList.toArray(new Predicate[0]));
     }
-
-
 
 
     private void setOrder(AdvertisementMultisearch advertisementMultisearch,

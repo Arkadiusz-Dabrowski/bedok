@@ -13,12 +13,9 @@ import com.startup.bedok.global.SimpleResponse;
 import com.startup.bedok.user.model.UserResponse;
 import com.startup.bedok.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.message.SimpleMessage;
 import org.bson.types.Binary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,7 +23,9 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 
@@ -139,11 +138,6 @@ public class AdvertisementService {
         Page<Advertisement> pageOfAdvertisements = advertisementCriteriaRepository
                 .findAllWithFilters(advertisementMultisearch);
         List<AdvertisementShort> listOfAdvertisements = pageOfAdvertisements.stream()
-                .filter(advertisement -> {
-                    if (advertisementMultisearch.getDateTo() != null)
-                        return checkIfRoomIsFreeInSelectedDate(advertisement, advertisementMultisearch.getDateFrom(), advertisementMultisearch.getDateTo()).bedsNumber() > 0;
-                    return true;
-                })
                 .map(advertisement -> {
                     UserResponse userResponse = userService
                             .getUserResponseByID(advertisement.getHostId());
@@ -159,6 +153,27 @@ public class AdvertisementService {
                 }).toList();
         return new PageImpl<>(listOfAdvertisements, pageOfAdvertisements.getPageable(),
                 pageOfAdvertisements.getTotalElements());
+    }
+
+    public Page<AdvertisementGroupCriteriaResponse> findAllGroupsWithFilters(AdvertisementMultisearch advertisementMultisearch) {
+        Page<AdvertisementGroupCriteriaResponse> pageOfAdvertisements = advertisementCriteriaRepository.findAllWithFiltersForGroup(advertisementMultisearch);
+        pageOfAdvertisements.forEach(group -> {
+            advertisementRepository.findAllByAdvertisementGroup(advertisementGroupRepository.findById(group.getAdvertisementGroupId()).get()).forEach(advertisement -> {
+                AdvertisementFromGroupResponse advertisementFromGroupResponse = checkIfRoomIsFreeInSelectedDate(advertisement, advertisementMultisearch.getDateFrom(), advertisementMultisearch.getDateTo());
+                if(advertisementFromGroupResponse.bedsNumber() > 0) {
+                    UserResponse userResponse = userService
+                            .getUserResponseByID(advertisement.getHostId());
+                    List<RoomPhoto> photos = roomPhotosRepository.findAllByAdvertisementId(advertisement.getId());
+                    if (!photos.isEmpty())
+                        photos = photos.stream().limit(5).collect(Collectors.toList());
+                    List<Binary> advertisementPhotos = advertisementPhotoService
+                            .getPhotos(photos).stream().map(AdvertisementPhoto::getImage).toList();
+                    group.addAdvertisementToList(advertisementMapper.mapAdvertisementToAdvertisementShort(advertisementFromGroupResponse.advertisement(),advertisementPhotos,userResponse));
+                }
+            });
+
+        });
+        return pageOfAdvertisements;
     }
 
     public List<Advertisement> createSomeRandomAdvertisements() {
@@ -215,7 +230,7 @@ public class AdvertisementService {
                         || (dateFrom.isAfter(reservation.getDateFrom()) && !dateFrom.isAfter(reservation.getDateTo()))
                 )
                 .count());
-        return new AdvertisementFromGroupResponse(advertisement.getId(), advertisement.getTitle(), numberOfFreeBeds, advertisement.getCity(), advertisement.getId());
+        return new AdvertisementFromGroupResponse(advertisement, numberOfFreeBeds);
     }
 
     public Map<String, List<String>> getDistrictsCollection() {
@@ -226,14 +241,6 @@ public class AdvertisementService {
                 ));
     }
 
-    public Page<AdvertisementGroup> getAvailableGroups(AdvertisementMultisearch advertisementMultisearch) {
-        Pageable pageable = getPageable(advertisementMultisearch);
-        return advertisementGroupRepository.findAvailableGroups(advertisementMultisearch.getDateFrom(), advertisementMultisearch.getDateTo(), pageable);
-    }
-
-    private Pageable getPageable(AdvertisementMultisearch advertisementMultisearch) {
-        return PageRequest.of(advertisementMultisearch.getPageNumber(), advertisementMultisearch.getPageSize());
-    }
 
     @Transactional
     public UUID createAdvertisementGroup(AdvertisementGroupCreate advertisementGroupCreate) {
@@ -241,41 +248,6 @@ public class AdvertisementService {
         AdvertisementGroup advertisementGroup = advertisementGroupRepository.save(new AdvertisementGroup(advertisementGroupCreate.getHostId(), advertisementGroupCreate.getCity(), advertisementGroupCreate.getTitle(), advertisementGroupCreate.getDescription(), advertisements));
         advertisements.forEach(advertisement -> advertisement.setAdvertisementGroup(advertisementGroup));
         return UUID.randomUUID();
-    }
-
-    public List<AdvertisementGroupResponse> getGroupedAdvertisements(AdvertisementGroupSearch advertisementGroupSearch) {
-        List<AdvertisementFromGroupResponse> advertisementsWithousGroup = new LinkedList<>();
-        advertisementRepository.findAllWithoutGroup().forEach(advertisement -> {
-            AdvertisementFromGroupResponse response = checkIfRoomIsFreeInSelectedDate(advertisement, advertisementGroupSearch.dateFrom(), advertisementGroupSearch.dateTo());
-            if (response.bedsNumber() >= advertisementGroupSearch.numberOfBeds())
-                advertisementsWithousGroup.add(response);
-        });
-        List<AdvertisementGroupResponse> firstPart = advertisementsWithousGroup.stream()
-                .map(response -> new AdvertisementGroupResponse(response.title(), response.city(), response.hostId(),
-                        advertisementGroupSearch.numberOfBeds(), List.of(response.advertisementID()))).collect(Collectors.toList());
-        List<AdvertisementGroupResponse> secondPart = advertisementGroupRepository.findAll().stream().map(group -> {
-            return filterAdvertisementsFromGroup(advertisementGroupSearch.dateFrom(), advertisementGroupSearch.dateTo(), group, advertisementGroupSearch.numberOfBeds());
-        }).filter(Objects::nonNull).toList();
-        firstPart.addAll(secondPart);
-        return firstPart;
-    }
-
-    private AdvertisementGroupResponse filterAdvertisementsFromGroup(LocalDate from, LocalDate to, AdvertisementGroup advertisementGroup, int numberOfBedsNeeded) {
-        AdvertisementGroupResponse groupResponse = new AdvertisementGroupResponse(advertisementGroup.getTitle(),
-                advertisementGroup.getCity(), advertisementGroup.getHostId(), 0, new ArrayList<>());
-
-        advertisementGroup.getAdvertisements().stream()
-                .map(advertisement -> checkIfRoomIsFreeInSelectedDate(advertisement, from, to))
-                .filter(response -> response.bedsNumber() > 0)
-                .forEach(x -> {
-                    groupResponse.setNumOfBeds(groupResponse.getNumOfBeds() + x.bedsNumber());
-                    groupResponse.getAdvertisementsId().add(x.advertisementID());
-                });
-
-        if (numberOfBedsNeeded >= groupResponse.getNumOfBeds())
-            return groupResponse;
-
-        return null;
     }
 
     @Transactional
