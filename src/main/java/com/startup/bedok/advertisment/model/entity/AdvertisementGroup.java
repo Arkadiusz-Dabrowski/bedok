@@ -35,4 +35,12 @@ public class AdvertisementGroup {
         this.description = description;
         this.advertisements = advertisements;
     }
+
+    public void addAdvertisementToGroup(Advertisement advertisement){
+        advertisements.add(advertisement);
+    }
+
+    public void deleteAdvertisementFromGroup(Advertisement advertisement){
+        advertisements.remove(advertisement);
+    }
 }

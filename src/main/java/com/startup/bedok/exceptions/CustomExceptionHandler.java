@@ -1,5 +1,6 @@
 package com.startup.bedok.exceptions;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,7 +9,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
+import javax.validation.ConstraintViolationException;
+import javax.validation.ValidationException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,9 +20,9 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class CustomExceptionHandler {
 
-    @ExceptionHandler({AdvertisementNoExistsException.class})
+    @ExceptionHandler({AdvertisementNotExistsException.class})
     public ResponseEntity<Object> handleAdvertisementNotExistsException(
-            AdvertisementNoExistsException ex) {
+            AdvertisementNotExistsException ex) {
         CustomException apiError =
                 new CustomException(HttpStatus.NOT_FOUND, ex.getLocalizedMessage());
         return new ResponseEntity<Object>(apiError, new HttpHeaders(), apiError.getStatus());
@@ -73,6 +76,18 @@ public class CustomExceptionHandler {
     public ResponseEntity<Object> handleInvalidDateRangeException(InvalidDateRangeException ex) {
         CustomException apiError =
                 new CustomException(HttpStatus.CONFLICT, ex.getMessage());
+        return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+        if(ex.getRootCause() instanceof SQLException sqlException){
+            CustomException apiError =
+                    new CustomException(HttpStatus.CONFLICT, sqlException.getMessage());
+            return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.CONFLICT);
+        }
+        CustomException apiError =
+                new CustomException(HttpStatus.CONFLICT, ex.getCause().getMessage());
         return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.CONFLICT);
     }
 

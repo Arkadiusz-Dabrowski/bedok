@@ -6,17 +6,12 @@ import com.startup.bedok.advertisment.model.entity.AdvertisementPhoto;
 import com.startup.bedok.advertisment.model.entity.RoomPhoto;
 import com.startup.bedok.advertisment.model.enumerated.RoomGender;
 import com.startup.bedok.advertisment.repository.AdvertisementRepository;
-import com.startup.bedok.advertisment.repository.DistrictRepository;
 import com.startup.bedok.advertisment.repository.RoomPhotosRepository;
 import com.startup.bedok.advertisment.services.AdvertisementPhotoService;
 import com.startup.bedok.user.model.ApplicationUser;
 import com.startup.bedok.user.model.GenderEnum;
-import com.startup.bedok.user.repository.UserPhotoRepository;
 import com.startup.bedok.user.repository.UserRepository;
-import com.startup.bedok.user.service.UserPhotoService;
 import lombok.RequiredArgsConstructor;
-import org.bson.BsonBinarySubType;
-import org.bson.types.Binary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,10 +36,7 @@ public class DataGenerator {
 
     private final UserRepository userRepository;
     private final AdvertisementRepository advertisementRepository;
-    private final UserPhotoRepository userPhotoRepository;
     private final RoomPhotosRepository roomPhotosRepository;
-    private final UserPhotoService userPhotoService;
-    private final DistrictRepository districtRepository;
     private final AdvertisementPhotoService advertisementPhotoService;
     private Faker faker = new Faker();
 
@@ -67,37 +59,6 @@ public class DataGenerator {
                         faker.bool().bool()
                 )).toList();
         userRepository.saveAll(users);
-    }
-
-    @Transactional
-    public List<RoomPhoto> createSomeAdvertisementPhotos() throws IOException {
-        String directory = "./src/main/resources/room/";
-        Set<String>  files = listFilesUsingFilesList(directory);
-        List<Advertisement> advertisementWithPhoto = roomPhotosRepository.findAll().stream().map(RoomPhoto::getAdvertisement).toList();
-        List<Advertisement> advertisementsWithoutPhoto =
-                advertisementRepository.findAll().
-                        stream().filter(x -> !advertisementWithPhoto.contains(x)).toList();
-        List<AdvertisementPhoto> advertisementPhotos = files.stream().map(x ->  new File(directory + x))
-                .toList()
-                .stream()
-                .map(file -> {
-                    try {
-                        return new FileInputStream(file);
-                    } catch (FileNotFoundException e) {
-                        throw new RuntimeException(e);
-                    }
-                }).map(in -> {
-                    try {
-                        return new AdvertisementPhoto(new Binary(BsonBinarySubType.BINARY, in.readAllBytes()));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }).toList();
-        List<String> advertisementPhotosId = advertisementPhotos.stream().map(advertisementPhotoService::saveAdvertisementPhoto).toList();
-        advertisementsWithoutPhoto.forEach(advertisement -> {
-              advertisementPhotosId.forEach(id -> roomPhotosRepository.save(new RoomPhoto(id, advertisement)));
-        });
-        return roomPhotosRepository.findAll();
     }
 
     public Set<String> listFilesUsingFilesList(String dir) throws IOException {

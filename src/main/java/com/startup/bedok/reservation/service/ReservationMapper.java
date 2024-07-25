@@ -13,7 +13,6 @@ public class ReservationMapper {
         return new ReservationDTO(reservation.getDateFrom(),
                 reservation.getDateTo(),
                 reservation.getAdvertisement().getId(),
-                reservation.getAccepted(),
-                reservation.getPaid());
+                reservation.getReservationStatus());
     }
 }

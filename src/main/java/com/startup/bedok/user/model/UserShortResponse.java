@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Data
 @NoArgsConstructor
-public class UserResponse {
+public class UserShortResponse {
 
     @NotNull
     private String name;
@@ -16,15 +16,13 @@ public class UserResponse {
     private UUID id;
     private String email;
     private String phone;
-    private String photo;
     private GenderEnum gender;
 
-    public UserResponse(String hostName, UUID id,String hostEmail, String hostPhone, String photo, GenderEnum gender) {
+    public UserShortResponse(String hostName, UUID id, String hostEmail, String hostPhone, GenderEnum gender) {
         this.name = hostName;
         this.id = id;
         this.email = hostEmail;
         this.phone = hostPhone;
-        this.photo = photo;
         this.gender = gender;
     }
 }

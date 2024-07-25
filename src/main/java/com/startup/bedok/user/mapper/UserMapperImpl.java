@@ -3,7 +3,7 @@ package com.startup.bedok.user.mapper;
 import com.startup.bedok.user.model.ApplicationUser;
 import com.startup.bedok.user.model.UserDTO;
 import com.startup.bedok.user.model.UserResponse;
-import org.bson.types.Binary;
+import com.startup.bedok.user.model.UserShortResponse;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.security.SecureRandom;
@@ -27,13 +27,40 @@ public class UserMapperImpl {
         );
     }
 
-    static public UserResponse userToUserResponse(ApplicationUser user, Binary hostPhoto) {
+    static public ApplicationUser hostDTOtoHost(UserDTO userDTO) {
+        return new ApplicationUser(
+                userDTO.getName(),
+                userDTO.getGender(),
+                encryptPassword(userDTO.getPassword()),
+                userDTO.getEmail(),
+                userDTO.getPhone(),
+                null,
+                userDTO.getDateOfBirth(),
+                userDTO.getLanguage(),
+                userDTO.isViber(),
+                userDTO.isSignal(),
+                userDTO.isWhatsapp(),
+                userDTO.isTelegram()
+        );
+    }
+
+    static public UserResponse userToUserResponse(ApplicationUser user, String hostPhoto) {
         return new UserResponse(
                 user.getName(),
                 user.getId(),
                 user.getEmail(),
                 user.getPhone(),
                 hostPhoto,
+                user.getGender()
+        );
+    }
+
+    static public UserShortResponse userToUserShortResponse(ApplicationUser user) {
+        return new UserShortResponse(
+                user.getName(),
+                user.getId(),
+                user.getEmail(),
+                user.getPhone(),
                 user.getGender()
         );
     }

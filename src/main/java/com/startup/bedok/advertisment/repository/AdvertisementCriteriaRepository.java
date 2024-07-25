@@ -26,7 +26,7 @@ public class AdvertisementCriteriaRepository {
     private final Session session;
     private CriteriaBuilder criteriaBuilder;
 
-    public Page<Advertisement> findAllWithFilters(AdvertisementMultisearch advertisementMultisearch){
+    public Page<Advertisement> findAllWithFilters(AdvertisementMultisearch advertisementMultisearch) {
         criteriaBuilder = session.getCriteriaBuilder();
         CriteriaQuery<Advertisement> criteriaQuery = criteriaBuilder.createQuery(Advertisement.class);
         Root<Advertisement> advertisementRoot = criteriaQuery.from(Advertisement.class);
@@ -52,7 +52,11 @@ public class AdvertisementCriteriaRepository {
         Root<Reservation> reservationRoot = subquery.from(Reservation.class);
         subquery.select(criteriaBuilder.count(reservationRoot.get("id")))
                 .where(criteriaBuilder.and(
-                        criteriaBuilder.equal(reservationRoot.get("advertisementGroup"), ad.get("advertisementGroup"))
+                        criteriaBuilder.equal(reservationRoot.get("advertisementGroup"), ad.get("advertisementGroup")),
+                        criteriaBuilder.or(
+                                criteriaBuilder.equal(reservationRoot.get("status"), "accepted"),
+                                criteriaBuilder.equal(reservationRoot.get("status"), "paid")
+                        )
                 ));
         // Group by advertisementGroupId
         criteriaQuery.groupBy(ad.get("advertisementGroup"));
@@ -80,27 +84,27 @@ public class AdvertisementCriteriaRepository {
         List<Predicate> predicateList = new ArrayList<>();
         criteriaBuilder = session.getCriteriaBuilder();
 
-        if(advertisementMultisearch.getLocation() != null){
+        if (advertisementMultisearch.getLocation() != null) {
             predicateList.add(criteriaBuilder.or(
-                criteriaBuilder.like(advertisementRoot.get("streetName"), "%" + advertisementMultisearch.getLocation() + "%"),
-                criteriaBuilder.like(advertisementRoot.get("city"), "%" + advertisementMultisearch.getLocation() + "%"),
-                criteriaBuilder.like(advertisementRoot.get("postCode"), "%" + advertisementMultisearch.getLocation() + "%")
-        ));
+                    criteriaBuilder.like(advertisementRoot.get("streetName"), "%" + advertisementMultisearch.getLocation() + "%"),
+                    criteriaBuilder.like(advertisementRoot.get("city"), "%" + advertisementMultisearch.getLocation() + "%"),
+                    criteriaBuilder.like(advertisementRoot.get("postCode"), "%" + advertisementMultisearch.getLocation() + "%")
+            ));
         }
 
-        if(advertisementMultisearch.getLanguage()!= null){
+        if (advertisementMultisearch.getLanguage() != null) {
             predicateList.add(criteriaBuilder.isMember(advertisementMultisearch.getLanguage(), advertisementRoot.get("language")));
         }
-        if(advertisementMultisearch.getRoomAreaFrom() != null){
+        if (advertisementMultisearch.getRoomAreaFrom() != null) {
             predicateList.add(criteriaBuilder.greaterThanOrEqualTo(advertisementRoot.get("roomArea"), advertisementMultisearch.getRoomAreaFrom()));
         }
-        if(advertisementMultisearch.getRoomAreaTo() != null){
+        if (advertisementMultisearch.getRoomAreaTo() != null) {
             predicateList.add(criteriaBuilder.lessThanOrEqualTo(advertisementRoot.get("roomArea"), advertisementMultisearch.getRoomAreaTo()));
         }
-        if(advertisementMultisearch.getRoomEquipment() != null){
+        if (advertisementMultisearch.getRoomEquipment() != null) {
             predicateList.add(criteriaBuilder.equal(advertisementRoot.get("roomEquipment"), advertisementMultisearch.getRoomEquipment()));
         }
-        if(advertisementMultisearch.getSharedEquipment() != null){
+        if (advertisementMultisearch.getSharedEquipment() != null) {
             predicateList.add(criteriaBuilder.equal(advertisementRoot.get("sharedEquipment"), advertisementMultisearch.getSharedEquipment()));
         }
         if (advertisementMultisearch.getDateFrom() != null && advertisementMultisearch.getDateTo() != null) {
@@ -110,8 +114,8 @@ public class AdvertisementCriteriaRepository {
                     .where(criteriaBuilder.and(
                             criteriaBuilder.equal(reservationRoot.get("advertisement"), advertisementRoot),
                             criteriaBuilder.or(
-                            criteriaBuilder.lessThanOrEqualTo(reservationRoot.get("dateFrom"), advertisementMultisearch.getDateTo()),
-                            criteriaBuilder.greaterThanOrEqualTo(reservationRoot.get("dateTo"), advertisementMultisearch.getDateFrom()))
+                                    criteriaBuilder.lessThanOrEqualTo(reservationRoot.get("dateFrom"), advertisementMultisearch.getDateTo()),
+                                    criteriaBuilder.greaterThanOrEqualTo(reservationRoot.get("dateTo"), advertisementMultisearch.getDateFrom()))
                     ));
             Expression<Long> totalCountPlusNumber = criteriaBuilder.sum(
                     subquery.getSelection(),

@@ -5,12 +5,9 @@ import com.startup.bedok.advertisment.model.request.AdvertisementRequest;
 import com.startup.bedok.advertisment.model.request.AdvertisementUpdateRequest;
 import com.startup.bedok.advertisment.model.response.AdvertisementResponse;
 import com.startup.bedok.advertisment.model.response.AdvertisementShort;
-import com.startup.bedok.global.PhotoResponse;
-import com.startup.bedok.reservation.model.entity.Reservation;
-import com.startup.bedok.user.model.UserResponse;
+import com.startup.bedok.user.model.UserShortResponse;
 import com.startup.bedok.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.bson.types.Binary;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -27,9 +24,10 @@ public class AdvertisementMapper {
 
     private final UserService userService;
 
-    public AdvertisementResponse mapAdvertisementToAdvertisementDTO(Advertisement advertisement, List<PhotoResponse> photos) {
+    public AdvertisementResponse mapAdvertisementToAdvertisementDTO(Advertisement advertisement, List<String> photos) {
         return new AdvertisementResponse(
                 userService.getUserResponseByID(advertisement.getHostId()),
+                advertisement.getId(),
                 advertisement.getTitle(),
                 advertisement.getCity(),
                 advertisement.getDistrict(),
@@ -65,7 +63,7 @@ public class AdvertisementMapper {
         );
     }
 
-    public AdvertisementShort mapAdvertisementToAdvertisementShort(Advertisement advertisement, List<Binary> photo, UserResponse userResponse) {
+    public AdvertisementShort mapAdvertisementToAdvertisementShort(Advertisement advertisement, List<String> photos, UserShortResponse userResponse) {
         return new AdvertisementShort(
                 advertisement.getId(),
                 userResponse.getId(),
@@ -83,7 +81,7 @@ public class AdvertisementMapper {
                 advertisement.getStreetName(),
                 advertisement.getRoomArea(),
                 userResponse,
-                photo,
+                photos,
                 advertisement.isIronRoom(),
                 advertisement.isHooverRoom(),
                 advertisement.isTelevisionRoom(),

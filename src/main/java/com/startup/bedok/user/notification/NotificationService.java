@@ -5,11 +5,13 @@ import com.startup.bedok.payment.Payment;
 import com.startup.bedok.payment.PaymentService;
 import com.startup.bedok.payment.PaymentStatus;
 import com.startup.bedok.reservation.model.entity.Reservation;
+import com.startup.bedok.reservation.model.entity.ReservationStatus;
 import com.startup.bedok.user.model.ApplicationUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -40,6 +42,7 @@ public class NotificationService {
     @Transactional
     public UUID approveNotificationAcceptance(UUID notificationId, String token) {
         Notification notification = getNotificationById(notificationId);
+        notification.getReservation().setUpdateDate(Instant.now().toEpochMilli());
         validateToken(notification.getUser().getId(), token);
         checkIfNotificationCanBeAccepted(notification);
         notification.setModified(true);
@@ -81,7 +84,7 @@ public class NotificationService {
         if (notification.getCreatedDate().plusHours(24).isBefore(LocalDateTime.now())) {
             throw new RuntimeException("Notification is too old");
         } else {
-            notification.getReservation().setAccepted(true);
+            notification.getReservation().setReservationStatus(ReservationStatus.ACCEPTED);
         }
     }
 

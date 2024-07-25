@@ -80,12 +80,13 @@ public class AdvertisementController {
 
     @PostMapping("{advertisementId}/photos")
     private ResponseEntity<SimpleResponse> addPhotosToAdvertisement(@RequestParam("photos") List<MultipartFile> photos,
+                                                                    @RequestHeader("Authorization") String token,
                                                                     @PathVariable UUID advertisementId) {
-        return ResponseEntity.ok(advertisementService.saveRoomPhotos(photos, advertisementId));
+        return ResponseEntity.ok(advertisementService.saveRoomPhotos(photos, advertisementId, token));
     }
 
     @DeleteMapping("{advertisementId}/photo")
-    private ResponseEntity<List<RoomPhoto>> deletePhotosFromAdvertisement(@RequestBody DeleteAdvertisementPhotoRequest deleteAdvertisementPhotoRequest,
+    private ResponseEntity<AdvertisementResponse> deletePhotosFromAdvertisement(@RequestBody DeleteAdvertisementPhotoRequest deleteAdvertisementPhotoRequest,
                                                                           @PathVariable UUID advertisementId,
                                                                           @RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(advertisementService.deletePhotosFromAdvertisement(deleteAdvertisementPhotoRequest, advertisementId, token));
@@ -94,11 +95,6 @@ public class AdvertisementController {
     @PostMapping("random")
     private ResponseEntity<List<Advertisement>> createSomeRandomAdvertisements() {
         return ResponseEntity.ok(advertisementService.createSomeRandomAdvertisements());
-    }
-
-    @PostMapping("randomPhotos")
-    private ResponseEntity<String> createSomePhotosForRandomAdvertisements() throws IOException {
-        return ResponseEntity.ok(advertisementService.createSomePhotosForRandomAdvertisements());
     }
 
     @DeleteMapping("delete/{advertisementId}")

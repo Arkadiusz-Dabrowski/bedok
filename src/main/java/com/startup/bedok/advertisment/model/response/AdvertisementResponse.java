@@ -1,16 +1,14 @@
 package com.startup.bedok.advertisment.model.response;
 
 import com.startup.bedok.advertisment.model.enumerated.RoomGender;
-import com.startup.bedok.global.PhotoResponse;
 import com.startup.bedok.guest.model.response.GuestResponse;
 import com.startup.bedok.user.model.UserResponse;
-import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.bson.types.Binary;
 
 import java.util.List;
+import java.util.UUID;
 
 @AllArgsConstructor
 @Setter
@@ -18,12 +16,13 @@ import java.util.List;
 public class AdvertisementResponse {
 
     private UserResponse host;
+    private UUID advertisementId;
     private String title;
     private String city;
     private String district;
     private String postCode;
     private String streetName;
-    private List<PhotoResponse> roomPhotos;
+    private List<String> roomPhotos;
 
     private String roomDescription;
     private RoomGender roomGender;

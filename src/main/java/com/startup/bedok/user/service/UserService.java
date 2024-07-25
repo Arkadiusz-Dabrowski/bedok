@@ -5,15 +5,18 @@ import com.startup.bedok.datahelper.DataGenerator;
 import com.startup.bedok.email.EmailService;
 import com.startup.bedok.exceptions.*;
 import com.startup.bedok.global.SimpleResponse;
+import com.startup.bedok.minio.MinioService;
 import com.startup.bedok.user.mapper.UserMapperImpl;
 import com.startup.bedok.user.model.*;
 import com.startup.bedok.user.notification.NotificationAcceptanceDTO;
 import com.startup.bedok.user.notification.NotificationService;
 import com.startup.bedok.user.repository.UserRepository;
+import io.minio.Result;
+import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.bson.types.Binary;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,10 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
-import java.util.Random;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static com.startup.bedok.user.mapper.UserMapperImpl.encryptPassword;
 
@@ -34,19 +34,14 @@ import static com.startup.bedok.user.mapper.UserMapperImpl.encryptPassword;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final UserPhotoService userPhotoService;
     private final DataGenerator dataGenerator;
     private final NotificationService notificationService;
     private final JwtTokenUtil jwtTokenUtil;
     private final EmailService emailService;
+    private final MinioService minioService;
 
     public RegistrationResponse registerUser(UserDTO userDTO) throws IOException {
-        String photoId = null;
-        if (userDTO.getHostPhoto() != null) {
-            photoId = userPhotoService.savePhoto(userDTO.getHostPhoto().getBytes(),
-                    userDTO.getName());
-        }
-        ApplicationUser user = UserMapperImpl.hostDTOtoHost(userDTO, photoId);
+        ApplicationUser user = UserMapperImpl.hostDTOtoHost(userDTO);
         try {
             return new RegistrationResponse(userRepository.save(user).getId());
         } catch (DataIntegrityViolationException e) {
@@ -61,16 +56,26 @@ public class UserService {
     public SimpleResponse addPhotoToUser(String token, MultipartFile photo)  {
         UUID id = getUserIdFromToken(token);
         ApplicationUser user = userRepository.findById(id).orElseThrow(() -> new UserNoExistsException(id.toString()));
-        String photoId;
-        try {
-            photoId = userPhotoService.savePhoto(photo.getBytes(),
-                    user.getName());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        String photoId = "user/" + id + "/" + photo.getOriginalFilename();
+        if(user.getPhotoId() != null){
+            minioService.deletePhotoFromMinio(user.getPhotoId());
         }
         user.setPhotoId(photoId);
+        minioService.addPhotoToMinio(photoId, photo);
         userRepository.save(user);
         return new SimpleResponse("User photo - updated");
+    }
+
+    public SimpleResponse deleteUserPhoto(String token){
+        UUID id = getUserIdFromToken(token);
+        Iterable<Result<Item>> objectsFromLocation = minioService.getObjectsFromLocation("user/" + id + "/");
+        try {
+            if (objectsFromLocation.iterator().hasNext())
+                minioService.deletePhotoFromMinio(objectsFromLocation.iterator().next().get().objectName());
+        }catch (Exception e){
+            throw new PhotoServiceException(e.getMessage());
+        }
+        return new SimpleResponse("photo deleted sucesfully");
     }
 
     public UserResponse getUserResponseFromToken(String token) {
@@ -81,12 +86,18 @@ public class UserService {
     public UserResponse getUserResponseByID(UUID id) {
         ApplicationUser user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException(String.format("there is no user with uuid: '%s'", id)));
-        Binary userPhoto = null;
+        String userPhoto = null;
         String photoId = user.getPhotoId();
         if (photoId != null)
-            userPhoto = userPhotoService.getPhoto(photoId);
+            userPhoto = minioService.getUrlOfPhoto(photoId);
 
         return UserMapperImpl.userToUserResponse(user, userPhoto);
+    }
+
+    public UserShortResponse getUserShortResponseByID(UUID id) {
+        ApplicationUser user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException(String.format("there is no user with uuid: '%s'", id)));
+        return UserMapperImpl.userToUserShortResponse(user);
     }
 
     public LoginResponse login(LoginDTO loginDTO) {

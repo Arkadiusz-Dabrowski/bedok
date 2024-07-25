@@ -30,4 +30,5 @@ public class EmailBeanConfig {
 
         return mailSender;
     }
+
 }

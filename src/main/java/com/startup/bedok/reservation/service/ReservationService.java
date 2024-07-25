@@ -6,6 +6,7 @@ import com.startup.bedok.guest.model.entity.Guest;
 import com.startup.bedok.guest.service.GuestService;
 import com.startup.bedok.exceptions.NoFreeBedsException;
 import com.startup.bedok.reservation.model.entity.Reservation;
+import com.startup.bedok.reservation.model.entity.ReservationStatus;
 import com.startup.bedok.reservation.model.request.AnonymousReservationRequest;
 import com.startup.bedok.reservation.model.request.UserReservationRequest;
 import com.startup.bedok.reservation.model.response.ReservationDTO;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -47,8 +49,8 @@ public class ReservationService {
         }
         Guest guest = guestService.createGuest(anonymousReservationRequest.guestName(), null, anonymousReservationRequest.age(), anonymousReservationRequest.language());
         Reservation reservation =  reservationRepository.save(new Reservation(guest, anonymousReservationRequest.dateFrom(), anonymousReservationRequest.dateTo(), advertisement));
-        reservation.setPaid(true);
-        reservation.setAccepted(true);
+        reservation.setReservationStatus(ReservationStatus.PAID);
+        reservation.setUpdateDate(Instant.now().toEpochMilli());
         advertisement.getReservations().add(reservation);
         return reservation.getId();
     }
@@ -64,7 +66,11 @@ public class ReservationService {
         Guest guest = guestService.createGuest(user.getName(),tenantId, (LocalDate.now().getYear() - user.getDateOfBirth().getYear()), user.getLanguage());
         Reservation reservation =  reservationRepository.save(new Reservation(guest, userReservationRequest.dateFrom(), userReservationRequest.dateTo(), advertisement));
         reservation.setUser(user);
+        reservation.setUpdateDate(Instant.now().toEpochMilli());
+        if(advertisement.getAdvertisementGroup() != null)
+            reservation.setAdvertisementGroup(advertisement.getAdvertisementGroup());
         advertisement.getReservations().add(reservation);
+
         ApplicationUser host = userService.getUserByID(advertisement.getHostId());
         notificationService.createNotification(reservation, host, NotificationType.ACCEPTANCE);
         return reservation.getId();

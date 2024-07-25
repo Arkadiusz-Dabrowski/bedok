@@ -1,19 +1,24 @@
 package com.startup.bedok.advertisment.services;
 
-import com.startup.bedok.advertisment.model.entity.*;
+import com.startup.bedok.advertisment.model.entity.Advertisement;
+import com.startup.bedok.advertisment.model.entity.AdvertisementGroup;
+import com.startup.bedok.advertisment.model.entity.District;
+import com.startup.bedok.advertisment.model.entity.RoomPhoto;
 import com.startup.bedok.advertisment.model.mapper.AdvertisementMapper;
 import com.startup.bedok.advertisment.model.request.*;
 import com.startup.bedok.advertisment.model.response.*;
-import com.startup.bedok.advertisment.repository.*;
+import com.startup.bedok.advertisment.repository.AdvertisementCriteriaRepository;
+import com.startup.bedok.advertisment.repository.AdvertisementGroupRepository;
+import com.startup.bedok.advertisment.repository.AdvertisementRepository;
+import com.startup.bedok.advertisment.repository.DistrictRepository;
 import com.startup.bedok.config.JwtTokenUtil;
 import com.startup.bedok.datahelper.DataGenerator;
-import com.startup.bedok.exceptions.AdvertisementNoExistsException;
-import com.startup.bedok.global.PhotoResponse;
+import com.startup.bedok.exceptions.AdvertisementNotExistsException;
 import com.startup.bedok.global.SimpleResponse;
-import com.startup.bedok.user.model.UserResponse;
+import com.startup.bedok.minio.MinioService;
+import com.startup.bedok.user.model.UserShortResponse;
 import com.startup.bedok.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.bson.types.Binary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
@@ -34,30 +39,37 @@ import java.util.stream.Collectors;
 public class AdvertisementService {
 
     private final AdvertisementRepository advertisementRepository;
-    private final AdvertisementPhotoService advertisementPhotoService;
+//    private final AdvertisementPhotoService advertisementPhotoService;
     private final AdvertisementMapper advertisementMapper;
     private final UserService userService;
     private final AdvertisementCriteriaRepository advertisementCriteriaRepository;
 
-    private final RoomPhotosRepository roomPhotosRepository;
+//    private final RoomPhotosRepository roomPhotosRepository;
     private final DataGenerator dataGenerator;
     private final DistrictRepository districtRepository;
     private final AdvertisementGroupRepository advertisementGroupRepository;
     private final JwtTokenUtil jwtTokenUtil;
 
+    private final MinioService minioService;
+
     @Transactional
     public AdvertisementCreateResponse createAdvertisement(@Valid AdvertisementRequest advertisementRequest, String token) {
         UUID userId = jwtTokenUtil.getUserIdFromToken(token);
         userService.checkIfHostExists(userId);
-        return new AdvertisementCreateResponse(advertisementRepository
-                .save(advertisementMapper.mapAdvertisementRequestToAdvertisement(advertisementRequest, userId))
-                .getId().toString());
+        try {
+            return new AdvertisementCreateResponse(advertisementRepository
+                    .save(advertisementMapper.mapAdvertisementRequestToAdvertisement(advertisementRequest, userId))
+                    .getId().toString());
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+        return null;
     }
 
     @Transactional
     public AdvertisementResponse updateAdvertisement(@Valid AdvertisementUpdateRequest advertisementRequest, UUID advertisementId, String token) {
         Advertisement advertisement = advertisementRepository.findById(advertisementId)
-                .orElseThrow(() -> new AdvertisementNoExistsException(advertisementId.toString()));
+                .orElseThrow(() -> new AdvertisementNotExistsException(advertisementId.toString()));
         isAdvertisementBelongToUser(token, advertisement);
         Advertisement advertisementEntity = advertisementMapper.updateAdvertisementFromRequest(advertisement, advertisementRequest);
         return advertisementMapper.mapAdvertisementToAdvertisementDTO(advertisementEntity, null);
@@ -67,27 +79,29 @@ public class AdvertisementService {
     public AdvertisementResponse getAdvertisementDTOById(UUID advertisementId) {
         Advertisement advertisement = advertisementRepository
                 .findById(advertisementId)
-                .orElseThrow(() -> new AdvertisementNoExistsException(advertisementId.toString()));
-        List<RoomPhoto> roomPhotos = roomPhotosRepository.findAllByAdvertisementId(advertisementId);
-        List<PhotoResponse> photos = advertisementPhotoService
-                .getPhotosByIds(roomPhotos
-                        .stream()
-                        .map(RoomPhoto::getPhotoId)
-                        .collect(Collectors.toList()))
-                .stream()
-                .map(photo -> {
-                    Binary image = photo.getImage();
-                    return new PhotoResponse(photo.getId(), image);
-                })
-                .collect(Collectors.toList());
-        return advertisementMapper.mapAdvertisementToAdvertisementDTO(advertisement, photos);
+                .orElseThrow(() -> new AdvertisementNotExistsException(advertisementId.toString()));
+        String photosLocation = "advertisement/" + advertisementId + "/";
+        List<String> listOfPhotosUrls = minioService.getListOfUrls(photosLocation);
+//        List<RoomPhoto> roomPhotos = roomPhotosRepository.findAllByAdvertisementId(advertisementId);
+//        List<PhotoResponse> photos = advertisementPhotoService
+//                .getPhotosByIds(roomPhotos
+//                        .stream()
+//                        .map(RoomPhoto::getPhotoId)
+//                        .collect(Collectors.toList()))
+//                .stream()
+//                .map(photo -> {
+//                    Binary image = photo.getImage();
+//                    return new PhotoResponse(photo.getId(), image);
+//                })
+//                .collect(Collectors.toList());
+        return advertisementMapper.mapAdvertisementToAdvertisementDTO(advertisement, listOfPhotosUrls);
     }
 
     @Transactional
     public Advertisement getAdvertisementById(UUID advertisementId) {
         return advertisementRepository
                 .findById(advertisementId)
-                .orElseThrow(() -> new AdvertisementNoExistsException(advertisementId.toString()));
+                .orElseThrow(() -> new AdvertisementNotExistsException(advertisementId.toString()));
     }
 
     @Transactional
@@ -95,24 +109,33 @@ public class AdvertisementService {
         return advertisementRepository.findAll().stream()
                 .filter(Advertisement::isActive)
                 .map(advertisement -> {
-                    UserResponse userResponse = userService
-                            .getUserResponseByID(advertisement.getHostId());
-                    List<RoomPhoto> photos = roomPhotosRepository.findAllByAdvertisementId(advertisement.getId());
-                    if (!photos.isEmpty())
-                        photos = photos.stream().limit(5).collect(Collectors.toList());
-                    List<Binary> advertisementPhotos = advertisementPhotoService
-                            .getPhotos(photos).stream().map(AdvertisementPhoto::getImage).toList();
+                    UserShortResponse userResponse = userService
+                            .getUserShortResponseByID(advertisement.getHostId());
+                    String photosLocation = "advertisement/" + advertisement.getId() + "/";
+                    List<String> listOfPhotosUrls = minioService.getListOfUrls(photosLocation);
 
-                    return advertisementMapper.mapAdvertisementToAdvertisementShort(advertisement, advertisementPhotos, userResponse);
+//                    List<RoomPhoto> photos = roomPhotosRepository.findAllByAdvertisementId(advertisement.getId());
+//                    if (!photos.isEmpty())
+//                        photos = photos.stream().limit(1).collect(Collectors.toList());
+//                    List<Binary> advertisementPhotos = advertisementPhotoService
+//                            .getPhotos(photos).stream().map(AdvertisementPhoto::getImage).toList();
+
+                    return advertisementMapper.mapAdvertisementToAdvertisementShort(advertisement, listOfPhotosUrls, userResponse);
                 })
                 .collect(Collectors.toList());
     }
 
-    public SimpleResponse saveRoomPhotos(List<MultipartFile> photos, UUID advertisementId) {
+    @Transactional
+    public SimpleResponse saveRoomPhotos(List<MultipartFile> photos, UUID advertisementId, String token) {
         Advertisement advertisement = advertisementRepository.findById(advertisementId)
-                .orElseThrow(() -> new AdvertisementNoExistsException(advertisementId.toString()));
-         advertisementPhotoService.saveAdvertisementPhotos(photos, advertisement).forEach(photo -> roomPhotosRepository.save(new RoomPhoto(photo.getPhotoId(), advertisement)));
-         return new SimpleResponse("Photos are uploaded sucesfully");
+                .orElseThrow(() -> new AdvertisementNotExistsException(advertisementId.toString()));
+        isAdvertisementBelongToUser(token, advertisement);
+        photos.stream().forEach(photo -> {
+            String photoId = "advertisement/" + advertisementId + "/" + photo.getOriginalFilename();
+            minioService.addPhotoToMinio(photoId, photo);
+        });
+//        advertisementPhotoService.saveAdvertisementPhotos(photos, advertisement).forEach(photo -> roomPhotosRepository.save(new RoomPhoto(photo.getPhotoId(), advertisement)));
+         return new SimpleResponse("Photos are uploaded successfully");
     }
 
 
@@ -121,15 +144,17 @@ public class AdvertisementService {
         userService.checkIfHostExists(hostId);
         return advertisementRepository.findAllByHostId(hostId).stream()
                 .map(advertisement -> {
-                    UserResponse userResponse = userService
-                            .getUserResponseByID(advertisement.getHostId());
-                    List<RoomPhoto> photos = roomPhotosRepository.findAllByAdvertisementId(advertisement.getId());
-                    if (!photos.isEmpty())
-                        photos = photos.stream().limit(5).collect(Collectors.toList());
-                    List<Binary> advertisementPhotos = advertisementPhotoService
-                            .getPhotos(photos).stream().map(AdvertisementPhoto::getImage).toList();
+                    UserShortResponse userResponse = userService
+                            .getUserShortResponseByID(advertisement.getHostId());
+                    String photosLocation = "advertisement/" + advertisement.getId() + "/";
+                    List<String> listOfPhotosUrls = minioService.getListOfUrls(photosLocation);
+//                    List<RoomPhoto> photos = roomPhotosRepository.findAllByAdvertisementId(advertisement.getId());
+//                    if (!photos.isEmpty())
+//                        photos = photos.stream().limit(1).collect(Collectors.toList());
+//                    List<Binary> advertisementPhotos = advertisementPhotoService
+//                            .getPhotos(photos).stream().map(AdvertisementPhoto::getImage).toList();
 
-                    return advertisementMapper.mapAdvertisementToAdvertisementShort(advertisement, advertisementPhotos, userResponse);
+                    return advertisementMapper.mapAdvertisementToAdvertisementShort(advertisement, listOfPhotosUrls, userResponse);
                 })
                 .collect(Collectors.toList());
     }
@@ -139,16 +164,18 @@ public class AdvertisementService {
                 .findAllWithFilters(advertisementMultisearch);
         List<AdvertisementShort> listOfAdvertisements = pageOfAdvertisements.stream()
                 .map(advertisement -> {
-                    UserResponse userResponse = userService
-                            .getUserResponseByID(advertisement.getHostId());
-                    List<RoomPhoto> photos = roomPhotosRepository.findAllByAdvertisementId(advertisement.getId());
-                    if (!photos.isEmpty())
-                        photos = photos.stream().limit(5).collect(Collectors.toList());
-                    List<Binary> advertisementPhotos = advertisementPhotoService
-                            .getPhotos(photos).stream().map(AdvertisementPhoto::getImage).toList();
+                    UserShortResponse userResponse = userService
+                            .getUserShortResponseByID(advertisement.getHostId());
+                    String photosLocation = "advertisement/" + advertisement.getId() + "/";
+                    List<String> listOfPhotosUrls = minioService.getListOfUrls(photosLocation);
+//                    List<RoomPhoto> photos = roomPhotosRepository.findAllByAdvertisementId(advertisement.getId());
+//                    if (!photos.isEmpty())
+//                        photos = photos.stream().limit(5).collect(Collectors.toList());
+//                    List<Binary> advertisementPhotos = advertisementPhotoService
+//                            .getPhotos(photos).stream().map(AdvertisementPhoto::getImage).toList();
                     return advertisementMapper
                             .mapAdvertisementToAdvertisementShort(advertisement,
-                                    advertisementPhotos,
+                                    listOfPhotosUrls,
                                     userResponse);
                 }).toList();
         return new PageImpl<>(listOfAdvertisements, pageOfAdvertisements.getPageable(),
@@ -158,17 +185,22 @@ public class AdvertisementService {
     public Page<AdvertisementGroupCriteriaResponse> findAllGroupsWithFilters(AdvertisementMultisearch advertisementMultisearch) {
         Page<AdvertisementGroupCriteriaResponse> pageOfAdvertisements = advertisementCriteriaRepository.findAllWithFiltersForGroup(advertisementMultisearch);
         pageOfAdvertisements.forEach(group -> {
-            advertisementRepository.findAllByAdvertisementGroup(advertisementGroupRepository.findById(group.getAdvertisementGroupId()).get()).forEach(advertisement -> {
-                AdvertisementFromGroupResponse advertisementFromGroupResponse = checkIfRoomIsFreeInSelectedDate(advertisement, advertisementMultisearch.getDateFrom(), advertisementMultisearch.getDateTo());
+            advertisementRepository.findAllByAdvertisementGroup(advertisementGroupRepository
+                    .findById(group.getAdvertisementGroupId()).get()).forEach(advertisement -> {
+                AdvertisementFromGroupResponse advertisementFromGroupResponse =
+                        checkIfRoomIsFreeInSelectedDate(advertisement, advertisementMultisearch.getDateFrom(), advertisementMultisearch.getDateTo());
                 if(advertisementFromGroupResponse.bedsNumber() > 0) {
-                    UserResponse userResponse = userService
-                            .getUserResponseByID(advertisement.getHostId());
-                    List<RoomPhoto> photos = roomPhotosRepository.findAllByAdvertisementId(advertisement.getId());
-                    if (!photos.isEmpty())
-                        photos = photos.stream().limit(5).collect(Collectors.toList());
-                    List<Binary> advertisementPhotos = advertisementPhotoService
-                            .getPhotos(photos).stream().map(AdvertisementPhoto::getImage).toList();
-                    group.addAdvertisementToList(advertisementMapper.mapAdvertisementToAdvertisementShort(advertisementFromGroupResponse.advertisement(),advertisementPhotos,userResponse));
+                    UserShortResponse userResponse = userService
+                            .getUserShortResponseByID(advertisement.getHostId());
+                    String photosLocation = "advertisement/" + advertisement.getId() + "/";
+                    List<String> listOfPhotosUrls = minioService.getListOfUrls(photosLocation);
+//                    List<RoomPhoto> photos = roomPhotosRepository.findAllByAdvertisementId(advertisement.getId());
+//                    if (!photos.isEmpty())
+//                        photos = photos.stream().limit(5).collect(Collectors.toList());
+//                    List<Binary> advertisementPhotos = advertisementPhotoService
+//                            .getPhotos(photos).stream().map(AdvertisementPhoto::getImage).toList();
+                    group.addAdvertisementToList(advertisementMapper
+                            .mapAdvertisementToAdvertisementShort(advertisementFromGroupResponse.advertisement(),listOfPhotosUrls,userResponse));
                 }
             });
 
@@ -180,20 +212,17 @@ public class AdvertisementService {
         return dataGenerator.createSomeAdvertisementData();
     }
 
-    public String createSomePhotosForRandomAdvertisements() throws IOException {
-        return dataGenerator.createSomeAdvertisementPhotos().toString();
-    }
-
-
     @Transactional
     public AdvertisementChangeStatusResponse deleteAdvertisementById(UUID id, String token) {
         Advertisement advertisementToDelete = advertisementRepository.findById(id)
-                .orElseThrow(() -> new AdvertisementNoExistsException(id.toString()));
+                .orElseThrow(() -> new AdvertisementNotExistsException(id.toString()));
         isAdvertisementBelongToUser(token, advertisementToDelete);
-        roomPhotosRepository.findAllByAdvertisementId(id).forEach(photo -> {
-            advertisementPhotoService.deletePhotoFromAdvertisement(photo);
-            roomPhotosRepository.delete(photo);
-        });
+        String photosLocation = "advertisement/" + id + "/";
+        minioService.deleteObjectsFromLocation(photosLocation);
+//        roomPhotosRepository.findAllByAdvertisementId(id).forEach(photo -> {
+//            advertisementPhotoService.deletePhotoFromAdvertisement(photo);
+//            roomPhotosRepository.delete(photo);
+//        });
         advertisementRepository.delete(advertisementToDelete);
         return new AdvertisementChangeStatusResponse(String.format("Your advertisement with title: %s is deleted", advertisementToDelete.getTitle()));
     }
@@ -201,7 +230,7 @@ public class AdvertisementService {
     @Transactional
     public AdvertisementChangeStatusResponse deactivateAdvertisementById(UUID id, String token) {
         Advertisement advertisementToDeactivate = advertisementRepository.findById(id)
-                .orElseThrow(() -> new AdvertisementNoExistsException(id.toString()));
+                .orElseThrow(() -> new AdvertisementNotExistsException(id.toString()));
         isAdvertisementBelongToUser(token, advertisementToDeactivate);
         advertisementToDeactivate.setActive(false);
         return new AdvertisementChangeStatusResponse(String.format("Your advertisement with title: %s is deactivated", advertisementToDeactivate.getTitle()));
@@ -210,7 +239,7 @@ public class AdvertisementService {
     @Transactional
     public AdvertisementChangeStatusResponse activateAdvertisementById(UUID id, String token) {
         Advertisement advertisementToActivate = advertisementRepository.findById(id)
-                .orElseThrow(() -> new AdvertisementNoExistsException(id.toString()));
+                .orElseThrow(() -> new AdvertisementNotExistsException(id.toString()));
         isAdvertisementBelongToUser(token, advertisementToActivate);
         advertisementToActivate.setActive(true);
         return new AdvertisementChangeStatusResponse(String.format("Your advertisement with title: %s is activated", advertisementToActivate.getTitle()));
@@ -251,15 +280,18 @@ public class AdvertisementService {
     }
 
     @Transactional
-    public List<RoomPhoto> deletePhotosFromAdvertisement(DeleteAdvertisementPhotoRequest deleteAdvertisementPhotoRequest,
+    public AdvertisementResponse deletePhotosFromAdvertisement(DeleteAdvertisementPhotoRequest deleteAdvertisementPhotoRequest,
                                                        UUID advertisementId,
                                                        String token) {
-        Advertisement advertisement = advertisementRepository.findById(advertisementId).orElseThrow(() -> new AdvertisementNoExistsException(advertisementId));
+        Advertisement advertisement = advertisementRepository.findById(advertisementId).orElseThrow(() -> new AdvertisementNotExistsException(advertisementId));
         isAdvertisementBelongToUser(token, advertisement);
-        deleteAdvertisementPhotoRequest.photoIds().forEach(id -> {
-            roomPhotosRepository.deleteByPhotoId(id);
-            advertisementPhotoService.deletePhotoFromAdvertisement(id);
-        });
-        return roomPhotosRepository.findAllByAdvertisementId(advertisementId);
+//        deleteAdvertisementPhotoRequest.photoIds().forEach(id -> {
+//            roomPhotosRepository.deleteByPhotoId(id);
+//            advertisementPhotoService.deletePhotoFromAdvertisement(id);
+//        });
+//        return roomPhotosRepository.findAllByAdvertisementId(advertisementId);
+        String photosLocation = "advertisement/" + advertisementId + "/";
+        minioService.deleteObjectsFromLocation(photosLocation);
+        return getAdvertisementDTOById(advertisementId);
     }
 }

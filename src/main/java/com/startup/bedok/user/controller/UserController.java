@@ -34,6 +34,11 @@ public class UserController {
         return ResponseEntity.ok(userService.addPhotoToUser(token, file));
     }
 
+    @DeleteMapping("photo/delete")
+    private ResponseEntity<SimpleResponse> addUserPhoto(@RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(userService.deleteUserPhoto(token));
+    }
+
     @PostMapping("login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginDTO loginDTO) {
         return ResponseEntity.ok(userService.login(loginDTO));

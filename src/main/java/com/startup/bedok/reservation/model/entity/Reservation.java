@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -34,8 +35,9 @@ public class Reservation {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "advertisement_group_fk")
     private AdvertisementGroup advertisementGroup;
-    private Boolean paid;
-    private Boolean accepted;
+
+    private ReservationStatus reservationStatus;
+    private Long updateDate;
 
 
     public Reservation(Guest guest, LocalDate dateFrom, LocalDate dateTo, Advertisement advertisement) {
@@ -43,7 +45,7 @@ public class Reservation {
         this.dateFrom = dateFrom;
         this.dateTo = dateTo;
         this.advertisement = advertisement;
-        this.paid = false;
-        this.accepted = false;
+        this.reservationStatus = ReservationStatus.CREATED;
+        this.updateDate = Instant.now().toEpochMilli();
     }
 }
