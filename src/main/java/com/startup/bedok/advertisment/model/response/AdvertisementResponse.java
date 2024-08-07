@@ -30,7 +30,6 @@ public class AdvertisementResponse {
     private Double roomArea;
     private Integer numBeds;
     private Double price;
-    private Boolean sharedBeds;
     private String language;
     private boolean ironRoom;
     private boolean hooverRoom;

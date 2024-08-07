@@ -21,7 +21,6 @@ public class AdvertisementUpdateRequest {
     private String district;
     @NotBlank(message = "field city, can't be empty")
     private String city;
-    @NotNull(message = "field roomGender, can't be empty(MALE, FEMALE, OTHER)")
     private RoomGender roomGender;
     private List<String> guests;
     @NotBlank(message = "field postCode, can't be empty")
@@ -40,7 +39,6 @@ public class AdvertisementUpdateRequest {
     private Double secondStageDiscount;
     private Double thirdStageDiscount;
     private Double fourthStageDiscount;
-    private Boolean sharedBeds;
     @NotBlank(message = "field language, can't be empty")
     private String language;
     private boolean ironRoom;

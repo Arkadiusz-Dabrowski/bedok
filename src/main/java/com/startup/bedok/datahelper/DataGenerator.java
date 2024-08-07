@@ -2,8 +2,6 @@ package com.startup.bedok.datahelper;
 
 import com.github.javafaker.Faker;
 import com.startup.bedok.advertisment.model.entity.Advertisement;
-import com.startup.bedok.advertisment.model.entity.AdvertisementPhoto;
-import com.startup.bedok.advertisment.model.entity.RoomPhoto;
 import com.startup.bedok.advertisment.model.enumerated.RoomGender;
 import com.startup.bedok.advertisment.repository.AdvertisementRepository;
 import com.startup.bedok.advertisment.repository.RoomPhotosRepository;
@@ -15,9 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -90,7 +85,6 @@ public class DataGenerator {
                         faker.number().randomDouble(2, 5, 8),
                         faker.number().numberBetween(8,10),
                         faker.number().numberBetween(10,15),
-                        faker.bool().bool(),
                         faker.programmingLanguage().name(),
                         faker.bool().bool(),
                         faker.bool().bool(),

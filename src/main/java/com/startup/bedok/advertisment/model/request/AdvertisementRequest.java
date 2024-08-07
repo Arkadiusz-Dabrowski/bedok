@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -21,9 +22,7 @@ public class AdvertisementRequest {
     private String district;
     @NotBlank(message = "field city, can't be empty")
     private String city;
-    @NotNull(message = "field roomGender, can't be empty")
     private RoomGender roomGender;
-    private List<String> guests;
     @NotBlank(message = "field postCode, can't be empty")
     private String postCode;
     @NotBlank(message = "field streetName, can't be empty")
@@ -44,8 +43,6 @@ public class AdvertisementRequest {
     private Double thirdStageDiscount;
     @NotNull(message = "field fourthStageDiscount, can't be empty")
     private Double fourthStageDiscount;
-    @NotNull(message = "field sharedBeds, can't be empty")
-    private Boolean sharedBeds;
     @NotBlank(message = "field language, can't be empty")
     private String language;
     private boolean ironRoom;

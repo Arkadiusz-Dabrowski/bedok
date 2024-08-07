@@ -46,7 +46,6 @@ public class Advertisement {
     private double secondStageDiscount;
     private double thirdStageDiscount;
     private double fourthStageDiscount;
-    private Boolean sharedBeds;
     private String language;
     private boolean ironRoom;
     private boolean hooverRoom;
@@ -83,7 +82,6 @@ public class Advertisement {
                          double secondStageDiscount,
                          double thirdStageDiscount,
                          double fourthStageDiscount,
-                         Boolean sharedBeds,
                          String language,
                          boolean ironRoom,
                          boolean hooverRoom,
@@ -114,7 +112,6 @@ public class Advertisement {
         this.secondStageDiscount = secondStageDiscount;
         this.thirdStageDiscount = thirdStageDiscount;
         this.fourthStageDiscount = fourthStageDiscount;
-        this.sharedBeds = sharedBeds;
         this.language = language;
         this.ironRoom = ironRoom;
         this.hooverRoom = hooverRoom;

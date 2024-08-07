@@ -43,7 +43,6 @@ public class AdvertisementMapper {
                 advertisement.getRoomArea(),
                 advertisement.getNumBeds(),
                 advertisement.getPrice(),
-                advertisement.getSharedBeds(),
                 advertisement.getLanguage(),
                 advertisement.isIronRoom(),
                 advertisement.isHooverRoom(),
@@ -115,7 +114,6 @@ public class AdvertisementMapper {
                 advertisementRequest.getSecondStageDiscount(),
                 advertisementRequest.getThirdStageDiscount(),
                 advertisementRequest.getFourthStageDiscount(),
-                advertisementRequest.getSharedBeds(),
                 advertisementRequest.getLanguage(),
                 advertisementRequest.isIronRoom(),
                 advertisementRequest.isHooverRoom(),
@@ -162,7 +160,6 @@ public class AdvertisementMapper {
             advertisement.setFourthStageDiscount(request.getFourthStageDiscount());
         else
             advertisement.setFourthStageDiscount(0.0);
-        advertisement.setSharedBeds(request.getSharedBeds());
         advertisement.setLanguage(request.getLanguage());
         advertisement.setIronRoom(request.isIronRoom());
         advertisement.setHooverRoom(request.isHooverRoom());

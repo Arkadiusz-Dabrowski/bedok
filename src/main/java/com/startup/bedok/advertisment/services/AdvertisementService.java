@@ -57,9 +57,10 @@ public class AdvertisementService {
         UUID userId = jwtTokenUtil.getUserIdFromToken(token);
         userService.checkIfHostExists(userId);
         try {
-            return new AdvertisementCreateResponse(advertisementRepository
+            AdvertisementCreateResponse response = new AdvertisementCreateResponse(advertisementRepository
                     .save(advertisementMapper.mapAdvertisementRequestToAdvertisement(advertisementRequest, userId))
                     .getId().toString());
+            return response;
         } catch (Exception e) {
             System.out.println(e.toString());
         }

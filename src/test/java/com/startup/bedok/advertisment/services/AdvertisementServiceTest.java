@@ -40,7 +40,6 @@ class AdvertisementServiceTest {
         advertisement.setSecondStageDiscount(10.0);
         advertisement.setThirdStageDiscount(15.0);
         advertisement.setFourthStageDiscount(20.0);
-        advertisement.setSharedBeds(true);
         advertisement.setLanguage("Polish");
         advertisement.setIronRoom(true);
         advertisement.setHooverRoom(true);
