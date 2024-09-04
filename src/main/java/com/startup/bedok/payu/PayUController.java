@@ -62,16 +62,16 @@ public class PayUController {
     }
 
     @PostMapping(URL_PAYMENT_CALLBACK)
-    public String handlePaymentCallback(final @RequestParam Optional<String> error, Model model, HttpServletRequest request) {
-        model.addAttribute("hasError", error.isPresent());
-        model.addAttribute("paymentFinished", true);
+    public void handlePaymentCallback(final @RequestParam Optional<String> error, Model model, Object request) {
+//        model.addAttribute("hasError", error.isPresent());
+//        model.addAttribute("paymentFinished", true);
         log.error("Request: " + request.toString());
         if(Optional.of(model).isPresent())
             log.error("Model: " + model.toString());
 
         error.ifPresent(e -> model.addAttribute("paymentErrorCode", e));
 
-        return payuForm(model, request);
+        //return payuForm(model, request);
     }
 
     private OrderCreateRequest prepareOrderCreateRequest(final PayUForm payUForm, final HttpServletRequest request) {
