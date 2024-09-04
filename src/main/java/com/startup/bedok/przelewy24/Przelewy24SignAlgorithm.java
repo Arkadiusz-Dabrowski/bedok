@@ -4,7 +4,11 @@ import com.startup.bedok.payment.Payment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+import static org.apache.commons.codec.digest.MessageDigestAlgorithms.SHA_384;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -13,49 +17,31 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class Przelewy24SignAlgorithm {
 
-    public static P24Request calculateSign(Payment payment){
-        P24Request request = P24Request.builder()
-                .amount(payment.getAmountToPay().toString())
-                .description("Testowa płatność")
-                .email("email@gmail.com")
-                .country("PL")
-                .language("pl")
-                .crc("db282f773f3aed2b")
-                .urlReturn("https://google.com")
-                .sessionId(UUID.randomUUID().toString())
-                .currency("PLN")
-                .merchantId("229554")
-                .posId("229554")
-                .amount("111")
-                .client("Jan Kowalski").build();
-        Map<String, String> sortedParams = new TreeMap<>();
+    public static void calculateSign(P24Request p24Request){
+        String sessionId = UUID.randomUUID().toString();
 
-        // Dodawanie zebranych danych do TreeMap
-        sortedParams.put("merchant_id", request.getMerchantId());
-        sortedParams.put("pos_id", request.getPosId());
-        sortedParams.put("session_id", request.getSessionId());
-        sortedParams.put("amount", "111");
-        sortedParams.put("currency", request.getCurrency());
-        sortedParams.put("description", request.getDescription());
-        sortedParams.put("email", request.getEmail());
-        sortedParams.put("country", request.getCountry());
-        sortedParams.put("language", request.getLanguage());
-        sortedParams.put("url_return", request.getUrlReturn());
-        sortedParams.put("client", request.getClient());
-        sortedParams.put("crc", request.getCrc());
 
-        // Tworzenie ciągu znaków z posortowanych danych
-        StringBuilder stringBuilder = new StringBuilder();
-        for (Map.Entry<String, String> entry : sortedParams.entrySet()) {
-            stringBuilder.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
-        }
-
-        // Dodawanie tajnego klucza MD5 na końcu ciągu znaków
-        stringBuilder.append("klucz_tajny_md5");
-
-        // Obliczanie sumy kontrolnej MD5
-        String sign = DigestUtils.md5DigestAsHex(stringBuilder.toString().getBytes());
-        request.setSign(sign);
-        return new P24Request();
+        PaymentChecksum paymentChecksum = new PaymentChecksum(sessionId, p24Request.getMerchantId(), p24Request.getAmount(), p24Request.getCurrency(), p24Request.getCrc());
+        String paymentChecksumString = paymentChecksum.toString();
+        String sign = calculateChecksum(paymentChecksumString);
+        p24Request.setSign(sign);
     }
+    public static String calculateChecksum(String data) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-384");
+            byte[] hash = digest.digest(data.getBytes());
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

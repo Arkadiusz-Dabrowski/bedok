@@ -1,31 +1,45 @@
 package com.startup.bedok.payment;
 
-import lombok.Data;
+import com.startup.bedok.przelewy24.P24Request;
+import com.startup.bedok.user.model.ApplicationUser;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Data
+@Setter
+@Getter
 public class Payment {
 
     @Id
     @GeneratedValue
     private UUID id;
-    private Double amountToPay;
-    private String paymentLink;
+    @Column(nullable = false)
+    private int amountToPay;
+    private String sessionId;
+    private String orderId;
+    private String currency;
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
+    private String sign;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private ApplicationUser user;
     private LocalDateTime createdDate;
 
-    public Payment(Double amountToPay,
-                   String paymentLink,
-                   PaymentStatus paymentStatus,
-                   LocalDateTime createdDate) {
-        this.amountToPay = amountToPay;
-        this.paymentLink = paymentLink;
-        this.paymentStatus = paymentStatus;
-        this.createdDate = createdDate;
+    public Payment() {
     }
+
+    public Payment(P24Request request,PaymentStatus status, ApplicationUser user) {
+        this.amountToPay = request.getAmount();
+        this.sessionId = request.getSessionId();
+        this.sign =request.getSign();
+        this.paymentStatus = status;
+        this.user = user;
+        this.createdDate = LocalDateTime.now();
+    }
+
 }

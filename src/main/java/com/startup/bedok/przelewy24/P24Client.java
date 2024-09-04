@@ -12,12 +12,12 @@ import java.nio.charset.StandardCharsets;
 @Service
 public class P24Client  {
 
-    public String getPaymentLink(P24Request p24Request) {
+    public PaymentResponse getPaymentData(P24Request p24Request) {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = createHeaders();
         HttpEntity<P24Request> httpEntity = new HttpEntity<>(p24Request, headers);
         String url = "https://sandbox.przelewy24.pl/api/v1/transaction/register";
-        ResponseEntity<String> response = restTemplate.postForEntity(url, httpEntity, String.class);
+        ResponseEntity<PaymentResponse> response = restTemplate.postForEntity(url, httpEntity, PaymentResponse.class);
         assert response != null;
         return response.getBody();
     }

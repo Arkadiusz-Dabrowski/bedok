@@ -12,7 +12,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, UUID> 
 
     List<Reservation> findAllByAdvertisementId(UUID advertisementId);
 
-    @Query(value = "update Reservation r set reservation_status = 3 where (reservation_status != 3 or reservation_status != 2) and r.updateDate < ?1",
+    @Query(value = "update Reservation r set reservation_status = 3 where (reservation_status != 3 or reservation_status != 2) and r.update_date < ?1",
     nativeQuery = true)
     List<Reservation> findAllByStatusAndUpdateTime(Long updateTimePlusOneDay);
 
