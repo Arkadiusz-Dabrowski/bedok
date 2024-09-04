@@ -21,7 +21,7 @@ public class PaymentService {
 
     public Payment createPaymentRequest(P24Request p24Request, ApplicationUser user){
         calculateSign(p24Request);
-        p24Request.setUrlStatus("http://192.168.0.24:8080/advertisement/test/status");
+        p24Request.setUrlStatus("https://192.168.0.24:443/advertisement/test/status");
         Payment payment =  new Payment(p24Request, PaymentStatus.WAITING, user);
         PaymentResponse paymentData = p24Client.getPaymentData(p24Request);
         payment.setOrderId(paymentData.id());
