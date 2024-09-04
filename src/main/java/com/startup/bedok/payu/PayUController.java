@@ -61,7 +61,7 @@ public class PayUController {
         return ResponseEntity.ok(orderResponse.getRedirectUri());
     }
 
-    @GetMapping(URL_PAYMENT_CALLBACK)
+    @PostMapping(URL_PAYMENT_CALLBACK)
     public String handlePaymentCallback(final @RequestParam Optional<String> error, Model model, HttpServletRequest request) {
         model.addAttribute("hasError", error.isPresent());
         model.addAttribute("paymentFinished", true);
