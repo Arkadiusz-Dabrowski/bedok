@@ -1,8 +1,8 @@
-package com.startup.bedok.payu;
+package com.startup.bedok.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.startup.bedok.payu.config.PayUConfigurationProperties;
-import com.startup.bedok.payu.model.PayUAuthToken;
+import com.startup.bedok.payment.config.PayUConfigurationProperties;
+import com.startup.bedok.payment.model.PayUAuthToken;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.http.HttpEntity;
@@ -28,7 +28,7 @@ public class PayUClientCredentialsAuthenticator {
         PayuAuthRequest payuAuthRequest = new PayuAuthRequest(GRANT_TYPE, payUConfigurationProperties.getClientId(), payUConfigurationProperties.getClientSecret());
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("grant_type", GRANT_TYPE);
         map.add("client_id", payuAuthRequest.clientId().toString());
         map.add("client_secret", payuAuthRequest.clientSecret());

@@ -1,4 +1,4 @@
-package com.startup.bedok.payu.model;
+package com.startup.bedok.payment.model;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;

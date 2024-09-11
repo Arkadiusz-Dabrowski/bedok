@@ -1,4 +1,4 @@
-package com.startup.bedok.payu.model;
+package com.startup.bedok.payment.model;
 
 import lombok.Builder;
 import lombok.Data;

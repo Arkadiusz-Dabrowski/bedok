@@ -1,4 +1,4 @@
-package com.startup.bedok.payu.model.notify;
+package com.startup.bedok.payment.model.notify;
 
 import java.util.List;
 

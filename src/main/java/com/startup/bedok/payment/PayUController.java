@@ -1,26 +1,22 @@
-package com.startup.bedok.payu;
+package com.startup.bedok.payment;
 
-import com.startup.bedok.payu.config.PayUConfigurationProperties;
-import com.startup.bedok.payu.model.*;
-import com.startup.bedok.payu.model.notify.PayUNotification;
+import com.startup.bedok.payment.config.PayUConfigurationProperties;
+import com.startup.bedok.payment.model.*;
+import com.startup.bedok.payment.model.notify.PayUNotification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpEntity;
-import org.bouncycastle.util.IPAddress;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.*;
 import java.util.Collections;
 import java.util.Objects;
-import java.util.Optional;
 
-import static com.startup.bedok.payu.model.OrderCreateResponse.Status.STATUS_CODE_SUCCESS;
+import static com.startup.bedok.payment.model.OrderCreateResponse.Status.STATUS_CODE_SUCCESS;
 
 
 @Slf4j
@@ -33,25 +29,16 @@ public class PayUController {
     public static final String TEMPLATE_PAYU_FORM = "payu-form";
 
     private final PayUOrderService orderService;
+    private final PaymentService paymentService;
+
     private final PayUConfigurationProperties payUConfiguration;
-
-    @GetMapping(URL_PAYU_DEMO_INDEX)
-    public String payuForm(Model model, HttpServletRequest request) {
-        model.addAttribute("payuForm", new PayUForm());
-
-        request.getSession().getAttribute("rawResponse");
-
-        return TEMPLATE_PAYU_FORM;
-    }
 
     @PostMapping(URL_PAYU_DEMO_INDEX)
     public ResponseEntity<String> handleCheckout(
-            @RequestBody PayUForm payUForm,
-            HttpServletRequest request,
-            Model model) {
+            @RequestBody PayUForm payUForm) {
         log.info(payUForm.toString());
 
-        final OrderCreateRequest orderRequest = prepareOrderCreateRequest(payUForm, request);
+        final OrderCreateRequest orderRequest = prepareOrderCreateRequest(payUForm);
         log.info("Order request = {}", orderRequest);
 
         final OrderCreateResponse orderResponse = orderService.order(orderRequest);
@@ -65,11 +52,12 @@ public class PayUController {
 
     @PostMapping(URL_PAYMENT_CALLBACK)
     public String handlePaymentCallback(@RequestBody PayUNotification notification) {
+        paymentService.managePaymentStatus(notification);
         log.info(notification.toString());
         return notification.toString();
     }
 
-    private OrderCreateRequest prepareOrderCreateRequest(final PayUForm payUForm, final HttpServletRequest request) {
+    private OrderCreateRequest prepareOrderCreateRequest(final PayUForm payUForm) {
         String hostAddress = "";
         try (final DatagramSocket datagramSocket = new DatagramSocket()) {
             datagramSocket.connect(InetAddress.getByName("8.8.8.8"), 12345);

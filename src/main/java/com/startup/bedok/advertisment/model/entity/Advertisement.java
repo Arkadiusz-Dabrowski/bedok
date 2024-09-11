@@ -10,6 +10,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Entity
@@ -24,9 +25,10 @@ public class Advertisement {
     private UUID id;
 
     @ManyToOne
-    @JoinColumn(name="advertisement_group_id")
+    @JoinColumn(name = "advertisement_group_id")
     private AdvertisementGroup advertisementGroup;
     private UUID hostId;
+    @Column(nullable = false)
     private String city;
     @Column(unique = true)
     private String title;
@@ -38,14 +40,14 @@ public class Advertisement {
     private String roomDescription;
     private double roomArea;
     private int numBeds;
-    private double price;
-
     @OneToMany(mappedBy = "advertisement")
     private List<Reservation> reservations;
-    private double firstStageDiscount;
-    private double secondStageDiscount;
-    private double thirdStageDiscount;
-    private double fourthStageDiscount;
+    @Column(nullable = false)
+    private Double dailyPrice;
+    @Column(nullable = false)
+    private Double weeklyPrice;
+    @Column(nullable = false)
+    private Double monthlyPrice;
     private String language;
     private boolean ironRoom;
     private boolean hooverRoom;
@@ -62,8 +64,11 @@ public class Advertisement {
     private boolean bathroom;
     private boolean transfer;
     private String rentalRulesObject;
+    @Column(nullable = false)
     private Long uploadDate;
+    @Column(nullable = false)
     private Long updateDate;
+    @Column(nullable = false)
     private boolean active;
 
 
@@ -77,11 +82,9 @@ public class Advertisement {
                          String roomDescription,
                          double roomArea,
                          int numBeds,
-                         double price,
-                         double firstStageDiscount,
-                         double secondStageDiscount,
-                         double thirdStageDiscount,
-                         double fourthStageDiscount,
+                         Double dailyPrice,
+                         Double weeklyPrice,
+                         Double monthlyPrice,
                          String language,
                          boolean ironRoom,
                          boolean hooverRoom,
@@ -107,11 +110,9 @@ public class Advertisement {
         this.roomDescription = roomDescription;
         this.roomArea = roomArea;
         this.numBeds = numBeds;
-        this.price = price;
-        this.firstStageDiscount = firstStageDiscount;
-        this.secondStageDiscount = secondStageDiscount;
-        this.thirdStageDiscount = thirdStageDiscount;
-        this.fourthStageDiscount = fourthStageDiscount;
+        this.dailyPrice = dailyPrice;
+        this.weeklyPrice = weeklyPrice;
+        this.monthlyPrice = monthlyPrice;
         this.language = language;
         this.ironRoom = ironRoom;
         this.hooverRoom = hooverRoom;

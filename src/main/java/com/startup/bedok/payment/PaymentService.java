@@ -1,35 +1,45 @@
 package com.startup.bedok.payment;
 
-import com.startup.bedok.przelewy24.P24Client;
-import com.startup.bedok.przelewy24.P24Request;
-import com.startup.bedok.przelewy24.PaymentResponse;
-import com.startup.bedok.przelewy24.Przelewy24SignAlgorithm;
+import com.startup.bedok.payment.model.OrderCreateRequest;
+import com.startup.bedok.payment.model.OrderCreateResponse;
+import com.startup.bedok.payment.model.notify.PayUNotification;
+import com.startup.bedok.reservation.controller.ReservationController;
+import com.startup.bedok.reservation.model.entity.Reservation;
+import com.startup.bedok.reservation.model.entity.ReservationStatus;
+import com.startup.bedok.reservation.repository.ReservationRepository;
+import com.startup.bedok.reservation.service.ReservationService;
 import com.startup.bedok.user.model.ApplicationUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import static com.startup.bedok.przelewy24.Przelewy24SignAlgorithm.calculateSign;
+import java.util.UUID;
+
 
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
-    private final Przelewy24SignAlgorithm p24SignAlgorithm;
-    private final P24Client p24Client;
-    private final String baseUrlForPayment = "https://sandbox.przelewy24.pl/trnRequest/";
+    private final PayUOrderService payUOrderService;
+    private final ReservationRepository reservationRepository;
 
-    public Payment createPaymentRequest(P24Request p24Request, ApplicationUser user){
-        calculateSign(p24Request);
-        p24Request.setUrlStatus("https://192.168.0.24:443/advertisement/test/status");
-        Payment payment =  new Payment(p24Request, PaymentStatus.WAITING, user);
-        PaymentResponse paymentData = p24Client.getPaymentData(p24Request);
-        payment.setOrderId(paymentData.id());
+    public OrderCreateResponse createPaymentRequest(OrderCreateRequest payuRequest, ApplicationUser user, Reservation reservation){
+        Payment payment =  new Payment(payuRequest, user, reservation);
+        OrderCreateResponse payuResponse = payUOrderService.order(payuRequest);
+        payment.setOrderId(payuResponse.getOrderId());
         paymentRepository.save(payment);
-        return payment;
+        return payuResponse;
     }
 
-    private String buildPaymentLink(PaymentResponse paymentResponse){
-        return baseUrlForPayment + paymentResponse.paymentLink().token();
+    @Transactional
+    public void managePaymentStatus(PayUNotification notification){
+        Payment payment = paymentRepository.findById(notification.order().orderId()).orElseThrow(() -> new RuntimeException("No payment with this id"));
+        if(notification.order().status() == "COMPLETED"){
+            payment.setPaymentStatus(PaymentStatus.PAID);
+            payment.getReservation().setReservationStatus(ReservationStatus.PAID);
+            reservationRepository.save(payment.getReservation());
+        }
+        paymentRepository.save(payment);
     }
 }

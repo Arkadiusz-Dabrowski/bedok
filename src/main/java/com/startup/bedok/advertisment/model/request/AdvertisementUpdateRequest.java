@@ -35,10 +35,9 @@ public class AdvertisementUpdateRequest {
     private Integer numBeds;
     @NotNull(message = "field price, can't be empty")
     private Integer price;
-    private Double firstStageDiscount;
-    private Double secondStageDiscount;
-    private Double thirdStageDiscount;
-    private Double fourthStageDiscount;
+    private Double dailyPrice;
+    private Double weeklyPrice;
+    private Double monthlyPrice;
     @NotBlank(message = "field language, can't be empty")
     private String language;
     private boolean ironRoom;

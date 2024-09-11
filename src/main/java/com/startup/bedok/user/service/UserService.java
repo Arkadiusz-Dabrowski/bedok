@@ -35,7 +35,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final DataGenerator dataGenerator;
-    private final NotificationService notificationService;
+//    private final NotificationService notificationService;
     private final JwtTokenUtil jwtTokenUtil;
     private final EmailService emailService;
     private final MinioService minioService;
@@ -114,9 +114,9 @@ public class UserService {
         }
     }
 
-    public List<NotificationAcceptanceDTO> getNotificationsByUser(String token) {
-        return notificationService.getUserAcceptanceNotifications(token);
-    }
+//    public List<NotificationAcceptanceDTO> getNotificationsByUser(String token) {
+//        return notificationService.getUserAcceptanceNotifications(token);
+//    }
 
     public ApplicationUser getUserByID(UUID id) {
         return userRepository.findById(id)

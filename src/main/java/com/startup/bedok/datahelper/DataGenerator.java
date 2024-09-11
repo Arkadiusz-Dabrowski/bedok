@@ -83,8 +83,6 @@ public class DataGenerator {
                         faker.number().randomDouble(2,50,80),
                         faker.number().randomDouble(2,0,5),
                         faker.number().randomDouble(2, 5, 8),
-                        faker.number().numberBetween(8,10),
-                        faker.number().numberBetween(10,15),
                         faker.programmingLanguage().name(),
                         faker.bool().bool(),
                         faker.bool().bool(),

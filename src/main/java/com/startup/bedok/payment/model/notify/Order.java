@@ -1,6 +1,4 @@
-package com.startup.bedok.payu.model.notify;
-
-import com.startup.bedok.payu.model.notify.Product;
+package com.startup.bedok.payment.model.notify;
 
 import java.util.List;
 

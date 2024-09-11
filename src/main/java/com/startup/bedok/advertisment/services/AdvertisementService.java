@@ -3,7 +3,6 @@ package com.startup.bedok.advertisment.services;
 import com.startup.bedok.advertisment.model.entity.Advertisement;
 import com.startup.bedok.advertisment.model.entity.AdvertisementGroup;
 import com.startup.bedok.advertisment.model.entity.District;
-import com.startup.bedok.advertisment.model.entity.RoomPhoto;
 import com.startup.bedok.advertisment.model.mapper.AdvertisementMapper;
 import com.startup.bedok.advertisment.model.request.*;
 import com.startup.bedok.advertisment.model.response.*;
@@ -26,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -39,32 +37,28 @@ import java.util.stream.Collectors;
 public class AdvertisementService {
 
     private final AdvertisementRepository advertisementRepository;
-//    private final AdvertisementPhotoService advertisementPhotoService;
     private final AdvertisementMapper advertisementMapper;
     private final UserService userService;
     private final AdvertisementCriteriaRepository advertisementCriteriaRepository;
-
-//    private final RoomPhotosRepository roomPhotosRepository;
     private final DataGenerator dataGenerator;
     private final DistrictRepository districtRepository;
     private final AdvertisementGroupRepository advertisementGroupRepository;
     private final JwtTokenUtil jwtTokenUtil;
-
     private final MinioService minioService;
 
     @Transactional
     public AdvertisementCreateResponse createAdvertisement(@Valid AdvertisementRequest advertisementRequest, String token) {
         UUID userId = jwtTokenUtil.getUserIdFromToken(token);
         userService.checkIfHostExists(userId);
-        try {
-            AdvertisementCreateResponse response = new AdvertisementCreateResponse(advertisementRepository
-                    .save(advertisementMapper.mapAdvertisementRequestToAdvertisement(advertisementRequest, userId))
-                    .getId().toString());
-            return response;
-        } catch (Exception e) {
-            System.out.println(e.toString());
+        if(advertisementRequest.getWeeklyPrice() == null){
+            advertisementRequest.setWeeklyPrice(advertisementRequest.getDailyPrice());
         }
-        return null;
+        if(advertisementRequest.getMonthlyPrice() == null){
+            advertisementRequest.setMonthlyPrice(advertisementRequest.getMonthlyPrice());
+        }
+        return new AdvertisementCreateResponse(advertisementRepository
+                .save(advertisementMapper.mapAdvertisementRequestToAdvertisement(advertisementRequest, userId))
+                .getId().toString());
     }
 
     @Transactional
@@ -136,7 +130,7 @@ public class AdvertisementService {
             minioService.addPhotoToMinio(photoId, photo);
         });
 //        advertisementPhotoService.saveAdvertisementPhotos(photos, advertisement).forEach(photo -> roomPhotosRepository.save(new RoomPhoto(photo.getPhotoId(), advertisement)));
-         return new SimpleResponse("Photos are uploaded successfully");
+        return new SimpleResponse("Photos are uploaded successfully");
     }
 
 
@@ -190,7 +184,7 @@ public class AdvertisementService {
                     .findById(group.getAdvertisementGroupId()).get()).forEach(advertisement -> {
                 AdvertisementFromGroupResponse advertisementFromGroupResponse =
                         checkIfRoomIsFreeInSelectedDate(advertisement, advertisementMultisearch.getDateFrom(), advertisementMultisearch.getDateTo());
-                if(advertisementFromGroupResponse.bedsNumber() > 0) {
+                if (advertisementFromGroupResponse.bedsNumber() > 0) {
                     UserShortResponse userResponse = userService
                             .getUserShortResponseByID(advertisement.getHostId());
                     String photosLocation = "advertisement/" + advertisement.getId() + "/";
@@ -201,7 +195,7 @@ public class AdvertisementService {
 //                    List<Binary> advertisementPhotos = advertisementPhotoService
 //                            .getPhotos(photos).stream().map(AdvertisementPhoto::getImage).toList();
                     group.addAdvertisementToList(advertisementMapper
-                            .mapAdvertisementToAdvertisementShort(advertisementFromGroupResponse.advertisement(),listOfPhotosUrls,userResponse));
+                            .mapAdvertisementToAdvertisementShort(advertisementFromGroupResponse.advertisement(), listOfPhotosUrls, userResponse));
                 }
             });
 
@@ -282,8 +276,8 @@ public class AdvertisementService {
 
     @Transactional
     public AdvertisementResponse deletePhotosFromAdvertisement(DeleteAdvertisementPhotoRequest deleteAdvertisementPhotoRequest,
-                                                       UUID advertisementId,
-                                                       String token) {
+                                                               UUID advertisementId,
+                                                               String token) {
         Advertisement advertisement = advertisementRepository.findById(advertisementId).orElseThrow(() -> new AdvertisementNotExistsException(advertisementId));
         isAdvertisementBelongToUser(token, advertisement);
 //        deleteAdvertisementPhotoRequest.photoIds().forEach(id -> {

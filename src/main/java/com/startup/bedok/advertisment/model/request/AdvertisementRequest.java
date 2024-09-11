@@ -35,15 +35,10 @@ public class AdvertisementRequest {
     private Integer numBeds;
     @NotNull(message = "field price, can't be empty")
     private Integer price;
-    @NotNull(message = "field firstStageDiscount, can't be empty")
-    private Double firstStageDiscount;
-    @NotNull(message = "field secondStageDiscount, can't be empty")
-    private Double secondStageDiscount;
-    @NotNull(message = "field thirdStageDiscount, can't be empty")
-    private Double thirdStageDiscount;
-    @NotNull(message = "field fourthStageDiscount, can't be empty")
-    private Double fourthStageDiscount;
-    @NotBlank(message = "field language, can't be empty")
+    @NotNull(message = "field dailyPrice, can't be empty")
+    private Double dailyPrice;
+    private Double weeklyPrice;
+    private Double monthlyPrice;
     private String language;
     private boolean ironRoom;
     private boolean hooverRoom;

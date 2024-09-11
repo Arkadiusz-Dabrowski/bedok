@@ -1,4 +1,4 @@
-package com.startup.bedok.payu.config;
+package com.startup.bedok.payment.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

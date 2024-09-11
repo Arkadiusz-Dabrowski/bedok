@@ -35,7 +35,6 @@ public class Reservation {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "advertisement_group_fk")
     private AdvertisementGroup advertisementGroup;
-
     private ReservationStatus reservationStatus;
     private Long updateDate;
 

@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -42,7 +41,7 @@ public class AdvertisementMapper {
                         .toList(),
                 advertisement.getRoomArea(),
                 advertisement.getNumBeds(),
-                advertisement.getPrice(),
+                advertisement.getDailyPrice(),
                 advertisement.getLanguage(),
                 advertisement.isIronRoom(),
                 advertisement.isHooverRoom(),
@@ -76,7 +75,7 @@ public class AdvertisementMapper {
                         .stream()
                         .map(reservation -> mapGuestToGuestResponse(reservation.getGuest()))
                         .toList(),
-                advertisement.getPrice(),
+                advertisement.getDailyPrice(),
                 advertisement.getStreetName(),
                 advertisement.getRoomArea(),
                 userResponse,
@@ -109,11 +108,9 @@ public class AdvertisementMapper {
                 advertisementRequest.getRoomDescription(),
                 advertisementRequest.getRoomArea(),
                 advertisementRequest.getNumBeds(),
-                advertisementRequest.getPrice(),
-                advertisementRequest.getFirstStageDiscount(),
-                advertisementRequest.getSecondStageDiscount(),
-                advertisementRequest.getThirdStageDiscount(),
-                advertisementRequest.getFourthStageDiscount(),
+                advertisementRequest.getDailyPrice(),
+                advertisementRequest.getWeeklyPrice(),
+                advertisementRequest.getMonthlyPrice(),
                 advertisementRequest.getLanguage(),
                 advertisementRequest.isIronRoom(),
                 advertisementRequest.isHooverRoom(),
@@ -143,23 +140,11 @@ public class AdvertisementMapper {
         advertisement.setRoomDescription(request.getRoomDescription());
         advertisement.setRoomArea(request.getRoomArea());
         advertisement.setNumBeds(request.getNumBeds());
-        advertisement.setPrice(request.getPrice());
-        if (request.getFirstStageDiscount() != null)
-            advertisement.setFirstStageDiscount(request.getFirstStageDiscount());
-        else
-            advertisement.setFirstStageDiscount(0.0);
-        if (request.getSecondStageDiscount() != null)
-            advertisement.setSecondStageDiscount(request.getSecondStageDiscount());
-        else
-            advertisement.setSecondStageDiscount(0.0);
-        if (request.getThirdStageDiscount() != null)
-            advertisement.setThirdStageDiscount(request.getThirdStageDiscount());
-        else
-            advertisement.setThirdStageDiscount(0.0);
-        if (request.getFourthStageDiscount() != null)
-            advertisement.setFourthStageDiscount(request.getFourthStageDiscount());
-        else
-            advertisement.setFourthStageDiscount(0.0);
+        advertisement.setDailyPrice(request.getDailyPrice());
+        if (request.getWeeklyPrice() != null)
+            advertisement.setWeeklyPrice(request.getWeeklyPrice());
+        if (request.getMonthlyPrice() != null)
+            advertisement.setMonthlyPrice(request.getMonthlyPrice());
         advertisement.setLanguage(request.getLanguage());
         advertisement.setIronRoom(request.isIronRoom());
         advertisement.setHooverRoom(request.isHooverRoom());
@@ -184,17 +169,5 @@ public class AdvertisementMapper {
             return String.join(",", rentalRules);
 
         return "";
-    }
-
-    private double calculatePrice(Advertisement advertisement, LocalDate dateFrom, LocalDate dateTo) {
-        int daysOfRental = dateTo.compareTo(dateFrom);
-        if (daysOfRental > 30)
-            return advertisement.getFourthStageDiscount();
-        if (daysOfRental > 20)
-            return advertisement.getThirdStageDiscount();
-        if (daysOfRental > 10)
-            return advertisement.getSecondStageDiscount();
-
-        return advertisement.getFirstStageDiscount();
     }
 }

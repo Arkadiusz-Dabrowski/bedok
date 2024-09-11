@@ -1,4 +1,4 @@
-package com.startup.bedok.payu;
+package com.startup.bedok.payment;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

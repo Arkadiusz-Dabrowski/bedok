@@ -44,10 +44,10 @@ public class UserController {
         return ResponseEntity.ok(userService.login(loginDTO));
     }
 
-    @GetMapping("notifications")
-    public ResponseEntity<List<NotificationAcceptanceDTO>> getNotifications(@RequestHeader("Authorization") String token){
-        return ResponseEntity.ok(userService.getNotificationsByUser(token));
-    }
+//    @GetMapping("notifications")
+//    public ResponseEntity<List<NotificationAcceptanceDTO>> getNotifications(@RequestHeader("Authorization") String token){
+//        return ResponseEntity.ok(userService.getNotificationsByUser(token));
+//    }
 
     @GetMapping
     private ResponseEntity<UserResponse> getUser(@RequestHeader("Authorization") String token) {

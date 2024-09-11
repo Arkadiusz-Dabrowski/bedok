@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public record AdvertisementShort(@NotNull UUID advertisementId, @NotNull UUID hostId, @NotNull String title, @NotNull String city, @NotNull String district,
                                  @NotNull Integer numBeds, String description, RoomGender roomGender,
-                                 List<GuestResponse> guests, Double price, String street, @NotNull Double roomArea,
+                                 List<GuestResponse> guests, Double dailyPrice, String street, @NotNull Double roomArea,
                                  @NotNull UserShortResponse userResponse, @NotNull List<String> mainPhotos,
                                  @NotNull boolean ironRoom, boolean hooverRoom, boolean televisionRoom,
                                  boolean radioRoom, boolean balconyRoom, boolean bathroom, boolean ironShared, boolean hooverShared,

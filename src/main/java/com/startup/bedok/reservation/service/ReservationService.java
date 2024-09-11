@@ -97,6 +97,11 @@ public class ReservationService {
                 .map(reservationMapper::mapToReservationDTO).toList();
     }
 
+    public void changeReservationStatus(Reservation reservation, ReservationStatus status){
+        reservation.setReservationStatus(status);
+        reservationRepository.save(reservation);
+    }
+
     private boolean checkBeedsAvaiability(LocalDate dateFrom, LocalDate dateTo, Advertisement advertisement){
         long num = advertisement.getReservations().stream().filter(reservation -> (dateFrom.equals(reservation.getDateFrom())) || dateTo.isEqual(reservation.getDateTo())
                 || (dateFrom.isBefore(reservation.getDateFrom()) && dateTo.isAfter(reservation.getDateFrom()))

@@ -23,7 +23,7 @@ public class NotificationMapper {
         Payment payment = notification.getPayment();
             return new NotificationPaymentDTO(reservationMapper.mapToReservationDTO(notification.getReservation()),
                     notification.getCreatedDate(),
-                    (double) payment.getAmountToPay(),
+                    Double.parseDouble(payment.getAmountToPay()),
                     null);
     }
 }
