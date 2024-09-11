@@ -33,8 +33,6 @@ public class AdvertisementRequest {
     private Double roomArea;
     @NotNull(message = "field numBeds, can't be empty")
     private Integer numBeds;
-    @NotNull(message = "field price, can't be empty")
-    private Integer price;
     @NotNull(message = "field dailyPrice, can't be empty")
     private Double dailyPrice;
     private Double weeklyPrice;
