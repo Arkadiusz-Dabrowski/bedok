@@ -35,11 +35,9 @@ class AdvertisementServiceTest {
         advertisement.setRoomDescription("A spacious room with a beautiful view.");
         advertisement.setRoomArea(20.5);
         advertisement.setNumBeds(1);
-        advertisement.setPrice(1200.00);
-        advertisement.setFirstStageDiscount(5.0);
-        advertisement.setSecondStageDiscount(10.0);
-        advertisement.setThirdStageDiscount(15.0);
-        advertisement.setFourthStageDiscount(20.0);
+        advertisement.setDailyPrice(1200.00);
+        advertisement.setWeeklyPrice(5.0);
+        advertisement.setMonthlyPrice(10.0);
         advertisement.setLanguage("Polish");
         advertisement.setIronRoom(true);
         advertisement.setHooverRoom(true);

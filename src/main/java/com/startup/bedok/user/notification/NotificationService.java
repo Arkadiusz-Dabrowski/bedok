@@ -2,6 +2,7 @@ package com.startup.bedok.user.notification;
 
 import com.startup.bedok.advertisment.model.entity.Advertisement;
 import com.startup.bedok.config.JwtTokenUtil;
+import com.startup.bedok.exceptions.NotificationNotFoundException;
 import com.startup.bedok.payment.PaymentService;
 import com.startup.bedok.payment.model.Buyer;
 import com.startup.bedok.payment.model.OrderCreateRequest;
@@ -33,18 +34,10 @@ public class NotificationService {
         notificationRepository.save(notification);
     }
 
-
-    public Notification getNotificationById(UUID id) {
-        return notificationRepository.findById(id).orElseThrow(() -> new RuntimeException(String.format("there is no notification with uuid: '%s'", id)));
-    }
-
-    public List<Notification> getNotificationsByUser(ApplicationUser user) {
-        return notificationRepository.findAllByUser(user);
-    }
-
     @Transactional
     public UUID approveNotificationAcceptance(UUID notificationId, String token) {
-        Notification notification = getNotificationById(notificationId);
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new NotificationNotFoundException(notificationId.toString()));
         notification.getReservation().setUpdateDate(Instant.now().toEpochMilli());
         validateToken(notification.getUser().getId(), token);
         checkIfNotificationCanBeAccepted(notification);
@@ -56,7 +49,8 @@ public class NotificationService {
 
     @Transactional
     public UUID declineNotificationAcceptance(UUID notificationId, String token) {
-        Notification notification = getNotificationById(notificationId);
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new NotificationNotFoundException(notificationId.toString()));
         validateToken(notification.getUser().getId(), token);
         notification.setModified(true);
         notification.setAccepted(false);
@@ -73,11 +67,11 @@ public class NotificationService {
                 acceptanceNotification.getUser());
 
         if (finalPrice != 0.0) {
-            OrderCreateRequest orderCreateRequest = OrderCreateRequest.builder().buyer(Buyer.builder().language(user.getLanguage())
+            OrderCreateRequest orderCreateRequest = OrderCreateRequest.builder().description("xyz").customerIp("127.0.0.1").buyer(Buyer.builder().language("cs")
                             .email(user.getEmail()).build()).currencyCode("PLN")
-                    .totalAmount(String.valueOf(finalPrice * 100))
+                    .totalAmount(String.valueOf((int) finalPrice*100))
                     .products(List.of(Product.builder().name(notification.getReservation().getAdvertisement().getTitle())
-                            .unitPrice(String.valueOf(finalPrice)).quantity("1").build())).build();
+                            .unitPrice(String.valueOf((int) finalPrice*100)).quantity("1").build())).build();
             paymentService.createPaymentRequest(orderCreateRequest, user, notification.getReservation() );
         }
         return notificationRepository.save(notification).getId();
@@ -96,7 +90,7 @@ public class NotificationService {
 
     private Double calculatePayment(Reservation reservation) {
         Advertisement advertrisement = reservation.getAdvertisement();
-        long numberOfDays = reservation.getDateFrom().toEpochDay() - reservation.getDateTo().toEpochDay();
+        long numberOfDays = reservation.getDateTo().toEpochDay() - reservation.getDateFrom().toEpochDay();
         if (numberOfDays > 30) {
             return advertrisement.getMonthlyPrice() * numberOfDays;
         } else if (numberOfDays > 6) {
