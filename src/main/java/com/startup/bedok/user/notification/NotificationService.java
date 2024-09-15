@@ -3,9 +3,11 @@ package com.startup.bedok.user.notification;
 import com.startup.bedok.advertisment.model.entity.Advertisement;
 import com.startup.bedok.config.JwtTokenUtil;
 import com.startup.bedok.exceptions.NotificationNotFoundException;
+import com.startup.bedok.global.SimpleResponse;
 import com.startup.bedok.payment.PaymentService;
 import com.startup.bedok.payment.model.Buyer;
 import com.startup.bedok.payment.model.OrderCreateRequest;
+import com.startup.bedok.payment.model.OrderCreateResponse;
 import com.startup.bedok.payment.model.Product;
 import com.startup.bedok.reservation.model.entity.Reservation;
 import com.startup.bedok.reservation.model.entity.ReservationStatus;
@@ -35,7 +37,7 @@ public class NotificationService {
     }
 
     @Transactional
-    public UUID approveNotificationAcceptance(UUID notificationId, String token) {
+    public OrderCreateResponse approveNotificationAcceptance(UUID notificationId, String token) {
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new NotificationNotFoundException(notificationId.toString()));
         notification.getReservation().setUpdateDate(Instant.now().toEpochMilli());
@@ -48,17 +50,17 @@ public class NotificationService {
     }
 
     @Transactional
-    public UUID declineNotificationAcceptance(UUID notificationId, String token) {
+    public SimpleResponse declineNotificationAcceptance(UUID notificationId, String token) {
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new NotificationNotFoundException(notificationId.toString()));
         validateToken(notification.getUser().getId(), token);
         notification.setModified(true);
         notification.setAccepted(false);
         notification.setModifiedDate(LocalDateTime.now());
-        return createPaymentNotification(notification);
+        return new SimpleResponse("reservation declined");
     }
 
-    private UUID createPaymentNotification(Notification acceptanceNotification) {
+    private OrderCreateResponse createPaymentNotification(Notification acceptanceNotification) {
         double finalPrice = calculatePayment(acceptanceNotification.getReservation());
         //user may not exists
         ApplicationUser user = acceptanceNotification.getUser();
@@ -72,9 +74,9 @@ public class NotificationService {
                     .totalAmount(String.valueOf((int) finalPrice*100))
                     .products(List.of(Product.builder().name(notification.getReservation().getAdvertisement().getTitle())
                             .unitPrice(String.valueOf((int) finalPrice*100)).quantity("1").build())).build();
-            paymentService.createPaymentRequest(orderCreateRequest, user, notification.getReservation() );
+            return paymentService.createPaymentRequest(orderCreateRequest, user, notification.getReservation());
         }
-        return notificationRepository.save(notification).getId();
+        return new OrderCreateResponse();
     }
 
     private void checkIfNotificationCanBeAccepted(Notification notification) {
