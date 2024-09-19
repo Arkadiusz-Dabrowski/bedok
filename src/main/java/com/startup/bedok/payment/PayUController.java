@@ -55,7 +55,7 @@ public class PayUController {
     @PostMapping(URL_PAYMENT_CALLBACK)
     public String handlePaymentCallback(@RequestBody PayUNotification notification) {
         paymentService.managePaymentStatus(notification);
-        log.info(notification.toString());
+        log.error(notification.toString());
         return notification.toString();
     }
 
