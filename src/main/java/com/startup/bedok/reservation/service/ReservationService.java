@@ -5,6 +5,11 @@ import com.startup.bedok.advertisment.services.AdvertisementService;
 import com.startup.bedok.guest.model.entity.Guest;
 import com.startup.bedok.guest.service.GuestService;
 import com.startup.bedok.exceptions.NoFreeBedsException;
+import com.startup.bedok.payment.PaymentService;
+import com.startup.bedok.payment.model.Buyer;
+import com.startup.bedok.payment.model.OrderCreateRequest;
+import com.startup.bedok.payment.model.OrderCreateResponse;
+import com.startup.bedok.payment.model.Product;
 import com.startup.bedok.reservation.model.entity.Reservation;
 import com.startup.bedok.reservation.model.entity.ReservationStatus;
 import com.startup.bedok.reservation.model.request.AnonymousReservationRequest;
@@ -36,6 +41,7 @@ public class ReservationService {
     private final NotificationService notificationService;
     private final JwtTokenUtil jwtTokenUtil;
     private final ReservationMapper reservationMapper;
+    private final PaymentService paymentService;
 
     @Transactional
     public UUID createAnonymousReservation(AnonymousReservationRequest anonymousReservationRequest, String token){
@@ -56,7 +62,7 @@ public class ReservationService {
     }
 
     @Transactional
-    public UUID createUserReservation(UserReservationRequest userReservationRequest, String token){
+    public OrderCreateResponse createUserReservation(UserReservationRequest userReservationRequest, String token){
         UUID tenantId = jwtTokenUtil.getUserIdFromToken(token);
         Advertisement advertisement = advertisementService.getAdvertisementById(userReservationRequest.advertisementId());
         if(!checkBeedsAvaiability(userReservationRequest.dateFrom(), userReservationRequest.dateTo(), advertisement)) {
@@ -72,8 +78,14 @@ public class ReservationService {
         advertisement.getReservations().add(reservation);
 
         ApplicationUser host = userService.getUserByID(advertisement.getHostId());
-        notificationService.createNotification(reservation, host, NotificationType.ACCEPTANCE);
-        return reservation.getId();
+        double finalPrice = calculatePayment(reservation);
+        OrderCreateRequest orderCreateRequest = OrderCreateRequest.builder().description(reservation.getId().toString())
+                .customerIp("127.0.0.1").buyer(Buyer.builder().language("pl")
+                        .email(user.getEmail()).build()).currencyCode("PLN")
+                .totalAmount(String.valueOf((int) finalPrice*100))
+                .products(List.of(Product.builder().name(reservation.getAdvertisement().getTitle())
+                        .unitPrice(String.valueOf((int) finalPrice*100)).quantity("1").build())).build();
+        return paymentService.createPaymentRequest(orderCreateRequest, user, reservation);
     }
 
     public List<ReservationDTO> getReservationsByUserId(String token){
@@ -100,6 +112,18 @@ public class ReservationService {
     public void changeReservationStatus(Reservation reservation, ReservationStatus status){
         reservation.setReservationStatus(status);
         reservationRepository.save(reservation);
+    }
+
+    private Double calculatePayment(Reservation reservation) {
+        Advertisement advertrisement = reservation.getAdvertisement();
+        long numberOfDays = reservation.getDateTo().toEpochDay() - reservation.getDateFrom().toEpochDay();
+        if (numberOfDays > 30) {
+            return advertrisement.getMonthlyPrice() * numberOfDays;
+        } else if (numberOfDays > 6) {
+            return advertrisement.getWeeklyPrice() * numberOfDays;
+        } else {
+            return advertrisement.getDailyPrice() * numberOfDays;
+        }
     }
 
     private boolean checkBeedsAvaiability(LocalDate dateFrom, LocalDate dateTo, Advertisement advertisement){

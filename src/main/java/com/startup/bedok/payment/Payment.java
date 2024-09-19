@@ -21,7 +21,6 @@ public class Payment {
     private UUID id;
     @Column(nullable = false)
     private String amountToPay;
-
     @OneToOne
     private Reservation reservation;
     private String sessionId;
@@ -34,6 +33,7 @@ public class Payment {
     @JoinColumn(name = "user_id")
     private ApplicationUser user;
     private LocalDateTime createdDate;
+    private String paymentLink;
 
     public Payment() {
     }

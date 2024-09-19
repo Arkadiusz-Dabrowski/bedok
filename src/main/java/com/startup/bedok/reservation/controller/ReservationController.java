@@ -1,5 +1,6 @@
 package com.startup.bedok.reservation.controller;
 
+import com.startup.bedok.payment.model.OrderCreateResponse;
 import com.startup.bedok.reservation.model.request.AnonymousReservationRequest;
 import com.startup.bedok.reservation.model.request.UserReservationRequest;
 import com.startup.bedok.reservation.model.response.ReservationDTO;
@@ -26,8 +27,8 @@ public class ReservationController {
     }
 
     @PostMapping("user")
-    public ResponseEntity<UUID> createUserReservation(@RequestBody UserReservationRequest userReservationRequest,
-                                                      @RequestHeader("Authorization") String token) {
+    public ResponseEntity<OrderCreateResponse> createUserReservation(@RequestBody UserReservationRequest userReservationRequest,
+                                                                     @RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(reservationService.createUserReservation(userReservationRequest, token));
     }
 

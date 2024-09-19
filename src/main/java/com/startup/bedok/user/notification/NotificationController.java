@@ -1,7 +1,6 @@
 package com.startup.bedok.user.notification;
 
 import com.startup.bedok.global.SimpleResponse;
-import com.startup.bedok.payment.model.OrderCreateResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,10 +16,10 @@ public class NotificationController {
 
     private final NotificationService notificationService;
 
-    @PutMapping("accept")
-    public OrderCreateResponse approveNotificationAcceptance(@RequestHeader("Authorization") String token, @RequestHeader UUID notificationId){
-        return notificationService.approveNotificationAcceptance(notificationId, token);
-    }
+//    @PutMapping("accept")
+//    public SimpleResponse approveNotificationAcceptance(@RequestHeader("Authorization") String token, @RequestHeader UUID notificationId){
+//        return notificationService.approveNotificationAcceptance(notificationId, token);
+//    }
 
     @PutMapping("decline")
     public SimpleResponse declineNotificationAcceptance(@RequestHeader("Authorization") String token, UUID notificationId){
