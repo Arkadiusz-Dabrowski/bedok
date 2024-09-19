@@ -30,8 +30,10 @@ public class PayUOrderService {
   @SneakyThrows
   public OrderCreateResponse order(final OrderCreateRequest orderCreateRequest) {
     HttpHeaders headers = new HttpHeaders();
-    orderCreateRequest.setNotifyUrl("https://167.86.70.65:8080/payu-callback");
+    orderCreateRequest.setNotifyUrl("https://167.86.70.65:443/payu-callback");
+    orderCreateRequest.setContinueUrl("https://google.com");
     orderCreateRequest.setMerchantPosId(payUConfiguration.getMerchantPosId());
+    log.info("Requst as String = {}", orderCreateRequest.toString());
     final ResponseEntity<String> jsonResponse = restTemplate.postForEntity(payUConfiguration.getOrderUrl(), orderCreateRequest, String.class);
 
     log.info("Response as String = {}", jsonResponse.getBody());
