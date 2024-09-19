@@ -33,7 +33,6 @@ public class Payment {
     @JoinColumn(name = "user_id")
     private ApplicationUser user;
     private LocalDateTime createdDate;
-    private String paymentLink;
 
     public Payment() {
     }

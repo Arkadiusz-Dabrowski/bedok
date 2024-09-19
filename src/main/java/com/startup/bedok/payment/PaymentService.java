@@ -26,7 +26,6 @@ public class PaymentService {
         Payment payment =  new Payment(payuRequest, user, reservation);
         OrderCreateResponse payuResponse = payUOrderService.order(payuRequest);
         payment.setOrderId(payuResponse.getOrderId());
-        payment.setPaymentLink(payuResponse.getRedirectUri());
         paymentRepository.save(payment);
         return payuResponse;
     }
