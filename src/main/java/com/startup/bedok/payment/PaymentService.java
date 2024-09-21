@@ -33,7 +33,7 @@ public class PaymentService {
     @Transactional
     public void managePaymentStatus(PayUNotification notification){
         log.info("payment notification: " + notification.toString());
-        Payment payment = paymentRepository.findById(notification.order().orderId()).orElseThrow(() -> new RuntimeException("No payment with this id"));
+        Payment payment = paymentRepository.findByOrderId(notification.order().orderId()).orElseThrow(() -> new RuntimeException("No payment with this order id"));
         if(notification.order().status() == "COMPLETED"){
             payment.setPaymentStatus(PaymentStatus.PAID);
             payment.getReservation().setReservationStatus(ReservationStatus.PAID);
