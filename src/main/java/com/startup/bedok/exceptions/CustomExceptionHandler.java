@@ -9,8 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import javax.validation.ConstraintViolationException;
-import javax.validation.ValidationException;
+
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -25,7 +24,7 @@ public class CustomExceptionHandler {
             AdvertisementNotExistsException ex) {
         CustomException apiError =
                 new CustomException(HttpStatus.NOT_FOUND, ex.getLocalizedMessage());
-        return new ResponseEntity<Object>(apiError, new HttpHeaders(), apiError.getStatus());
+        return new ResponseEntity(apiError, new HttpHeaders(), apiError.getStatus());
     }
 
     @ExceptionHandler({UserWithSelectedPhoneAlreadyExistsException.class})
@@ -33,7 +32,7 @@ public class CustomExceptionHandler {
             UserWithSelectedPhoneAlreadyExistsException ex) {
         CustomException apiError =
                 new CustomException(HttpStatus.CONFLICT, ex.getLocalizedMessage());
-        return new ResponseEntity<Object>(apiError, new HttpHeaders(), apiError.getStatus());
+        return new ResponseEntity(apiError, new HttpHeaders(), apiError.getStatus());
     }
 
     @ExceptionHandler({UserWithSelectedEmailAlreadyExistsException.class})
@@ -41,42 +40,42 @@ public class CustomExceptionHandler {
             UserWithSelectedEmailAlreadyExistsException ex) {
         CustomException apiError =
                 new CustomException(HttpStatus.CONFLICT, ex.getLocalizedMessage());
-        return new ResponseEntity<Object>(apiError, new HttpHeaders(), apiError.getStatus());
+        return new ResponseEntity(apiError, new HttpHeaders(), apiError.getStatus());
     }
 
     @ExceptionHandler(MissingRequestHeaderException.class)
     public ResponseEntity<Object> handleMissingRequestHeaderException(MissingRequestHeaderException ex) {
         CustomException apiError =
                 new CustomException(HttpStatus.METHOD_NOT_ALLOWED, String.format("%s header needed", ex.getHeaderName()));
-        return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.METHOD_NOT_ALLOWED);
+        return new ResponseEntity(apiError, new HttpHeaders(), HttpStatus.METHOD_NOT_ALLOWED);
     }
 
     @ExceptionHandler({AuthenticationException.class})
     public ResponseEntity<Object> handleAuthenticationException(AuthenticationException ex) {
         CustomException apiError =
                 new CustomException(HttpStatus.UNAUTHORIZED, ex.getMessage());
-        return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity(apiError, new HttpHeaders(), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, List<String>>> handleValidationErrors(MethodArgumentNotValidException ex) {
         List<String> errors = ex.getBindingResult().getFieldErrors()
                 .stream().map(FieldError::getDefaultMessage).collect(Collectors.toList());
-        return new ResponseEntity<>(getErrorsMap(errors), new HttpHeaders(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity(getErrorsMap(errors), new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(NoFreeBedsException.class)
     public ResponseEntity<Object> handleNoFreeBedsException(NoFreeBedsException ex) {
         CustomException apiError =
                 new CustomException(HttpStatus.CONFLICT, ex.getMessage());
-        return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.CONFLICT);
+        return new ResponseEntity(apiError, new HttpHeaders(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(InvalidDateRangeException.class)
     public ResponseEntity<Object> handleInvalidDateRangeException(InvalidDateRangeException ex) {
         CustomException apiError =
                 new CustomException(HttpStatus.CONFLICT, ex.getMessage());
-        return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.CONFLICT);
+        return new ResponseEntity(apiError, new HttpHeaders(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
@@ -84,11 +83,11 @@ public class CustomExceptionHandler {
         if(ex.getRootCause() instanceof SQLException sqlException){
             CustomException apiError =
                     new CustomException(HttpStatus.CONFLICT, sqlException.getMessage());
-            return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.CONFLICT);
+            return new ResponseEntity(apiError, new HttpHeaders(), HttpStatus.CONFLICT);
         }
         CustomException apiError =
                 new CustomException(HttpStatus.CONFLICT, ex.getCause().getMessage());
-        return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.CONFLICT);
+        return new ResponseEntity(apiError, new HttpHeaders(), HttpStatus.CONFLICT);
     }
 
     private Map<String, List<String>> getErrorsMap(List<String> errors) {

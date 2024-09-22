@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.startup.bedok.payment.config.PayUConfigurationProperties;
 import com.startup.bedok.payment.model.OrderCreateRequest;
 import com.startup.bedok.payment.model.OrderCreateResponse;
-import com.startup.bedok.payment.model.notify.PayUNotification;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +32,7 @@ public class PayUOrderService {
     orderCreateRequest.setNotifyUrl("https://167.86.70.65:443/payu-callback");
     orderCreateRequest.setContinueUrl("https://google.com");
     orderCreateRequest.setMerchantPosId(payUConfiguration.getMerchantPosId());
-    log.info("Requst as String = {}", orderCreateRequest.toString());
+    log.info("Requst as String = {}", orderCreateRequest);
     final ResponseEntity<String> jsonResponse = restTemplate.postForEntity(payUConfiguration.getOrderUrl(), orderCreateRequest, String.class);
 
     log.info("Response as String = {}", jsonResponse.getBody());

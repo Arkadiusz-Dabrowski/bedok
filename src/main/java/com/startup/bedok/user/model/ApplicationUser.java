@@ -1,16 +1,19 @@
 package com.startup.bedok.user.model;
 
 import com.sun.istack.NotNull;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
 @NoArgsConstructor
-@Data
-public class ApplicationUser  {
+@Getter
+@Setter
+public class ApplicationUser {
     @Id
     @GeneratedValue
     private UUID id;
@@ -42,18 +45,18 @@ public class ApplicationUser  {
     private boolean telegram;
 
     public ApplicationUser(
-                String name,
-                GenderEnum gender,
-                String password,
-                String email,
-                String hostPhone,
-                String photoId,
-                           LocalDate dateOfBirth,
-                           String language,
-                           boolean viber,
-                           boolean signal,
-                           boolean whatsapp,
-                           boolean telegram) {
+            String name,
+            GenderEnum gender,
+            String password,
+            String email,
+            String hostPhone,
+            String photoId,
+            LocalDate dateOfBirth,
+            String language,
+            boolean viber,
+            boolean signal,
+            boolean whatsapp,
+            boolean telegram) {
         this.name = name;
         this.gender = gender;
         this.password = password;
@@ -67,4 +70,4 @@ public class ApplicationUser  {
         this.whatsapp = whatsapp;
         this.telegram = telegram;
     }
-    }
+}

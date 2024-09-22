@@ -1,14 +1,8 @@
 package com.startup.bedok.guest.model.entity;
 
-import com.startup.bedok.advertisment.model.entity.Advertisement;
-import com.startup.bedok.user.model.ApplicationUser;
-import com.sun.istack.NotNull;
 import lombok.*;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.util.Set;
 import java.util.UUID;
 
 @Getter

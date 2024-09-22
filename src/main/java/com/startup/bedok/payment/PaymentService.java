@@ -1,5 +1,6 @@
 package com.startup.bedok.payment;
 
+import com.startup.bedok.exceptions.PaymentNotFoundException;
 import com.startup.bedok.payment.model.OrderCreateRequest;
 import com.startup.bedok.payment.model.OrderCreateResponse;
 import com.startup.bedok.payment.model.notify.PayUNotification;
@@ -30,11 +31,16 @@ public class PaymentService {
         return payuResponse;
     }
 
+    public PaymentStatus getPaymentStatusForReservation(Reservation reservation){
+        Payment payment = paymentRepository.getByReservation(reservation).orElseThrow(() -> new PaymentNotFoundException(reservation));
+        return payment.getPaymentStatus();
+    }
+
     @Transactional
     public void managePaymentStatus(PayUNotification notification){
         log.info("payment notification: " + notification.toString());
-        Payment payment = paymentRepository.findByOrderId(notification.order().orderId()).orElseThrow(() -> new RuntimeException("No payment with this order id"));
-        if(notification.order().status() == "COMPLETED"){
+        Payment payment = paymentRepository.findByOrderId(notification.order().orderId()).orElseThrow(() -> new PaymentNotFoundException(notification.order().orderId()));
+        if(notification.order().status().equals("COMPLETED")) {
             payment.setPaymentStatus(PaymentStatus.PAID);
             payment.getReservation().setReservationStatus(ReservationStatus.PAID);
             reservationRepository.save(payment.getReservation());

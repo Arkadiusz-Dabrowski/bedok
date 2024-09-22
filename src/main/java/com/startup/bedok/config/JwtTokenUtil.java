@@ -54,11 +54,6 @@ public class JwtTokenUtil {
         return claims.get("name", String.class);
     }
 
-    public boolean validateToken(String token, UserDetails userDetails) {
-        UUID userId = getUserIdFromToken(token);
-        return userId.equals(userDetails.getUsername()) && !isTokenExpired(token);
-    }
-
     public boolean validateToken(String token) {
         return getUserIdFromToken(token) != null;
     }

@@ -1,6 +1,5 @@
 package com.startup.bedok.minio;
 
-import com.startup.bedok.exceptions.CustomException;
 import com.startup.bedok.exceptions.PhotoServiceException;
 import com.startup.bedok.global.SimpleResponse;
 import io.minio.*;
@@ -8,15 +7,12 @@ import io.minio.errors.MinioException;
 import io.minio.http.Method;
 import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import static org.apache.naming.SelectorContext.prefix;
 
 @RequiredArgsConstructor
 @Service

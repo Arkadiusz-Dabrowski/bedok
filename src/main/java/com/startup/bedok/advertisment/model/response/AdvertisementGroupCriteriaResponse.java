@@ -1,6 +1,5 @@
 package com.startup.bedok.advertisment.model.response;
 
-import com.startup.bedok.advertisment.model.entity.AdvertisementGroup;
 import lombok.Getter;
 import lombok.Setter;
 

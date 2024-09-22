@@ -2,13 +2,11 @@ package com.startup.bedok.advertisment.services;
 
 import com.startup.bedok.advertisment.model.entity.Advertisement;
 import com.startup.bedok.advertisment.model.entity.AdvertisementGroup;
-import com.startup.bedok.advertisment.model.request.AdvertisementGroupModifyRequest;
 import com.startup.bedok.advertisment.repository.AdvertisementGroupRepository;
 import com.startup.bedok.advertisment.repository.AdvertisementRepository;
 import com.startup.bedok.config.JwtTokenUtil;
 import com.startup.bedok.exceptions.AdvertisementGroupNotExistsException;
 import com.startup.bedok.exceptions.AdvertisementNotExistsException;
-import com.startup.bedok.global.SimpleResponse;
 import com.startup.bedok.reservation.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

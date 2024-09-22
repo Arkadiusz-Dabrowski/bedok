@@ -1,6 +1,5 @@
 package com.startup.bedok.user.controller;
 
-import com.startup.bedok.email.EmailService;
 import com.startup.bedok.global.SimpleResponse;
 import com.startup.bedok.user.model.*;
 import com.startup.bedok.user.notification.NotificationAcceptanceDTO;
@@ -13,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("host")

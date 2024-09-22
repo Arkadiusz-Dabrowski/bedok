@@ -16,7 +16,6 @@ import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -55,7 +54,7 @@ public class UserService {
     @Transactional
     public SimpleResponse addPhotoToUser(String token, MultipartFile photo)  {
         UUID id = getUserIdFromToken(token);
-        ApplicationUser user = userRepository.findById(id).orElseThrow(() -> new UserNoExistsException(id.toString()));
+        ApplicationUser user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id.toString()));
         String photoId = "user/" + id + "/" + photo.getOriginalFilename();
         if(user.getPhotoId() != null){
             minioService.deletePhotoFromMinio(user.getPhotoId());
@@ -85,7 +84,7 @@ public class UserService {
 
     public UserResponse getUserResponseByID(UUID id) {
         ApplicationUser user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(String.format("there is no user with uuid: '%s'", id)));
+                .orElseThrow(() -> new UserNotFoundException(id));
         String userPhoto = null;
         String photoId = user.getPhotoId();
         if (photoId != null)
@@ -96,7 +95,7 @@ public class UserService {
 
     public UserShortResponse getUserShortResponseByID(UUID id) {
         ApplicationUser user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(String.format("there is no user with uuid: '%s'", id)));
+                .orElseThrow(() -> new UserNotFoundException(id));
         return UserMapperImpl.userToUserShortResponse(user);
     }
 
@@ -120,7 +119,7 @@ public class UserService {
 
     public ApplicationUser getUserByID(UUID id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new UserNoExistsException(id.toString()));
+                .orElseThrow(() -> new UserNotFoundException(id.toString()));
     }
 
     public void checkIfHostExists(UUID id) {
@@ -146,7 +145,7 @@ public class UserService {
     @Transactional
     public SimpleResponse generateNewPasswordAndSendToUser(String email){
         ApplicationUser user = getUserByEmail(email);
-        String message = "Twoje nowe hasło dateTo: ";
+        String message = "Twoje nowe hasło: ";
         String upperCaseLetters = RandomStringUtils.random(6, 65, 90, true, true);
         String lowerCaseLetters = RandomStringUtils.random(6, 97, 122, true, true);
         String combinedChars = upperCaseLetters.concat(lowerCaseLetters);
@@ -170,14 +169,14 @@ public class UserService {
     @Transactional
     public SimpleResponse changePassword(ChangePasswordDTO changePasswordDTO, String token) {
         UUID userId = getUserIdFromToken(token);
-        ApplicationUser user = userRepository.findById(userId).orElseThrow(() -> new UserNoExistsException(userId.toString()));
+        ApplicationUser user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId.toString()));
         checkIfPasswordIsCorrect(user.getPassword(), changePasswordDTO.oldPassword());
         user.setPassword(changePasswordDTO.newPassword());
         return new SimpleResponse("password has been changed");
     }
 
-    private void checkIfPasswordIsCorrect(String orgilnalPassword, String passwordFromForm) {
-        if(!orgilnalPassword.equals(passwordFromForm))
-            throw new RuntimeException("password is incorrect");
+    private void checkIfPasswordIsCorrect(String orgilnalPassword, String passwordToCheck) {
+        if(!orgilnalPassword.equals(passwordToCheck))
+            throw new IncorrectPasswordException();
     }
 }

@@ -19,7 +19,6 @@ import com.startup.bedok.reservation.repository.ReservationRepository;
 import com.startup.bedok.config.JwtTokenUtil;
 import com.startup.bedok.user.model.ApplicationUser;
 import com.startup.bedok.user.notification.NotificationService;
-import com.startup.bedok.user.notification.NotificationType;
 import com.startup.bedok.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -90,7 +89,7 @@ public class ReservationService {
 
     public List<ReservationDTO> getReservationsByUserId(String token){
         return reservationRepository.findAllByUserId(jwtTokenUtil.getUserIdFromToken(token)).stream()
-                .map(reservationMapper::mapToReservationDTO).toList();
+                .map(reservation -> reservationMapper.mapToReservationDTO(reservation, paymentService.getPaymentStatusForReservation(reservation))).toList();
     }
 
     public List<ReservationDTO> getReservationsByAdvertisementId(UUID advertisementId, String token){
@@ -99,14 +98,14 @@ public class ReservationService {
             throw new IllegalArgumentException("Advertisement does not belong dateTo user");
         }
         return reservationRepository.findAllByAdvertisementId(advertisement.getId()).stream()
-                .map(reservationMapper::mapToReservationDTO).toList();
+                .map(reservation -> reservationMapper.mapToReservationDTO(reservation, paymentService.getPaymentStatusForReservation(reservation))).toList();
     }
 
     public List<ReservationDTO> getReservationsByHostId(String token) {
         UUID userId = jwtTokenUtil.getUserIdFromToken(token);
         return reservationRepository.findAll().stream()
                 .filter(reservation -> reservation.getAdvertisement().getHostId().equals(userId))
-                .map(reservationMapper::mapToReservationDTO).toList();
+                .map(reservation -> reservationMapper.mapToReservationDTO(reservation, paymentService.getPaymentStatusForReservation(reservation))).toList();
     }
 
     public void changeReservationStatus(Reservation reservation, ReservationStatus status){

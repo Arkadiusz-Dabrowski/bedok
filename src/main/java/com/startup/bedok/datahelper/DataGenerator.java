@@ -4,8 +4,6 @@ import com.github.javafaker.Faker;
 import com.startup.bedok.advertisment.model.entity.Advertisement;
 import com.startup.bedok.advertisment.model.enumerated.RoomGender;
 import com.startup.bedok.advertisment.repository.AdvertisementRepository;
-import com.startup.bedok.advertisment.repository.RoomPhotosRepository;
-import com.startup.bedok.advertisment.services.AdvertisementPhotoService;
 import com.startup.bedok.user.model.ApplicationUser;
 import com.startup.bedok.user.model.GenderEnum;
 import com.startup.bedok.user.repository.UserRepository;
@@ -31,9 +29,7 @@ public class DataGenerator {
 
     private final UserRepository userRepository;
     private final AdvertisementRepository advertisementRepository;
-    private final RoomPhotosRepository roomPhotosRepository;
-    private final AdvertisementPhotoService advertisementPhotoService;
-    private Faker faker = new Faker();
+    private final Faker faker = new Faker();
 
     @Transactional
     public void createSomeHostData(){

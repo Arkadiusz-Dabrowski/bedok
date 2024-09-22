@@ -1,21 +1,13 @@
 package com.startup.bedok.user.notification;
 
-import com.startup.bedok.advertisment.model.entity.Advertisement;
 import com.startup.bedok.config.JwtTokenUtil;
 import com.startup.bedok.exceptions.NotificationNotFoundException;
 import com.startup.bedok.global.SimpleResponse;
-import com.startup.bedok.payment.PaymentService;
-import com.startup.bedok.payment.model.Buyer;
-import com.startup.bedok.payment.model.OrderCreateRequest;
-import com.startup.bedok.payment.model.Product;
 import com.startup.bedok.reservation.model.entity.Reservation;
-import com.startup.bedok.reservation.model.entity.ReservationStatus;
-import com.startup.bedok.user.model.ApplicationUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -24,7 +16,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class NotificationService {
     private final NotificationRepository notificationRepository;
-//    private final PaymentService paymentService;
     private final NotificationMapper notificationMapper;
     private final JwtTokenUtil jwtTokenUtil;
 
@@ -40,7 +31,7 @@ public class NotificationService {
 //        Notification notification = notificationRepository.findById(notificationId)
 //                .orElseThrow(() -> new NotificationNotFoundException(notificationId.toString()));
 //        validateToken(notification.getUser().getId(), token);
-//        checkIfNotificationCanBeAccepted(notification);
+//        checkIfReservationCanBeAccepted(notification);
 //        createPaymentNotification(notification.getReservation());
 //        notification.setModified(true);
 //        notification.setAccepted(true);
@@ -87,20 +78,16 @@ public class NotificationService {
 //        return new SimpleResponse("Reservation is accepted");
 //    }
 
-    private void checkIfNotificationCanBeAccepted(Notification notification) {
-        if (notification.isModified()) {
-            throw new RuntimeException("Notification has already been modified");
-        }
-        if (notification.getCreatedDate().plusHours(24).isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Notification is too old");
-        } else {
-            notification.getReservation().setReservationStatus(ReservationStatus.ACCEPTED);
-        }
-    }
+//    private void checkIfReservationCanBeAccepted(Notification notification) {
+//        if (notification.isModified()) {
+//            throw new RuntimeException("Notification has already been modified");
+//        }
+//        if (notification.getCreatedDate().plusHours(24).isBefore(LocalDateTime.now())) {
+//            throw new RuntimeException("Notification is too old");
+//        } else {
+//            notification.getReservation().setReservationStatus(ReservationStatus.ACCEPTED);
+//        }
 
-//    private Double calculatePayment(Reservation reservation) {
-//        Advertisement advertrisement = reservation.getAdvertisement();
-//        long numberOfDays = reservation.getDateTo().toEpochDay() - reservation.getDateFrom().toEpochDay();
 //        if (numberOfDays > 30) {
 //            return advertrisement.getMonthlyPrice() * numberOfDays;
 //        } else if (numberOfDays > 6) {

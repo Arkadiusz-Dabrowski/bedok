@@ -4,14 +4,17 @@ import com.startup.bedok.payment.Payment;
 import com.startup.bedok.reservation.model.entity.Reservation;
 import com.startup.bedok.user.model.ApplicationUser;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public class Notification {
 

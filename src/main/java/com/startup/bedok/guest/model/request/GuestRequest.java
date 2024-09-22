@@ -1,12 +1,7 @@
 package com.startup.bedok.guest.model.request;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-
-import java.time.LocalDate;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @Getter
