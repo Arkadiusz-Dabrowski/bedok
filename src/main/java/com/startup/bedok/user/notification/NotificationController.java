@@ -31,8 +31,8 @@ public class NotificationController {
         return ResponseEntity.ok(notificationService.getUserAcceptanceNotifications(token));
     }
 
-    @GetMapping("payment")
-    public ResponseEntity<List<NotificationPaymentDTO>> getUserPaymentNotifications(@RequestHeader("Authorization") String token){
-        return ResponseEntity.ok(notificationService.getUserPaymentNotifications(token));
-    }
+//    @GetMapping("payment")
+//    public ResponseEntity<List<NotificationPaymentDTO>> getUserPaymentNotifications(@RequestHeader("Authorization") String token){
+//        return ResponseEntity.ok(notificationService.getUserPaymentNotifications(token));
+//    }
 }

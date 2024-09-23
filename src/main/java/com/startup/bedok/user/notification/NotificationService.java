@@ -104,12 +104,12 @@ public class NotificationService {
                 .map(notificationMapper::mapToNotificationAcceptanceDTO).toList();
     }
 
-    public List<NotificationPaymentDTO> getUserPaymentNotifications(String token) {
-        UUID userId = jwtTokenUtil.getUserIdFromToken(token);
-
-        return notificationRepository.findAllByUserId(userId).stream()
-                .map(notificationMapper::mapToNotificationPaymentDTO).toList();
-    }
+//    public List<NotificationPaymentDTO> getUserPaymentNotifications(String token) {
+//        UUID userId = jwtTokenUtil.getUserIdFromToken(token);
+//
+//        return notificationRepository.findAllByUserId(userId).stream()
+//                .map(notificationMapper::mapToNotificationPaymentDTO).toList();
+//    }
 
     private void validateToken(UUID userId, String token) {
         UUID userIdFromToken = jwtTokenUtil.getUserIdFromToken(token);
