@@ -15,13 +15,8 @@ public class NotificationMapper {
 
     private final ReservationMapper reservationMapper;
 
-        public NotificationAcceptanceDTO mapToNotificationAcceptanceDTO(Notification notification){
+        public NotificationAcceptanceDTO mapToNotificationAcceptanceDTO(Notification notification, PaymentStatus paymentStatus){
             ApplicationUser user = notification.getReservation().getUser();
-            PaymentStatus paymentStatus =  null;
-            if(notification.getPayment() != null){
-                paymentStatus = notification.getPayment().getPaymentStatus();
-            }
-
             return new NotificationAcceptanceDTO(notification, user, reservationMapper.mapToReservationDTO(notification.getReservation(), paymentStatus));
         }
 

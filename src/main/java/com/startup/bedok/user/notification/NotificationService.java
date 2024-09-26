@@ -3,6 +3,7 @@ package com.startup.bedok.user.notification;
 import com.startup.bedok.config.JwtTokenUtil;
 import com.startup.bedok.exceptions.NotificationNotFoundException;
 import com.startup.bedok.global.SimpleResponse;
+import com.startup.bedok.payment.PaymentService;
 import com.startup.bedok.reservation.model.entity.Reservation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
     private final JwtTokenUtil jwtTokenUtil;
+    private final PaymentService paymentService;
 
 
 //    @Transactional
@@ -99,9 +101,9 @@ public class NotificationService {
 
     public List<NotificationAcceptanceDTO> getUserAcceptanceNotifications(String token) {
         UUID userId = jwtTokenUtil.getUserIdFromToken(token);
-
         return notificationRepository.findAllByUserId(userId).stream()
-                .map(notificationMapper::mapToNotificationAcceptanceDTO).toList();
+                .map(notification -> notificationMapper.mapToNotificationAcceptanceDTO(notification, paymentService
+                        .getPaymentStatusForReservation(notification.getReservation()))).toList();
     }
 
 //    public List<NotificationPaymentDTO> getUserPaymentNotifications(String token) {
