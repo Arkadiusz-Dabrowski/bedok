@@ -32,7 +32,10 @@ public class PaymentService {
     }
 
     public PaymentStatus getPaymentStatusForReservation(Reservation reservation){
-        Payment payment = paymentRepository.getByReservation(reservation).orElseThrow(() -> new PaymentNotFoundException(reservation));
+        Payment payment = paymentRepository.getByReservation(reservation).orElse( null);
+        if(payment == null){
+            return PaymentStatus.WAITING;
+        }
         return payment.getPaymentStatus();
     }
 
