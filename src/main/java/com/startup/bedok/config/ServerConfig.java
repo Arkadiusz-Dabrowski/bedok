@@ -14,7 +14,6 @@ public class ServerConfig {
         return factory -> {
             // Konfiguracja dla portu HTTPS
             factory.setPort(443);  // Port HTTPS
-            factory.setContextPath("/app");
         };
     }
 
