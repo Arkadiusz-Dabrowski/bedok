@@ -64,7 +64,7 @@ public class ReservationService {
     public OrderCreateResponse createUserReservation(UserReservationRequest userReservationRequest, String token){
         UUID tenantId = jwtTokenUtil.getUserIdFromToken(token);
         Advertisement advertisement = advertisementService.getAdvertisementById(userReservationRequest.advertisementId());
-        if(!checkBeedsAvaiability(userReservationRequest.dateFrom(), userReservationRequest.dateTo(), advertisement)) {
+        if(!checkBedsAvailability(userReservationRequest.dateFrom(), userReservationRequest.dateTo(), advertisement)) {
             throw new NoFreeBedsException();
         }
         ApplicationUser user = userService.getUserByID(tenantId);
@@ -89,7 +89,7 @@ public class ReservationService {
 
     public List<ReservationDTO> getReservationsByUserId(String token){
         return reservationRepository.findAllByUserId(jwtTokenUtil.getUserIdFromToken(token)).stream()
-                .map(reservation -> reservationMapper.mapToReservationDTO(reservation, paymentService.getPaymentStatusForReservation(reservation))).toList();
+                .map(reservationMapper::mapToReservationDTO).toList();
     }
 
     public List<ReservationDTO> getReservationsByAdvertisementId(UUID advertisementId, String token){
@@ -98,14 +98,14 @@ public class ReservationService {
             throw new IllegalArgumentException("Advertisement does not belong dateTo user");
         }
         return reservationRepository.findAllByAdvertisementId(advertisement.getId()).stream()
-                .map(reservation -> reservationMapper.mapToReservationDTO(reservation, paymentService.getPaymentStatusForReservation(reservation))).toList();
+                .map(reservationMapper::mapToReservationDTO).toList();
     }
 
     public List<ReservationDTO> getReservationsByHostId(String token) {
         UUID userId = jwtTokenUtil.getUserIdFromToken(token);
         return reservationRepository.findAll().stream()
                 .filter(reservation -> reservation.getAdvertisement().getHostId().equals(userId))
-                .map(reservation -> reservationMapper.mapToReservationDTO(reservation, paymentService.getPaymentStatusForReservation(reservation))).toList();
+                .map(reservationMapper::mapToReservationDTO).toList();
     }
 
     public void changeReservationStatus(Reservation reservation, ReservationStatus status){
@@ -125,11 +125,12 @@ public class ReservationService {
         }
     }
 
-    private boolean checkBeedsAvaiability(LocalDate dateFrom, LocalDate dateTo, Advertisement advertisement){
-        long num = advertisement.getReservations().stream().filter(reservation -> (dateFrom.equals(reservation.getDateFrom())) || dateTo.isEqual(reservation.getDateTo())
+    private boolean checkBedsAvailability(LocalDate dateFrom, LocalDate dateTo, Advertisement advertisement){
+        long num = advertisement.getReservations().stream()
+                .filter(reservation -> reservation.getReservationStatus() == ReservationStatus.PAID && ((dateFrom.equals(reservation.getDateFrom())) || dateTo.isEqual(reservation.getDateTo())
                 || (dateFrom.isBefore(reservation.getDateFrom()) && dateTo.isAfter(reservation.getDateFrom()))
                 || (dateFrom.isAfter(reservation.getDateFrom()) && !dateFrom.isAfter(reservation.getDateTo()))
-        ).count();
+        )).count();
         return num < advertisement.getNumBeds();
     }
 }

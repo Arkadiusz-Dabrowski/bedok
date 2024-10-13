@@ -16,23 +16,8 @@ public class NotificationController {
 
     private final NotificationService notificationService;
 
-//    @PutMapping("accept")
-//    public SimpleResponse approveNotificationAcceptance(@RequestHeader("Authorization") String token, @RequestHeader UUID notificationId){
-//        return notificationService.approveNotificationAcceptance(notificationId, token);
-//    }
-
     @PutMapping("decline")
     public SimpleResponse declineNotificationAcceptance(@RequestHeader("Authorization") String token, UUID notificationId){
         return notificationService.declineNotificationAcceptance(notificationId, token);
     }
-
-    @GetMapping("acceptance")
-    public ResponseEntity<List<NotificationAcceptanceDTO>> getUserAcceptanceNotifications(@RequestHeader("Authorization") String token){
-        return ResponseEntity.ok(notificationService.getUserAcceptanceNotifications(token));
-    }
-
-//    @GetMapping("payment")
-//    public ResponseEntity<List<NotificationPaymentDTO>> getUserPaymentNotifications(@RequestHeader("Authorization") String token){
-//        return ResponseEntity.ok(notificationService.getUserPaymentNotifications(token));
-//    }
 }

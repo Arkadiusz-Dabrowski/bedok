@@ -8,7 +8,7 @@ import com.startup.bedok.global.SimpleResponse;
 import com.startup.bedok.minio.MinioService;
 import com.startup.bedok.user.mapper.UserMapperImpl;
 import com.startup.bedok.user.model.*;
-import com.startup.bedok.user.notification.NotificationAcceptanceDTO;
+import com.startup.bedok.user.notification.NotificationDTO;
 import com.startup.bedok.user.notification.NotificationService;
 import com.startup.bedok.user.repository.UserRepository;
 import io.minio.Result;
@@ -113,8 +113,8 @@ public class UserService {
         }
     }
 
-    public List<NotificationAcceptanceDTO> getNotificationsByUser(String token) {
-        return notificationService.getUserAcceptanceNotifications(token);
+    public List<NotificationDTO> getNotificationsByUser(String token) {
+        return notificationService.getUserNotifications(token);
     }
 
     public ApplicationUser getUserByID(UUID id) {

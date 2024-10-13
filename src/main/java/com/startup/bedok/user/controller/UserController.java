@@ -2,7 +2,7 @@ package com.startup.bedok.user.controller;
 
 import com.startup.bedok.global.SimpleResponse;
 import com.startup.bedok.user.model.*;
-import com.startup.bedok.user.notification.NotificationAcceptanceDTO;
+import com.startup.bedok.user.notification.NotificationDTO;
 import com.startup.bedok.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +43,7 @@ public class UserController {
     }
 
     @GetMapping("notifications")
-    public ResponseEntity<List<NotificationAcceptanceDTO>> getNotifications(@RequestHeader("Authorization") String token){
+    public ResponseEntity<List<NotificationDTO>> getNotifications(@RequestHeader("Authorization") String token){
         return ResponseEntity.ok(userService.getNotificationsByUser(token));
     }
 

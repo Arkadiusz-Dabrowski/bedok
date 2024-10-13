@@ -33,6 +33,7 @@ public class Notification {
     private ApplicationUser user;
     @OneToOne
     private Payment payment;
+    private String message;
 
     public Notification(Reservation reservation,
                         LocalDateTime createdDate,

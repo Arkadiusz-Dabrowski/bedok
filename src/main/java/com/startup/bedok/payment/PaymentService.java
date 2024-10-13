@@ -1,5 +1,6 @@
 package com.startup.bedok.payment;
 
+import com.startup.bedok.email.EmailService;
 import com.startup.bedok.exceptions.PaymentNotFoundException;
 import com.startup.bedok.payment.model.OrderCreateRequest;
 import com.startup.bedok.payment.model.OrderCreateResponse;
@@ -8,6 +9,7 @@ import com.startup.bedok.reservation.model.entity.Reservation;
 import com.startup.bedok.reservation.model.entity.ReservationStatus;
 import com.startup.bedok.reservation.repository.ReservationRepository;
 import com.startup.bedok.user.model.ApplicationUser;
+import com.startup.bedok.user.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,21 +24,15 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final PayUOrderService payUOrderService;
     private final ReservationRepository reservationRepository;
+    private final EmailService emailService;
 
     public OrderCreateResponse createPaymentRequest(OrderCreateRequest payuRequest, ApplicationUser user, Reservation reservation){
         Payment payment =  new Payment(payuRequest, user, reservation);
         OrderCreateResponse payuResponse = payUOrderService.order(payuRequest);
+        emailService.sendPaymentLink(user.getEmail(), payuResponse.getRedirectUri());
         payment.setOrderId(payuResponse.getOrderId());
         paymentRepository.save(payment);
         return payuResponse;
-    }
-
-    public PaymentStatus getPaymentStatusForReservation(Reservation reservation){
-        Payment payment = paymentRepository.getByReservation(reservation).orElse( null);
-        if(payment == null){
-            return PaymentStatus.WAITING;
-        }
-        return payment.getPaymentStatus();
     }
 
     @Transactional

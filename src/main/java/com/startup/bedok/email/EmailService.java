@@ -21,4 +21,15 @@ public class EmailService {
         emailSender.send(message);
         System.out.println("sended");
     }
+
+    public void sendPaymentLink(
+            String to, String text) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("arkadiusz.dabrowski1993@gmail.com");
+        message.setTo(to);
+        message.setSubject("Payment Link for your new reservation");
+        message.setText(text);
+        emailSender.send(message);
+        System.out.println("sended");
+    }
 }

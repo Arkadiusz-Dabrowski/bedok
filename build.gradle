@@ -34,8 +34,9 @@ dependencies {
     }
     implementation 'io.springfox:springfox-boot-starter:3.0.0'
     implementation group: 'com.github.javafaker', name: 'javafaker', version: '1.0.2'
-    implementation 'org.springframework.boot:spring-boot-starter-mail:3.1.5'
+    implementation 'org.springframework.boot:spring-boot-starter-mail:3.3.4'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.7.0'
+    implementation group: 'com.sun.mail', name: 'javax.mail', version: '1.6.2'
     implementation(platform("org.springdoc:springdoc-openapi:2.0.2")) {
         exclude group: 'com.squareup.okhttp3', module: 'okhttp'
     }
@@ -55,7 +56,6 @@ dependencies {
     testImplementation 'io.projectreactor:reactor-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation group: 'com.h2database', name: 'h2', version: '2.1.212'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '1.2.0.RELEASE'
 
 
 }
