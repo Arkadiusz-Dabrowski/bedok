@@ -78,6 +78,13 @@ public class CustomExceptionHandler {
         return new ResponseEntity(apiError, new HttpHeaders(), HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(PaymentLinkGenerationException.class)
+    public ResponseEntity<Object> handlePaymentLinkGenerationException(PaymentLinkGenerationException ex) {
+        CustomException apiError =
+                new CustomException(HttpStatus.BAD_GATEWAY, ex.getMessage());
+        return new ResponseEntity(apiError, new HttpHeaders(), HttpStatus.BAD_GATEWAY);
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
         if(ex.getRootCause() instanceof SQLException sqlException){

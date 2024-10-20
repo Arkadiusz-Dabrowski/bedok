@@ -26,6 +26,11 @@ public class UserController {
         return ResponseEntity.ok(userService.registerUser(userDTO));
     }
 
+    @PutMapping()
+    private ResponseEntity<SimpleResponse> updateUser(@Valid @RequestBody UserUpdateDTO userDTO,
+                                                            @RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(userService.updateUser(userDTO, token));
+    }
     @PostMapping("photo")
     private ResponseEntity<SimpleResponse> addUserPhoto(@RequestHeader("Authorization") String token,
                                                 @RequestParam MultipartFile file) {

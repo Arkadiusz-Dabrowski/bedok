@@ -39,7 +39,8 @@ public class UserService {
     private final EmailService emailService;
     private final MinioService minioService;
 
-    public RegistrationResponse registerUser(UserDTO userDTO) throws IOException {
+    @Transactional
+    public RegistrationResponse registerUser(UserDTO userDTO) {
         ApplicationUser user = UserMapperImpl.hostDTOtoHost(userDTO);
         try {
             return new RegistrationResponse(userRepository.save(user).getId());
@@ -49,6 +50,26 @@ public class UserService {
             else
                 throw new UserWithSelectedPhoneAlreadyExistsException(user.getPhone());
         }
+    }
+
+    @Transactional
+    public SimpleResponse updateUser(UserUpdateDTO userUpdateDTO, String token) {
+        UUID id = getUserIdFromToken(token);
+        ApplicationUser user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+        user.setName(userUpdateDTO.getName());
+        user.setGender(userUpdateDTO.getGender());
+        user.setEmail(userUpdateDTO.getEmail());
+        user.setPhone(userUpdateDTO.getPhone());
+        user.setDateOfBirth(userUpdateDTO.getDateOfBirth());
+        user.setLanguage(userUpdateDTO.getLanguage());
+        user.setViber(userUpdateDTO.isViber());
+        user.setSignal(userUpdateDTO.isSignal());
+        user.setWhatsapp(userUpdateDTO.isWhatsapp());
+        user.setTelegram(userUpdateDTO.isTelegram());
+
+        // Zapisz zaktualizowanego użytkownika do bazy
+        userRepository.save(user);
+        return new SimpleResponse("User data is sucesfully updated");
     }
 
     @Transactional

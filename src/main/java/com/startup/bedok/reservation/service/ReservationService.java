@@ -24,8 +24,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.UUID;
 
@@ -61,30 +63,29 @@ public class ReservationService {
     }
 
     @Transactional
-    public OrderCreateResponse createUserReservation(UserReservationRequest userReservationRequest, String token){
+    public OrderCreateResponse createUserReservation(UserReservationRequest userReservationRequest, String token, HttpServletRequest request){
         UUID tenantId = jwtTokenUtil.getUserIdFromToken(token);
         Advertisement advertisement = advertisementService.getAdvertisementById(userReservationRequest.advertisementId());
         if(!checkBedsAvailability(userReservationRequest.dateFrom(), userReservationRequest.dateTo(), advertisement)) {
             throw new NoFreeBedsException();
         }
-        ApplicationUser user = userService.getUserByID(tenantId);
-        Guest guest = guestService.createGuest(user.getName(),tenantId, (LocalDate.now().getYear() - user.getDateOfBirth().getYear()), user.getLanguage());
+        ApplicationUser tenant = userService.getUserByID(tenantId);
+        Guest guest = guestService.createGuest(tenant.getName(),tenantId, (LocalDate.now().getYear() - tenant.getDateOfBirth().getYear()), tenant.getLanguage());
         Reservation reservation =  reservationRepository.save(new Reservation(guest, userReservationRequest.dateFrom(), userReservationRequest.dateTo(), advertisement));
-        reservation.setUser(user);
+        reservation.setUser(tenant);
         reservation.setUpdateDate(Instant.now().toEpochMilli());
         if(advertisement.getAdvertisementGroup() != null)
             reservation.setAdvertisementGroup(advertisement.getAdvertisementGroup());
         advertisement.getReservations().add(reservation);
 
-        ApplicationUser host = userService.getUserByID(advertisement.getHostId());
         double finalPrice = calculatePayment(reservation);
         OrderCreateRequest orderCreateRequest = OrderCreateRequest.builder().description(reservation.getId().toString())
-                .customerIp("127.0.0.1").buyer(Buyer.builder().language("pl")
-                        .email(user.getEmail()).build()).currencyCode("PLN")
+                .customerIp(getClientIp(request)).buyer(Buyer.builder().language("pl")
+                        .email(tenant.getEmail()).build()).currencyCode("PLN")
                 .totalAmount(String.valueOf((int) finalPrice*100))
                 .products(List.of(Product.builder().name(reservation.getAdvertisement().getTitle())
                         .unitPrice(String.valueOf((int) finalPrice*100)).quantity("1").build())).build();
-        return paymentService.createPaymentRequest(orderCreateRequest, user, reservation);
+        return paymentService.createPaymentRequest(orderCreateRequest, tenant, reservation);
     }
 
     public List<ReservationDTO> getReservationsByUserId(String token){
@@ -108,11 +109,6 @@ public class ReservationService {
                 .map(reservationMapper::mapToReservationDTO).toList();
     }
 
-    public void changeReservationStatus(Reservation reservation, ReservationStatus status){
-        reservation.setReservationStatus(status);
-        reservationRepository.save(reservation);
-    }
-
     private Double calculatePayment(Reservation reservation) {
         Advertisement advertrisement = reservation.getAdvertisement();
         long numberOfDays = reservation.getDateTo().toEpochDay() - reservation.getDateFrom().toEpochDay();
@@ -132,5 +128,13 @@ public class ReservationService {
                 || (dateFrom.isAfter(reservation.getDateFrom()) && !dateFrom.isAfter(reservation.getDateTo()))
         )).count();
         return num < advertisement.getNumBeds();
+    }
+
+    private String getClientIp(HttpServletRequest request) {
+        String clientIp = request.getHeader("X-Forwarded-For");
+        if (clientIp == null || clientIp.isEmpty()) {
+            clientIp = request.getRemoteAddr();
+        }
+        return clientIp;
     }
 }

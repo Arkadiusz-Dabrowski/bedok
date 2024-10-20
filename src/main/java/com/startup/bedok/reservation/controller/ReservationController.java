@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,8 +29,8 @@ public class ReservationController {
 
     @PostMapping("user")
     public ResponseEntity<OrderCreateResponse> createUserReservation(@RequestBody UserReservationRequest userReservationRequest,
-                                                                     @RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(reservationService.createUserReservation(userReservationRequest, token));
+                                                                     @RequestHeader("Authorization") String token, HttpServletRequest request) {
+        return ResponseEntity.ok(reservationService.createUserReservation(userReservationRequest, token, request));
     }
 
     @GetMapping("tenant")
